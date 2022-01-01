@@ -1,0 +1,15 @@
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\bin\Debug\net6.0-windows\SWD4CS.exe
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\bin\Debug\net6.0-windows\SWD4CS.deps.json
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\bin\Debug\net6.0-windows\SWD4CS.runtimeconfig.json
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\bin\Debug\net6.0-windows\SWD4CS.dll
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\bin\Debug\net6.0-windows\ref\SWD4CS.dll
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\bin\Debug\net6.0-windows\SWD4CS.pdb
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\obj\Debug\net6.0-windows\SWD4CS.csproj.AssemblyReference.cache
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\obj\Debug\net6.0-windows\SWD4CS.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\obj\Debug\net6.0-windows\SWD4CS.AssemblyInfoInputs.cache
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\obj\Debug\net6.0-windows\SWD4CS.AssemblyInfo.cs
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\obj\Debug\net6.0-windows\SWD4CS.csproj.CoreCompileInputs.cache
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\obj\Debug\net6.0-windows\SWD4CS.dll
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\obj\Debug\net6.0-windows\ref\SWD4CS.dll
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\obj\Debug\net6.0-windows\SWD4CS.pdb
+C:\Users\HRY\0001_DATA\0000_SourceCode\C#\SWD4CS_vscode\SWD4CS\obj\Debug\net6.0-windows\SWD4CS.genruntimeconfig.cache
