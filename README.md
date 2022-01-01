@@ -11,6 +11,9 @@
 ## 動画
  https://youtu.be/3KAt203qVsA
  
+## ブログ
+ https://danpapa-hry.hateblo.jp/entry/2022/01/01/211917
+ 
 ## 実装
  ・ポトペタ  
  ・Button  
