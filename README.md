@@ -1,7 +1,7 @@
 # SWD4CS
   SWD4CS:Simple WinForms Designer for CSharp
-  ・VisualStudioは重い
-  ・VSCodeをよく使うが、デザイナがない
+  VisualStudioは重い
+  VSCodeをよく使うが、デザイナがない
  
   とりあえず作成（未完成）
   ・デザイナの作り方が全く分からず、思い付くままに書いてみました
