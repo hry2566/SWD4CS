@@ -44,8 +44,8 @@ namespace SWD4CS
                 this.selectbox[i].TabIndex = i;
 
                 //event_handler
-                this.selectbox[i].MouseDown += new MouseEventHandler(SelectboxMouseDown);
-                this.selectbox[i].MouseMove += new MouseEventHandler(SelectboxMouseMove);
+                this.selectbox[i].MouseDown += new MouseEventHandler(SelectboxMouseDown!);
+                this.selectbox[i].MouseMove += new MouseEventHandler(SelectboxMouseMove!);
 
             }
 
@@ -146,7 +146,7 @@ namespace SWD4CS
             if(this.ctrl is cls_form)
             {
                 cls_form? ctrl = this.ctrl as cls_form;
-                ctrl.SetSelect(true);
+                ctrl!.SetSelect(true);
             }
         }
 
@@ -218,22 +218,22 @@ namespace SWD4CS
             if (this.ctrl is cls_button)
             {
                 cls_button? ctrl = this.ctrl as cls_button;
-                ctrl.ctrlBase.SetSelect(true);
+                ctrl!.ctrlBase.SetSelect(true);
             }
             else if (this.ctrl is cls_label)
             {
                 cls_label? ctrl = this.ctrl as cls_label;
-                ctrl.ctrlBase.SetSelect(true);
+                ctrl!.ctrlBase.SetSelect(true);
             }
             else if (this.ctrl is cls_textbox)
             {
                 cls_textbox? ctrl = this.ctrl as cls_textbox;
-                ctrl.ctrlBase.SetSelect(true);
+                ctrl!.ctrlBase.SetSelect(true);
             }
             else if (this.ctrl is cls_listbox)
             {
                 cls_listbox? ctrl = this.ctrl as cls_listbox;
-                ctrl.ctrlBase.SetSelect(true);
+                ctrl!.ctrlBase.SetSelect(true);
             }
 
             
