@@ -5,14 +5,18 @@ namespace SWD4CS
     {
         private cls_selectbox selectBox;
         private Control ctrl;
+        private DataGridView propertyList;
+        private cls_form form;
         private bool selectFlag = false;
         private bool changeFlag = false;
         private Point memPos;
         private int grid = 8;
 
-        public cls_control_base(Control parent, Control ctrl, Control backPanel)
+        public cls_control_base(Control parent, Control ctrl, Control backPanel, DataGridView propertyList)
         {
             this.ctrl = ctrl;
+            this.propertyList = propertyList;
+            this.form = (cls_form)parent;
 
             ctrl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ControlMouseMove);
             ctrl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ControlMouseDown);
@@ -20,11 +24,10 @@ namespace SWD4CS
             ctrl.Click += new System.EventHandler(Ctrl_Click);
 
             selectBox = new cls_selectbox(ctrl, parent);
-            selectFlag = true;
-            selectBox.SetSelectBoxPos(selectFlag);
+            SetSelect(true);
         }
 
-        private void ControlMouseDown(object sender, MouseEventArgs e)
+        private void ControlMouseDown(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left && selectFlag)
             {
@@ -33,7 +36,7 @@ namespace SWD4CS
             }
         }
 
-        private void ControlMouseMove(object sender, MouseEventArgs e)
+        private void ControlMouseMove(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left && selectFlag)
             {
@@ -52,7 +55,7 @@ namespace SWD4CS
             }
         }
 
-        private void Ctrl_Click(object sender, EventArgs e)
+        private void Ctrl_Click(object? sender, EventArgs e)
         {
             if (e.ToString() != "System.EventArgs")
             {
@@ -66,13 +69,14 @@ namespace SWD4CS
                     }
                     else
                     {
+                        form.SelectAllClear();
                         SetSelect(true);
                     }
                 }
             }
         }
 
-        private void Backpanel_Click(object sender, EventArgs e)
+        private void Backpanel_Click(object? sender, EventArgs e)
         {
             MouseEventArgs me = (MouseEventArgs)e;
 
@@ -85,13 +89,29 @@ namespace SWD4CS
             }
         }
 
-        public void SetSelect(bool flag)
+        internal void SetSelect(bool flag)
         {
+            if (flag)
+            {
+                propertyList.Rows.Clear();
+                propertyList.Rows.Add("Name", ctrl.Name);
+                propertyList.Rows.Add("Location.X", ctrl.Location.X);
+                propertyList.Rows.Add("Location.Y", ctrl.Location.Y);
+                propertyList.Rows.Add("Size.Width", ctrl.Size.Width);
+                propertyList.Rows.Add("Size.Height", ctrl.Size.Height);
+                propertyList.Rows.Add("TabIndex", ctrl.TabIndex);
+                propertyList.Rows.Add("Text", ctrl.Text);
+            }
+            else
+            {
+                propertyList.Rows.Clear();
+            }
+
             selectFlag = flag;
             selectBox.SetSelectBoxPos(selectFlag);
         }
 
-        public bool GetSelected()
+        internal bool GetSelected()
         {
             return selectFlag;
         }
