@@ -11,7 +11,8 @@ namespace SWD4CS
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            cls_design_form1.Init(tabPage5, listBox1);
+            cls_design_form1.Init(tabPage5, listBox1, dataGridView1);
+
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
@@ -70,21 +71,31 @@ namespace SWD4CS
                     var ctrl = new Control();
                     string ctrlClass = "";
 
-                    if (cls_design_form1.CtrlItems[i].GetType().ToString() == "SWD4CS.cls_button")
+                    // ****************************************************************************************
+                    // コントロール追加時に下記を編集すること
+                    // ****************************************************************************************
+                    if (cls_design_form1.CtrlItems[i] is cls_button)
                     {
-                        ctrl = (cls_button)cls_design_form1.CtrlItems[i];
+                        ctrl = cls_design_form1.CtrlItems[i] as cls_button;
                         ctrlClass = "Button";
                     }
-                    else if (cls_design_form1.CtrlItems[i].GetType().ToString() == "SWD4CS.cls_label")
+                    else if (cls_design_form1.CtrlItems[i] is cls_label)
                     {
-                        ctrl = (cls_label)cls_design_form1.CtrlItems[i];
+                        ctrl = cls_design_form1.CtrlItems[i] as cls_label;
                         ctrlClass = "Label";
                     }
-                    else if (cls_design_form1.CtrlItems[i].GetType().ToString() == "SWD4CS.cls_textbox")
+                    else if (cls_design_form1.CtrlItems[i] is cls_textbox)
                     {
-                        ctrl = (cls_textbox)cls_design_form1.CtrlItems[i];
+                        ctrl = cls_design_form1.CtrlItems[i] as cls_textbox;
                         ctrlClass = "TextBox";
                     }
+                    else if (cls_design_form1.CtrlItems[i] is cls_listbox)
+                    {
+                        ctrl = cls_design_form1.CtrlItems[i] as cls_listbox;
+                        ctrlClass = "ListBox";
+                    }
+
+                    // ****************************************************************************************
 
                     name = ctrl.Name;
                     x = ctrl.Left;
@@ -109,7 +120,7 @@ namespace SWD4CS
 
                 }
 
-                textBox1.Text = code2 +code6 + code3 + code1 + code4 + code5;
+                textBox1.Text = code2 + code6 + code3 + code1 + code4 + code5;
 
             }
         }
