@@ -68,11 +68,11 @@ namespace SWD4CS
                 int itemCount = cls_design_form1.CtrlItems.Count;
                 for (int i = 0; i < itemCount; i++)
                 {
-                    var ctrl = new Control();
+                    Control? ctrl = new Control();
                     string ctrlClass = "";
 
                     // ****************************************************************************************
-                    // コントロール追加時に下記を編集すること
+                    // // 繧ｳ繝ｳ繝医Ο繝ｼ繝ｫ霑ｽ蜉譎ゅ↓荳玖ｨ倥ｒ邱ｨ髮�縺吶ｋ縺薙→
                     // ****************************************************************************************
                     if (cls_design_form1.CtrlItems[i] is cls_button)
                     {
@@ -97,7 +97,7 @@ namespace SWD4CS
 
                     // ****************************************************************************************
 
-                    name = ctrl.Name;
+                    name = ctrl!.Name;
                     x = ctrl.Left;
                     y = ctrl.Top;
                     w = ctrl.Width;
