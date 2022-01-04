@@ -34,6 +34,7 @@
             this.Text = "Label" + index.ToString();
             this.Size = new System.Drawing.Size(64, 24);
             this.Location = new System.Drawing.Point(X, Y);
+            this.TabIndex = index;
         }
 
         #endregion
