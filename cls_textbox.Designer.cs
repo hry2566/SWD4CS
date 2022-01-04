@@ -34,6 +34,7 @@
             this.Text = "TextBox" + index.ToString();
             this.Size = new System.Drawing.Size(80, 24);
             this.Location = new System.Drawing.Point(X, Y);
+            this.TabIndex = index;
         }
 
         #endregion
