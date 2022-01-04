@@ -50,7 +50,6 @@ namespace SWD4CS
             }
 
             parent.Controls.AddRange(this.selectbox);
-
         }
 
         public void SetSelectBoxPos(bool flag)
@@ -99,7 +98,7 @@ namespace SWD4CS
                 var newPos = new Point(e.X - memPos.X + move_selectbox.Location.X, e.Y - memPos.Y + move_selectbox.Location.Y);
                 move_selectbox.Location = newPos;
 
-                if (parent.GetType().ToString() == "System.Windows.Forms.TabPage")
+                if (parent is TabPage)
                 {
                     SetFormSize(newPos, move_selectbox.TabIndex);
                 }
@@ -144,7 +143,11 @@ namespace SWD4CS
                 ctrl.Height = 40;
             }
 
-            SetSelectBoxPos(true);
+            if(this.ctrl is cls_form)
+            {
+                cls_form? ctrl = this.ctrl as cls_form;
+                ctrl.SetSelect(true);
+            }
         }
 
         private void SetControlSize(Point newPos, int index)
@@ -209,7 +212,33 @@ namespace SWD4CS
                 ctrl.Top = memtop;
             }
 
-            SetSelectBoxPos(true);
+            // ****************************************************************************************
+            // コントロール追加時に下記を編集すること
+            // ****************************************************************************************
+            if (this.ctrl is cls_button)
+            {
+                cls_button? ctrl = this.ctrl as cls_button;
+                ctrl.ctrlBase.SetSelect(true);
+            }
+            else if (this.ctrl is cls_label)
+            {
+                cls_label? ctrl = this.ctrl as cls_label;
+                ctrl.ctrlBase.SetSelect(true);
+            }
+            else if (this.ctrl is cls_textbox)
+            {
+                cls_textbox? ctrl = this.ctrl as cls_textbox;
+                ctrl.ctrlBase.SetSelect(true);
+            }
+            else if (this.ctrl is cls_listbox)
+            {
+                cls_listbox? ctrl = this.ctrl as cls_listbox;
+                ctrl.ctrlBase.SetSelect(true);
+            }
+
+            
+
+            // ****************************************************************************************
         }
 
     }
