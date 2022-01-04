@@ -7,10 +7,10 @@ namespace SWD4CS
     public partial class cls_form : Panel
     {
         public ArrayList CtrlItems = new ArrayList();
-        private cls_selectbox selectBox;
-        private Control backPanel;
-        private ListBox toolList;
-        private DataGridView propertyList;
+        private cls_selectbox? selectBox;
+        private Control? backPanel;
+        private ListBox? toolList;
+        private DataGridView? propertyList;
         private bool selectFlag = false;
         private int grid = 8;
         private int cnt_Button;
@@ -42,7 +42,7 @@ namespace SWD4CS
             string? propertyName = "";
             string? propertyValue = "";
 
-            if (propertyList.Rows[index].Cells[0].Value == null)
+            if (propertyList!.Rows[index].Cells[0].Value == null)
             {
                 return;
             }
@@ -60,11 +60,11 @@ namespace SWD4CS
             {
                 if (propertyName == "Size.Width")
                 {
-                    this.Width = Int32.Parse(propertyValue);
+                    this.Width = Int32.Parse(propertyValue!);
                 }
                 else if (propertyName == "Size.Height")
                 {
-                    this.Height = Int32.Parse(propertyValue);
+                    this.Height = Int32.Parse(propertyValue!);
                 }
                 else if (propertyName == "Text")
                 {
@@ -78,27 +78,27 @@ namespace SWD4CS
 
                 if (propertyName == "Name")
                 {
-                    item.Name = propertyValue;
+                    item!.Name = propertyValue;
                 }
                 else if (propertyName == "Location.X")
                 {
-                    item.Left = Int32.Parse(propertyValue);
+                    item!.Left = Int32.Parse(propertyValue!);
                 }
                 else if (propertyName == "Location.Y")
                 {
-                    item.Top = Int32.Parse(propertyValue);
+                    item!.Top = Int32.Parse(propertyValue!);
                 }
                 else if (propertyName == "Size.Width")
                 {
-                    item.Width = Int32.Parse(propertyValue);
+                    item!.Width = Int32.Parse(propertyValue!);
                 }
                 else if (propertyName == "Size.Height")
                 {
-                    item.Height = Int32.Parse(propertyValue);
+                    item!.Height = Int32.Parse(propertyValue!);
                 }
                 else if (propertyName == "Text")
                 {
-                    item.Text = propertyValue;
+                    item!.Text = propertyValue;
                 }
             }
         }
@@ -119,12 +119,12 @@ namespace SWD4CS
         public void SetSelect(bool flag)
         {
             selectFlag = flag;
-            selectBox.SetSelectBoxPos(selectFlag);
+            selectBox!.SetSelectBoxPos(selectFlag);
 
             // 選択されていたらプロパティ表示
             if (flag)
             {
-                propertyList.Rows.Clear();
+                propertyList!.Rows.Clear();
                 propertyList.Rows.Add("Name", "From1");
                 propertyList.Rows.Add("Size.Width", this.Size.Width);
                 propertyList.Rows.Add("Size.Height", this.Size.Height);
@@ -133,13 +133,13 @@ namespace SWD4CS
             }
             else
             {
-                propertyList.Rows.Clear();
+                propertyList!.Rows.Clear();
             }
         }
 
         private void Form_Click(object? sender, EventArgs e)
         {
-            if (toolList.Text == "")
+            if (toolList!.Text == "")
             {
                 MouseEventArgs me = (MouseEventArgs)e;
 
@@ -221,24 +221,24 @@ namespace SWD4CS
         // ****************************************************************************************
         private void AddControl(int X, int Y)
         {
-            if (toolList.Text == "Button")
+            if (toolList!.Text == "Button")
             {
-                cls_button ctrl = new cls_button(this, backPanel, propertyList, cnt_Button, X, Y);
+                cls_button ctrl = new cls_button(this, backPanel!, propertyList!, cnt_Button, X, Y);
                 cnt_Button++;
             }
             else if (toolList.Text == "Label")
             {
-                cls_label ctrl = new cls_label(this, backPanel, propertyList, cnt_Label, X, Y);
+                cls_label ctrl = new cls_label(this, backPanel!, propertyList!, cnt_Label, X, Y);
                 cnt_Label++;
             }
             else if (toolList.Text == "TextBox")
             {
-                cls_textbox ctrl = new cls_textbox(this, backPanel, propertyList, cnt_TextBox, X, Y);
+                cls_textbox ctrl = new cls_textbox(this, backPanel!, propertyList!, cnt_TextBox, X, Y);
                 cnt_TextBox++;
             }
             else if (toolList.Text == "ListBox")
             {
-                cls_listbox ctrl = new cls_listbox(this, backPanel, propertyList, cnt_TextBox, X, Y);
+                cls_listbox ctrl = new cls_listbox(this, backPanel!, propertyList!, cnt_TextBox, X, Y);
                 cnt_ListBox++;
             }
         }
@@ -251,11 +251,11 @@ namespace SWD4CS
 
                 if (mode == 0)
                 {
-                    ctrl.ctrlBase.SetSelect(false);
+                    ctrl!.ctrlBase.SetSelect(false);
                 }
                 else
                 {
-                    if (ctrl.ctrlBase.GetSelected())
+                    if (ctrl!.ctrlBase.GetSelected())
                     {
                         if (mode == 1)
                         {
@@ -276,11 +276,11 @@ namespace SWD4CS
                 cls_label? ctrl = CtrlItems[i] as cls_label;
                 if (mode == 0)
                 {
-                    ctrl.ctrlBase.SetSelect(false);
+                    ctrl!.ctrlBase.SetSelect(false);
                 }
                 else
                 {
-                    if (ctrl.ctrlBase.GetSelected())
+                    if (ctrl!.ctrlBase.GetSelected())
                     {
                         if (mode == 1)
                         {
@@ -301,11 +301,11 @@ namespace SWD4CS
                 cls_textbox? ctrl = CtrlItems[i] as cls_textbox;
                 if (mode == 0)
                 {
-                    ctrl.ctrlBase.SetSelect(false);
+                    ctrl!.ctrlBase.SetSelect(false);
                 }
                 else
                 {
-                    if (ctrl.ctrlBase.GetSelected())
+                    if (ctrl!.ctrlBase.GetSelected())
                     {
                         if (mode == 1)
                         {
@@ -326,11 +326,11 @@ namespace SWD4CS
                 cls_listbox? ctrl = CtrlItems[i] as cls_listbox;
                 if (mode == 0)
                 {
-                    ctrl.ctrlBase.SetSelect(false);
+                    ctrl!.ctrlBase.SetSelect(false);
                 }
                 else
                 {
-                    if (ctrl.ctrlBase.GetSelected())
+                    if (ctrl!.ctrlBase.GetSelected())
                     {
                         if (mode == 1)
                         {
