@@ -3,21 +3,21 @@ namespace SWD4CS
 {
     public class cls_control_base
     {
-        private cls_selectbox selectBox;
-        private Control ctrl;
-        private DataGridView propertyList;
         private cls_form form;
+        private Control ctrl;
+        private cls_selectbox selectBox;
+        private DataGridView propertyList;
         private bool selectFlag = false;
         private bool changeFlag = false;
         private Point memPos;
         private int grid = 8;
 
-        public cls_control_base(Control parent, Control ctrl, Control backPanel, DataGridView propertyList)
+        public cls_control_base(cls_form form, Control ctrl, Control parent, Control backPanel, DataGridView propertyList)
         {
+            this.form = form;
             this.ctrl = ctrl;
             this.propertyList = propertyList;
-            this.form = (cls_form)parent;
-
+            
             ctrl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ControlMouseMove);
             ctrl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ControlMouseDown);
             backPanel.Click += new System.EventHandler(Backpanel_Click);
