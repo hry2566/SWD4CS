@@ -22,6 +22,8 @@
  ・TextBox  
  ・ListBox  
  ・GroupBox  
+ ・TabControl  
+ ・TabPage  
  ・他のコントローラー等は必要になったら追加する。
 
 ## コントロール追加方法
