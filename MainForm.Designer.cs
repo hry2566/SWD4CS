@@ -114,12 +114,14 @@
             this.listBox1.Items.AddRange(new object[] {
             "",
             "Button",
+            "GroupBox",
             "Label",
-            "TextBox",
-            "ListBox"});
+            "ListBox",
+            "TextBox"});
             this.listBox1.Location = new System.Drawing.Point(3, 3);
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(186, 411);
+            this.listBox1.Sorted = true;
             this.listBox1.TabIndex = 0;
             // 
             // tabPage2
@@ -177,7 +179,8 @@
             // 
             // cls_design_form1
             // 
-            this.cls_design_form1.BackColor = System.Drawing.Color.LightGray;
+            this.cls_design_form1.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.cls_design_form1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.cls_design_form1.Location = new System.Drawing.Point(12, 12);
             this.cls_design_form1.Name = "cls_design_form1";
             this.cls_design_form1.Size = new System.Drawing.Size(160, 80);
