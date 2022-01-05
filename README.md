@@ -21,6 +21,7 @@
  ・Label  
  ・TextBox  
  ・ListBox  
+ ・GroupBox  
  ・他のコントローラー等は必要になったら追加する。
 
 ## コントロール追加方法
