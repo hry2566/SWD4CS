@@ -26,5 +26,5 @@
 
 ## コントロール追加方法
  ・cls_button等を参考に追加したいコントロールを継承したクラスを作成  
- ・「// コントロール追加時に下記を編集すること」に追記。（cls_form.cs, cls_selectbox.cs, MainForm.cs）  
+ ・「// コントロール追加時に下記を編集すること」に追記。（cls_form.cs, cls_selectbox.cs, MainForm.cs, cls_groupbox）  
  ・追記は、コピーしてクラス名等を追加したクラスに変更するだけ。
