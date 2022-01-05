@@ -65,37 +65,53 @@ namespace SWD4CS
                 code4 += "    #endregion\r\n";
                 code4 += "\r\n";
 
-                int itemCount = cls_design_form1.CtrlItems.Count;
+                int itemCount = cls_design_form1.CtrlItems!.Count;
                 for (int i = 0; i < itemCount; i++)
                 {
-                    Control? ctrl = new Control();
+                    Control? ctrl = cls_design_form1.CtrlItems[i] as Control;
                     string ctrlClass = "";
+                    string parentName = "";
 
                     // ****************************************************************************************
-                    // 繧ｳ繝ｳ繝医Ο繝ｼ繝ｫ霑ｽ蜉譎ゅ↓荳玖ｨ倥ｒ邱ｨ髮�縺吶ｋ縺薙→
+                    // コントロール追加時に下記を編集すること
                     // ****************************************************************************************
                     if (cls_design_form1.CtrlItems[i] is cls_button)
                     {
-                        ctrl = cls_design_form1.CtrlItems[i] as cls_button;
+                        cls_button? parent = cls_design_form1.CtrlItems[i] as cls_button;
                         ctrlClass = "Button";
+                        parentName = parent!.parentCtrl.Name;
                     }
                     else if (cls_design_form1.CtrlItems[i] is cls_label)
                     {
-                        ctrl = cls_design_form1.CtrlItems[i] as cls_label;
+                        cls_label? parent = cls_design_form1.CtrlItems[i] as cls_label;
                         ctrlClass = "Label";
+                        parentName = parent!.parentCtrl.Name;
                     }
                     else if (cls_design_form1.CtrlItems[i] is cls_textbox)
                     {
-                        ctrl = cls_design_form1.CtrlItems[i] as cls_textbox;
+                        cls_textbox? parent = cls_design_form1.CtrlItems[i] as cls_textbox;
                         ctrlClass = "TextBox";
+                        parentName = parent!.parentCtrl.Name;
                     }
                     else if (cls_design_form1.CtrlItems[i] is cls_listbox)
                     {
-                        ctrl = cls_design_form1.CtrlItems[i] as cls_listbox;
+                        cls_listbox? parent = cls_design_form1.CtrlItems[i] as cls_listbox;
                         ctrlClass = "ListBox";
+                        parentName = parent!.parentCtrl.Name;
+                    }
+                    else if (cls_design_form1.CtrlItems[i] is cls_groupbox)
+                    {
+                        cls_groupbox? parent = cls_design_form1.CtrlItems[i] as cls_groupbox;
+                        ctrlClass = "GroupBox";
+                        parentName = parent!.parentCtrl.Name;
                     }
 
                     // ****************************************************************************************
+
+                    if (parentName == "cls_design_form1")
+                    {
+                        parentName = "this";
+                    }
 
                     name = ctrl!.Name;
                     x = ctrl.Left;
@@ -104,6 +120,7 @@ namespace SWD4CS
                     h = ctrl.Height;
                     tabindex = ctrl.TabIndex;
                     text = ctrl.Text;
+
                     code3 += "        //\r\n";
                     code3 += "        // " + name + "\r\n";
                     code3 += "        //\r\n";
@@ -112,7 +129,7 @@ namespace SWD4CS
                     code3 += "        this." + name + ".Size = new System.Drawing.Size(" + w + "," + h + ");\r\n";
                     code3 += "        this." + name + ".TabIndex = " + tabindex + ";\r\n";
                     code3 += "        this." + name + ".Text = \"" + text + "\";\r\n";
-                    code3 += "        this.Controls.Add(this." + name + ");\r\n";
+                    code3 += "        " + parentName + ".Controls.Add(this." + name + ");\r\n";
 
                     code5 += "    private " + ctrlClass + " " + name + ";\r\n";
 
