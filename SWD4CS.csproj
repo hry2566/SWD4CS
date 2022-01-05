@@ -13,4 +13,15 @@
     <Optimize>False</Optimize>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Update="cls_listbox.cs" />
+    <Compile Update="cls_textbox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="cls_label.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="cls_groupbox.cs" />
+  </ItemGroup>
+
 </Project>
