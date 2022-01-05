@@ -235,8 +235,13 @@ namespace SWD4CS
                 cls_listbox? ctrl = this.ctrl as cls_listbox;
                 ctrl!.ctrlBase.SetSelect(true);
             }
+            else if (this.ctrl is cls_groupbox)
+            {
+                cls_groupbox? ctrl = this.ctrl as cls_groupbox;
+                ctrl!.SetSelect(true);
+            }
 
-            
+
 
             // ****************************************************************************************
         }
