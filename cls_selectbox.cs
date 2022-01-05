@@ -240,6 +240,11 @@ namespace SWD4CS
                 cls_groupbox? ctrl = this.ctrl as cls_groupbox;
                 ctrl!.SetSelect(true);
             }
+            else if (this.ctrl is cls_tabcontrol)
+            {
+                cls_tabcontrol? ctrl = this.ctrl as cls_tabcontrol;
+                ctrl!.SetSelect(true);
+            }
 
 
 
