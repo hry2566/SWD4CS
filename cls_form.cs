@@ -6,7 +6,7 @@ namespace SWD4CS
 {
     public partial class cls_form : Panel
     {
-        public ArrayList CtrlItems = new ArrayList();
+        internal ArrayList? CtrlItems = new ArrayList();
         private cls_selectbox? selectBox;
         private Control? backPanel;
         private ListBox? toolList;
@@ -17,6 +17,7 @@ namespace SWD4CS
         private int cnt_Label;
         private int cnt_TextBox;
         private int cnt_ListBox;
+        private int cnt_GroupBox;
 
         public cls_form()
         {
@@ -74,7 +75,7 @@ namespace SWD4CS
             }
             else
             {
-                Control? item = CtrlItems[i] as Control;
+                Control? item = CtrlItems![i] as Control;
 
                 if (propertyName == "Name")
                 {
@@ -167,7 +168,7 @@ namespace SWD4CS
                 int X = (int)(me.X / grid) * grid;
                 int Y = (int)(me.Y / grid) * grid;
 
-                AddControl(X, Y);
+                AddControl(X, Y, this);
 
                 toolList.SelectedIndex = -1;
             }
@@ -178,7 +179,7 @@ namespace SWD4CS
         {
             SetSelect(false);
 
-            for (int i = 0; i < CtrlItems.Count; i++)
+            for (int i = 0; i < CtrlItems!.Count; i++)
             {
                 ControlCom(i, 0, 0);
             }
@@ -186,7 +187,7 @@ namespace SWD4CS
 
         internal void RemoveSelectedItem()
         {
-            for (int i = 0; i < CtrlItems.Count; i++)
+            for (int i = 0; i < CtrlItems!.Count; i++)
             {
                 if (ControlCom(i, 1, 0))
                 {
@@ -206,7 +207,7 @@ namespace SWD4CS
             }
             else
             {
-                for (int i = 0; i < CtrlItems.Count; i++)
+                for (int i = 0; i < CtrlItems!.Count; i++)
                 {
                     if (ControlCom(i, 2, index))
                     {
@@ -219,33 +220,38 @@ namespace SWD4CS
         // ****************************************************************************************
         // コントロール追加時に下記を編集すること
         // ****************************************************************************************
-        private void AddControl(int X, int Y)
+        internal void AddControl(int X, int Y, Control parent)
         {
             if (toolList!.Text == "Button")
             {
-                cls_button ctrl = new cls_button(this, backPanel!, propertyList!, cnt_Button, X, Y);
+                cls_button ctrl = new cls_button(this, parent, backPanel!, toolList, propertyList!, cnt_Button, X, Y);
                 cnt_Button++;
             }
             else if (toolList.Text == "Label")
             {
-                cls_label ctrl = new cls_label(this, backPanel!, propertyList!, cnt_Label, X, Y);
+                cls_label ctrl = new cls_label(this, parent, backPanel!, toolList, propertyList!, cnt_Label, X, Y);
                 cnt_Label++;
             }
             else if (toolList.Text == "TextBox")
             {
-                cls_textbox ctrl = new cls_textbox(this, backPanel!, propertyList!, cnt_TextBox, X, Y);
+                cls_textbox ctrl = new cls_textbox(this, parent, backPanel!, toolList, propertyList!, cnt_Label, X, Y);
                 cnt_TextBox++;
             }
             else if (toolList.Text == "ListBox")
             {
-                cls_listbox ctrl = new cls_listbox(this, backPanel!, propertyList!, cnt_TextBox, X, Y);
+                cls_listbox ctrl = new cls_listbox(this, parent, backPanel!, toolList, propertyList!, cnt_Label, X, Y);
                 cnt_ListBox++;
+            }
+            else if (toolList!.Text == "GroupBox")
+            {
+                cls_groupbox ctrl = new cls_groupbox(this, parent, backPanel!, toolList, propertyList!, cnt_GroupBox, X, Y);
+                cnt_GroupBox++;
             }
         }
         
-        private bool ControlCom(int i, int mode, int index)
+        internal bool ControlCom(int i, int mode, int index)
         {
-            if (CtrlItems[i] is cls_button)
+            if (CtrlItems![i] is cls_button)
             {
                 cls_button? ctrl = CtrlItems[i] as cls_button;
 
@@ -341,6 +347,31 @@ namespace SWD4CS
                         {
                             SetProperty(i, index, false);
                             ctrl.ctrlBase.SetSelect(true);
+                        }
+                        return true;
+                    }
+                }
+            }
+            else if (CtrlItems[i] is cls_groupbox)
+            {
+                cls_groupbox? ctrl = CtrlItems[i] as cls_groupbox;
+                if (mode == 0)
+                {
+                    ctrl!.SetSelect(false);
+                }
+                else
+                {
+                    if (ctrl!.GetSelected())
+                    {
+                        if (mode == 1)
+                        {
+                            ctrl.Deleate(this);
+                            CtrlItems.Remove(ctrl);
+                        }
+                        else if (mode == 2)
+                        {
+                            SetProperty(i, index, false);
+                            ctrl.SetSelect(true);
                         }
                         return true;
                     }
