@@ -18,6 +18,8 @@ namespace SWD4CS
         private int cnt_TextBox;
         private int cnt_ListBox;
         private int cnt_GroupBox;
+        private int cnt_TabControl;
+        private int cnt_TabPage;
 
         public cls_form()
         {
@@ -234,18 +236,31 @@ namespace SWD4CS
             }
             else if (toolList.Text == "TextBox")
             {
-                cls_textbox ctrl = new cls_textbox(this, parent, backPanel!, toolList, propertyList!, cnt_Label, X, Y);
+                cls_textbox ctrl = new cls_textbox(this, parent, backPanel!, toolList, propertyList!, cnt_TextBox, X, Y);
                 cnt_TextBox++;
             }
             else if (toolList.Text == "ListBox")
             {
-                cls_listbox ctrl = new cls_listbox(this, parent, backPanel!, toolList, propertyList!, cnt_Label, X, Y);
+                cls_listbox ctrl = new cls_listbox(this, parent, backPanel!, toolList, propertyList!, cnt_ListBox, X, Y);
                 cnt_ListBox++;
             }
             else if (toolList!.Text == "GroupBox")
             {
                 cls_groupbox ctrl = new cls_groupbox(this, parent, backPanel!, toolList, propertyList!, cnt_GroupBox, X, Y);
                 cnt_GroupBox++;
+            }
+            else if (toolList!.Text == "TabControl")
+            {
+                cls_tabcontrol ctrl = new cls_tabcontrol(this, parent, backPanel!, toolList, propertyList!, cnt_TabControl, X, Y);
+                cnt_TabControl++;
+            }
+            else if (toolList!.Text == "TabPage")
+            {
+                if(parent is cls_tabcontrol)
+                {
+                    cls_tabpage ctrl = new cls_tabpage(this, parent, backPanel!, toolList, propertyList!, cnt_TabPage, X, Y);
+                    cnt_TabPage++;
+                }
             }
         }
         
@@ -355,6 +370,56 @@ namespace SWD4CS
             else if (CtrlItems[i] is cls_groupbox)
             {
                 cls_groupbox? ctrl = CtrlItems[i] as cls_groupbox;
+                if (mode == 0)
+                {
+                    ctrl!.SetSelect(false);
+                }
+                else
+                {
+                    if (ctrl!.GetSelected())
+                    {
+                        if (mode == 1)
+                        {
+                            ctrl.Deleate(this);
+                            CtrlItems.Remove(ctrl);
+                        }
+                        else if (mode == 2)
+                        {
+                            SetProperty(i, index, false);
+                            ctrl.SetSelect(true);
+                        }
+                        return true;
+                    }
+                }
+            }
+            else if (CtrlItems[i] is cls_tabcontrol)
+            {
+                cls_tabcontrol? ctrl = CtrlItems[i] as cls_tabcontrol;
+                if (mode == 0)
+                {
+                    ctrl!.SetSelect(false);
+                }
+                else
+                {
+                    if (ctrl!.GetSelected())
+                    {
+                        if (mode == 1)
+                        {
+                            ctrl.Deleate(this);
+                            CtrlItems.Remove(ctrl);
+                        }
+                        else if (mode == 2)
+                        {
+                            SetProperty(i, index, false);
+                            ctrl.SetSelect(true);
+                        }
+                        return true;
+                    }
+                }
+            }
+            else if (CtrlItems[i] is cls_tabpage)
+            {
+                cls_tabpage? ctrl = CtrlItems[i] as cls_tabpage;
                 if (mode == 0)
                 {
                     ctrl!.SetSelect(false);
