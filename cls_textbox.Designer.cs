@@ -32,7 +32,7 @@
 
             this.Name = "TextBox" + index.ToString();
             this.Text = "TextBox" + index.ToString();
-            this.Size = new System.Drawing.Size(80, 24);
+            this.Size = new System.Drawing.Size(120, 32);
             this.Location = new System.Drawing.Point(X, Y);
             this.TabIndex = index;
         }
