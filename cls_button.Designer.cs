@@ -32,7 +32,7 @@
 
             this.Name = "Button" + index.ToString();
             this.Text = "Button" + index.ToString();
-            this.Size = new System.Drawing.Size(80, 24);
+            this.Size = new System.Drawing.Size(96, 32);
             this.Location = new System.Drawing.Point(X, Y);
             this.TabIndex = index;
         }
