@@ -34,7 +34,7 @@
             this.ItemHeight = 20;
             this.Name = "ListBox" + index.ToString();
             this.Text = "ListBox" + index.ToString();
-            this.Size = new System.Drawing.Size(150, 104);
+            this.Size = new System.Drawing.Size(120, 104);
             this.Location = new System.Drawing.Point(X, Y);
             this.TabIndex = index;
         }
