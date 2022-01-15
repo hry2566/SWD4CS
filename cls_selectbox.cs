@@ -3,17 +3,30 @@ namespace SWD4CS
 {
     internal class cls_selectbox
     {
-        private Control ctrl;
+        private cls_form? form;
+        private cls_control? ctrl;
         private Control parent;
         private Label[] selectbox = new Label[8];
         private Point memPos;
         private int grid = 8;
 
-        public cls_selectbox(Control ctrl, Control parent)
+        public cls_selectbox(cls_form ctrl, Control parent)
+        {
+            this.form = ctrl;
+            this.parent = parent;
+
+            Init();
+        }
+        public cls_selectbox(cls_control ctrl, Control parent)
         {
             this.ctrl = ctrl;
             this.parent = parent;
 
+            Init();
+        }
+
+        private void Init()
+        {
             // 
             // selectbox
             // 
@@ -46,7 +59,6 @@ namespace SWD4CS
                 //event_handler
                 this.selectbox[i].MouseDown += new MouseEventHandler(SelectboxMouseDown!);
                 this.selectbox[i].MouseMove += new MouseEventHandler(SelectboxMouseMove!);
-
             }
 
             parent.Controls.AddRange(this.selectbox);
@@ -56,12 +68,31 @@ namespace SWD4CS
         {
             if (flag)
             {
-                int x1 = ctrl.Left - 8;
-                int x2 = ctrl.Width / 2 + ctrl.Left - 4;
-                int x3 = ctrl.Width + ctrl.Left;
-                int y1 = ctrl.Top - 8;
-                int y2 = ctrl.Height / 2 + ctrl.Top - 4;
-                int y3 = ctrl.Height + ctrl.Top;
+                int x1;
+                int x2;
+                int x3;
+                int y1;
+                int y2;
+                int y3;
+
+                if (ctrl != null)
+                {
+                    x1 = ctrl.Left - 8;
+                    x2 = ctrl.Width / 2 + ctrl.Left - 4;
+                    x3 = ctrl.Width + ctrl.Left;
+                    y1 = ctrl.Top - 8;
+                    y2 = ctrl.Height / 2 + ctrl.Top - 4;
+                    y3 = ctrl.Height + ctrl.Top;
+                }
+                else
+                {
+                    x1 = form!.Left - 8;
+                    x2 = form.Width / 2 + form.Left - 4;
+                    x3 = form.Width + form.Left;
+                    y1 = form.Top - 8;
+                    y2 = form.Height / 2 + form.Top - 4;
+                    y3 = form.Height + form.Top;
+                }
 
                 this.selectbox[0].Location = new Point(x1, y1);
                 this.selectbox[1].Location = new Point(x2, y1);
@@ -98,7 +129,7 @@ namespace SWD4CS
                 var newPos = new Point(e.X - memPos.X + move_selectbox.Location.X, e.Y - memPos.Y + move_selectbox.Location.Y);
                 move_selectbox.Location = newPos;
 
-                if (parent is TabPage)
+                if (ctrl == null)
                 {
                     SetFormSize(newPos, move_selectbox.TabIndex);
                 }
@@ -114,40 +145,36 @@ namespace SWD4CS
             newPos.X = (int)(newPos.X / grid) * grid;
             newPos.Y = (int)(newPos.Y / grid) * grid;
 
-            int width = newPos.X - ctrl.Left;
-            int height = newPos.Y - ctrl.Top;
+            int width = newPos.X - form!.Left;
+            int height = newPos.Y - form.Top;
 
             switch (index)
             {
                 case 3:
                 case 4:
-                    ctrl.Height = height;
+                    form.Height = height;
                     break;
                 case 5:
-                    ctrl.Width = width;
-                    ctrl.Height = height;
+                    form.Width = width;
+                    form.Height = height;
                     break;
                 case 2:
                 case 7:
-                    ctrl.Width = width;
+                    form.Width = width;
                     break;
             }
 
-            if (ctrl.Width < 160)
+            if (form.Width < 160)
             {
-                ctrl.Width = 160;
+                form.Width = 160;
             }
 
-            if (ctrl.Height < 40)
+            if (form.Height < 40)
             {
-                ctrl.Height = 40;
+                form.Height = 40;
             }
 
-            if(this.ctrl is cls_form)
-            {
-                cls_form? ctrl = this.ctrl as cls_form;
-                ctrl!.SetSelect(true);
-            }
+            form.SetSelect(true);
         }
 
         private void SetControlSize(Point newPos, int index)
@@ -155,7 +182,7 @@ namespace SWD4CS
             newPos.X = (int)(newPos.X / grid) * grid;
             newPos.Y = (int)(newPos.Y / grid) * grid;
 
-            int width = newPos.X - ctrl.Left;
+            int width = newPos.X - ctrl!.Left;
             int height = newPos.Y - ctrl.Top;
             int width2 = ctrl.Width - (newPos.X + 8 - ctrl.Left);
             int height2 = ctrl.Height - (newPos.Y + 8 - ctrl.Top);
@@ -212,44 +239,50 @@ namespace SWD4CS
                 ctrl.Top = memtop;
             }
 
-            // ****************************************************************************************
-            // コントロール追加時に下記を編集すること
-            // ****************************************************************************************
-            if (this.ctrl is cls_button)
-            {
-                cls_button? ctrl = this.ctrl as cls_button;
-                ctrl!.ctrlBase.SetSelect(true);
-            }
-            else if (this.ctrl is cls_label)
-            {
-                cls_label? ctrl = this.ctrl as cls_label;
-                ctrl!.ctrlBase.SetSelect(true);
-            }
-            else if (this.ctrl is cls_textbox)
-            {
-                cls_textbox? ctrl = this.ctrl as cls_textbox;
-                ctrl!.ctrlBase.SetSelect(true);
-            }
-            else if (this.ctrl is cls_listbox)
-            {
-                cls_listbox? ctrl = this.ctrl as cls_listbox;
-                ctrl!.ctrlBase.SetSelect(true);
-            }
-            else if (this.ctrl is cls_groupbox)
-            {
-                cls_groupbox? ctrl = this.ctrl as cls_groupbox;
-                ctrl!.SetSelect(true);
-            }
-            else if (this.ctrl is cls_tabcontrol)
-            {
-                cls_tabcontrol? ctrl = this.ctrl as cls_tabcontrol;
-                ctrl!.SetSelect(true);
-            }
+            ctrl.Selected = true;
 
 
-
-            // ****************************************************************************************
         }
+
+
+
+        // ****************************************************************************************
+        // コントロール追加時に下記を編集すること
+        // ****************************************************************************************
+        //if (this.ctrl is cls_button)
+        //{
+        //    cls_button? ctrl = this.ctrl as cls_button;
+        //    ctrl!.ctrlBase.SetSelect(true);
+        //}
+        //else if (this.ctrl is cls_label)
+        //{
+        //    cls_label? ctrl = this.ctrl as cls_label;
+        //    ctrl!.ctrlBase.SetSelect(true);
+        //}
+        //else if (this.ctrl is cls_textbox)
+        //{
+        //    cls_textbox? ctrl = this.ctrl as cls_textbox;
+        //    ctrl!.ctrlBase.SetSelect(true);
+        //}
+        //else if (this.ctrl is cls_listbox)
+        //{
+        //    cls_listbox? ctrl = this.ctrl as cls_listbox;
+        //    ctrl!.ctrlBase.SetSelect(true);
+        //}
+        //else if (this.ctrl is cls_groupbox)
+        //{
+        //    cls_groupbox? ctrl = this.ctrl as cls_groupbox;
+        //    ctrl!.SetSelect(true);
+        //}
+        //else if (this.ctrl is cls_tabcontrol)
+        //{
+        //    cls_tabcontrol? ctrl = this.ctrl as cls_tabcontrol;
+        //    ctrl!.SetSelect(true);
+        //}
+
+
+
+        // ****************************************************************************************
 
     }
 }
