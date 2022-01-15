@@ -18,12 +18,14 @@
  ・ポトペタ  
  ・一部のプロパティ変更  
  ・Button  
+ ・ChechBox  
+ ・ComboBox  
+ ・GroupBox 
  ・Label  
- ・TextBox  
  ・ListBox  
- ・GroupBox  
  ・TabControl  
  ・TabPage  
+ ・TextBox  
  ・他のコントローラー等は必要になったら追加する。
 
 ## コントロール追加方法
