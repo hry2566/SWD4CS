@@ -1,9 +1,11 @@
-using System.Collections;
-
 namespace SWD4CS
 {
     public partial class MainForm : Form
     {
+        List<string> source_base = new List<string>();
+        List<string> source_custom = new List<string>();
+        string sourceFileName = "";
+
         public MainForm()
         {
             InitializeComponent();
@@ -13,6 +15,10 @@ namespace SWD4CS
         {
             cls_design_form1.Init(tabPage5, listBox1, dataGridView1);
 
+            cls_file file = new cls_file();
+            List<string>[] ret = file.NewFile();
+            source_base = ret[0];
+            source_custom = ret[1];
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
@@ -25,100 +31,58 @@ namespace SWD4CS
 
         private void tabControl3_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string code1 = "\r\n";
-            string code2 = "\r\n";
-            string code3 = "\r\n";
-            string code4 = "\r\n";
-            string code5 = "\r\n";
-            string code6 = "\r\n";
-            string name = "";
+            string name;
             int x;
             int y;
             int w;
             int h;
             int tabindex;
-            string text = "";
+            string text;
 
             if (tabControl3.SelectedIndex == 1)
             {
+                for (int i = 2; i < source_custom.Count; i++)
+                {
+                    source_custom.RemoveAt(i);
+                    if (source_custom[i] == "    }")
+                    {
+                        break;
+                    }
+                    i--;
+                }
 
-                // create source code
+                bool flag = false;
 
-                w = cls_design_form1.Width;
-                h = cls_design_form1.Height;
-                text = cls_design_form1.Text;
-                code1 += "        //\r\n";
-                code1 += "        // Form1\r\n";
-                code1 += "        //\r\n";
-                code1 += "        this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);\r\n";
-                code1 += "        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;\r\n";
-                code1 += "        this.ClientSize = new System.Drawing.Size(" + w + "," + h + ");\r\n";
-                code1 += "        this.Text = \"" + text + "\";\r\n";
-                code1 += "\r\n";
+                for (int i = 0; i < source_custom.Count; i++)
+                {
+                    if (source_custom[i] == "}" && flag)
+                    {
+                        flag = false;
+                    }
 
-                code2 += "    //\r\n";
-                code2 += "    private void InitializeComponent()\r\n";
-                code2 += "    {\r\n";
+                    if (flag)
+                    {
+                        source_custom.RemoveAt(i);
+                        i--;
+                    }
 
-                code4 += "    }\r\n";
-                code4 += "\r\n";
-                code4 += "    #endregion\r\n";
-                code4 += "\r\n";
+                    if (source_custom[i] == "    #endregion")
+                    {
+                        flag = true;
+                    }
+                }
 
+                int insertPos = 2;
+                int insertPos2 = 0;
                 int itemCount = cls_design_form1.CtrlItems!.Count;
                 for (int i = 0; i < itemCount; i++)
                 {
-                    Control? ctrl = cls_design_form1.CtrlItems[i] as Control;
+                    cls_control ctrl = cls_design_form1.CtrlItems[i];
                     string ctrlClass = "";
                     string parentName = ".";
 
-                    // ****************************************************************************************
-                    // コントロール追加時に下記を編集すること
-                    // ****************************************************************************************
-                    if (cls_design_form1.CtrlItems[i] is cls_button)
-                    {
-                        cls_button? parent = cls_design_form1.CtrlItems[i] as cls_button;
-                        ctrlClass = "Button";
-                        parentName += parent!.parentCtrl.Name;
-                    }
-                    else if (cls_design_form1.CtrlItems[i] is cls_label)
-                    {
-                        cls_label? parent = cls_design_form1.CtrlItems[i] as cls_label;
-                        ctrlClass = "Label";
-                        parentName += parent!.parentCtrl.Name;
-                    }
-                    else if (cls_design_form1.CtrlItems[i] is cls_textbox)
-                    {
-                        cls_textbox? parent = cls_design_form1.CtrlItems[i] as cls_textbox;
-                        ctrlClass = "TextBox";
-                        parentName += parent!.parentCtrl.Name;
-                    }
-                    else if (cls_design_form1.CtrlItems[i] is cls_listbox)
-                    {
-                        cls_listbox? parent = cls_design_form1.CtrlItems[i] as cls_listbox;
-                        ctrlClass = "ListBox";
-                        parentName += parent!.parentCtrl.Name;
-                    }
-                    else if (cls_design_form1.CtrlItems[i] is cls_groupbox)
-                    {
-                        cls_groupbox? parent = cls_design_form1.CtrlItems[i] as cls_groupbox;
-                        ctrlClass = "GroupBox";
-                        parentName += parent!.parentCtrl.Name;
-                    }
-                    else if (cls_design_form1.CtrlItems[i] is cls_tabcontrol)
-                    {
-                        cls_tabcontrol? parent = cls_design_form1.CtrlItems[i] as cls_tabcontrol;
-                        ctrlClass = "TabControl";
-                        parentName += parent!.parentCtrl.Name;
-                    }
-                    else if (cls_design_form1.CtrlItems[i] is cls_tabpage)
-                    {
-                        cls_tabpage? parent = cls_design_form1.CtrlItems[i] as cls_tabpage;
-                        ctrlClass = "TabPage";
-                        parentName += parent!.parentCtrl.Name;
-                    }
-
-                    // ****************************************************************************************
+                    ctrlClass = ctrl.className;
+                    parentName += ctrl.parent!.Name;
 
                     if (parentName == ".cls_design_form1")
                     {
@@ -133,25 +97,119 @@ namespace SWD4CS
                     tabindex = ctrl.TabIndex;
                     text = ctrl.Text;
 
-                    code3 += "        //\r\n";
-                    code3 += "        // " + name + "\r\n";
-                    code3 += "        //\r\n";
-                    code3 += "        this." + name + ".Location = new System.Drawing.Point(" + x + "," + y + ");\r\n";
-                    code3 += "        this." + name + ".Name = \"" + name + "\";\r\n";
-                    code3 += "        this." + name + ".Size = new System.Drawing.Size(" + w + "," + h + ");\r\n";
-                    code3 += "        this." + name + ".TabIndex = " + tabindex + ";\r\n";
-                    code3 += "        this." + name + ".Text = \"" + text + "\";\r\n";
-                    code3 += "        this" + parentName + ".Controls.Add(this." + name + ");\r\n";
+                    source_custom.Insert(insertPos, "        //");
+                    insertPos++;
+                    source_custom.Insert(insertPos, "        // " + name);
+                    insertPos++;
+                    source_custom.Insert(insertPos, "        //");
+                    insertPos++;
+                    source_custom.Insert(insertPos, "        this." + ctrl.Name + " = new System.Windows.Forms." + ctrlClass + "();");
+                    insertPos++;
+                    source_custom.Insert(insertPos, "        this." + name + ".Location = new System.Drawing.Point(" + x + "," + y + ");");
+                    insertPos++;
+                    source_custom.Insert(insertPos, "        this." + name + ".Name = \"" + name + "\";");
+                    insertPos++;
+                    source_custom.Insert(insertPos, "        this." + name + ".Size = new System.Drawing.Size(" + w + "," + h + ");");
+                    insertPos++;
+                    source_custom.Insert(insertPos, "        this." + name + ".TabIndex = " + tabindex + ";");
+                    insertPos++;
+                    source_custom.Insert(insertPos, "        this." + name + ".Text = \"" + text + "\";");
+                    insertPos++;
+                    source_custom.Insert(insertPos, "        this" + parentName + ".Controls.Add(this." + name + ");\r\n");
+                    insertPos++;
 
-                    code5 += "    private " + ctrlClass + " " + name + ";\r\n";
-
-                    code6 += "        this." + ctrl.Name + " = new System.Windows.Forms." + ctrlClass + "();\r\n";
-
+                    source_custom.Insert(3 + insertPos + insertPos2, "    private " + ctrlClass + " " + name + ";");
+                    insertPos2++;
                 }
 
-                textBox1.Text = code2 + code6 + code3 + code1 + code4 + code5;
+                w = cls_design_form1.Width;
+                h = cls_design_form1.Height;
+                text = cls_design_form1.Text;
 
+                source_custom.Insert(insertPos, "        //");
+                insertPos++;
+                source_custom.Insert(insertPos, "        // Form1");
+                insertPos++;
+                source_custom.Insert(insertPos, "        //");
+                insertPos++;
+                source_custom.Insert(insertPos, "        this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);");
+                insertPos++;
+                source_custom.Insert(insertPos, "        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;");
+                insertPos++;
+                source_custom.Insert(insertPos, "        this.ClientSize = new System.Drawing.Size(" + w + "," + h + ");");
+                insertPos++;
+                source_custom.Insert(insertPos, "        this.Text = \"" + text + "\";");
+                insertPos++;
+
+                string source = "";
+                for (int i = 0; i < source_base.Count; i++)
+                {
+                    source += source_base[i] + "\r\n";
+                }
+                for (int i = 0; i < source_custom.Count; i++)
+                {
+                    source += source_custom[i] + "\r\n"; ;
+                }
+
+                textBox1.Text = source;
             }
+        }
+
+        private void readrToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //cls_file file = new cls_file();
+            //List<string>[] ret = file.OpenFile();
+
+            //if (ret[2] != null)
+            //{
+            //    source_base = ret[0];
+            //    source_custom = ret[1];
+            //    sourceFileName = ret[2][0];
+
+            //    // コントロール全クリア
+            //    cls_design_form1.CtrlAllClear();
+
+
+
+
+
+
+            //    //string source = "";
+            //    //for (int i = 0; i < source_base.Count; i++)
+            //    //{
+            //    //    source += source_base[i] + "\r\n";
+            //    //}
+            //    //for (int i = 0; i < source_custom.Count; i++)
+            //    //{
+            //    //    source += source_custom[i] + "\r\n"; ;
+            //    //}
+
+            //    //textBox2.Text = source;
+            //}
+
+        }
+
+        private void saveSToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            cls_file file = new cls_file();
+
+            tabControl3.SelectedIndex = 1;
+
+            if (sourceFileName != "")
+            {
+                // 上書き保存
+                file.SaveAs(sourceFileName, textBox1.Text);
+            }
+            else
+            {
+                // 新規保存
+                file.Save(textBox1.Text);
+            }
+        }
+
+        private void closeCToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }
