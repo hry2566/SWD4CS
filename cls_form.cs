@@ -1,25 +1,29 @@
-﻿
-using System.Collections;
-using System.Data;
-
-namespace SWD4CS
+﻿namespace SWD4CS
 {
     public partial class cls_form : Panel
     {
-        internal ArrayList? CtrlItems = new ArrayList();
+        internal List<cls_control> CtrlItems = new List<cls_control>();
         private cls_selectbox? selectBox;
         private Control? backPanel;
         private ListBox? toolList;
         private DataGridView? propertyList;
         private bool selectFlag = false;
         private int grid = 8;
-        private int cnt_Button;
-        private int cnt_Label;
-        private int cnt_TextBox;
-        private int cnt_ListBox;
-        private int cnt_GroupBox;
-        private int cnt_TabControl;
-        private int cnt_TabPage;
+
+        // ****************************************************************************************
+        // コントロール追加時に下記を編集すること
+        // ****************************************************************************************
+        public int cnt_Button;
+        public int cnt_Label;
+        public int cnt_TextBox;
+        public int cnt_ListBox;
+        public int cnt_GroupBox;
+        public int cnt_TabControl;
+        public int cnt_TabPage;
+        public int cnt_CheckBox;
+        public int cnt_ComboBox;
+
+        // ****************************************************************************************
 
         public cls_form()
         {
@@ -77,31 +81,29 @@ namespace SWD4CS
             }
             else
             {
-                Control? item = CtrlItems![i] as Control;
-
                 if (propertyName == "Name")
                 {
-                    item!.Name = propertyValue;
+                    CtrlItems[i].Name = propertyValue!;
                 }
                 else if (propertyName == "Location.X")
                 {
-                    item!.Left = Int32.Parse(propertyValue!);
+                    CtrlItems[i].Left = Int32.Parse(propertyValue!);
                 }
                 else if (propertyName == "Location.Y")
                 {
-                    item!.Top = Int32.Parse(propertyValue!);
+                    CtrlItems[i].Top = Int32.Parse(propertyValue!);
                 }
                 else if (propertyName == "Size.Width")
                 {
-                    item!.Width = Int32.Parse(propertyValue!);
+                    CtrlItems[i].Width = Int32.Parse(propertyValue!);
                 }
                 else if (propertyName == "Size.Height")
                 {
-                    item!.Height = Int32.Parse(propertyValue!);
+                    CtrlItems[i].Height = Int32.Parse(propertyValue!);
                 }
                 else if (propertyName == "Text")
                 {
-                    item!.Text = propertyValue;
+                    CtrlItems[i].Text = propertyValue!;
                 }
             }
         }
@@ -170,8 +172,13 @@ namespace SWD4CS
                 int X = (int)(me.X / grid) * grid;
                 int Y = (int)(me.Y / grid) * grid;
 
-                AddControl(X, Y, this);
+                cls_control ctrl = new cls_control(this, toolList!.Text, this, backPanel!, toolList, propertyList!, X, Y);
 
+                if (toolList.Text == "TabControl")
+                {
+                    cls_control page1 = new cls_control(this, "TabPage", ctrl.ctrl!, backPanel!, toolList, propertyList!, X, Y);
+                    cls_control page2 = new cls_control(this, "TabPage", ctrl.ctrl!, backPanel!, toolList, propertyList!, X, Y);
+                }
                 toolList.SelectedIndex = -1;
             }
 
@@ -183,7 +190,7 @@ namespace SWD4CS
 
             for (int i = 0; i < CtrlItems!.Count; i++)
             {
-                ControlCom(i, 0, 0);
+                CtrlItems[i].Selected = false;
             }
         }
 
@@ -191,11 +198,27 @@ namespace SWD4CS
         {
             for (int i = 0; i < CtrlItems!.Count; i++)
             {
-                if (ControlCom(i, 1, 0))
+                if (CtrlItems[i].Selected)
                 {
+                    //コントロール削除（子含む）
+                    Delete(CtrlItems[i]);
                     i--;
                 }
             }
+        }
+
+        private void Delete(cls_control ctrl)
+        {
+            for (int i = 0; i < CtrlItems.Count; i++)
+            {
+                if (ctrl.ctrl == CtrlItems[i].ctrl!.Parent)
+                {
+                    Delete(CtrlItems[i]);
+                    i--;
+                }
+            }
+            ctrl.Delete();
+            CtrlItems.Remove(ctrl);
         }
 
         private void dataGridView1_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
@@ -211,239 +234,14 @@ namespace SWD4CS
             {
                 for (int i = 0; i < CtrlItems!.Count; i++)
                 {
-                    if (ControlCom(i, 2, index))
+                    if (CtrlItems[i].Selected)
                     {
+                        SetProperty(i, index, false);
+                        CtrlItems[i].Selected = true;
                         break;
                     }
                 }
             }
         }
-
-        // ****************************************************************************************
-        // コントロール追加時に下記を編集すること
-        // ****************************************************************************************
-        internal void AddControl(int X, int Y, Control parent)
-        {
-            if (toolList!.Text == "Button")
-            {
-                cls_button ctrl = new cls_button(this, parent, backPanel!, toolList, propertyList!, cnt_Button, X, Y);
-                cnt_Button++;
-            }
-            else if (toolList.Text == "Label")
-            {
-                cls_label ctrl = new cls_label(this, parent, backPanel!, toolList, propertyList!, cnt_Label, X, Y);
-                cnt_Label++;
-            }
-            else if (toolList.Text == "TextBox")
-            {
-                cls_textbox ctrl = new cls_textbox(this, parent, backPanel!, toolList, propertyList!, cnt_TextBox, X, Y);
-                cnt_TextBox++;
-            }
-            else if (toolList.Text == "ListBox")
-            {
-                cls_listbox ctrl = new cls_listbox(this, parent, backPanel!, toolList, propertyList!, cnt_ListBox, X, Y);
-                cnt_ListBox++;
-            }
-            else if (toolList!.Text == "GroupBox")
-            {
-                cls_groupbox ctrl = new cls_groupbox(this, parent, backPanel!, toolList, propertyList!, cnt_GroupBox, X, Y);
-                cnt_GroupBox++;
-            }
-            else if (toolList!.Text == "TabControl")
-            {
-                cls_tabcontrol ctrl = new cls_tabcontrol(this, parent, backPanel!, toolList, propertyList!, cnt_TabControl, X, Y);
-                cnt_TabControl++;
-            }
-            else if (toolList!.Text == "TabPage")
-            {
-                if(parent is cls_tabcontrol)
-                {
-                    cls_tabpage ctrl = new cls_tabpage(this, parent, backPanel!, toolList, propertyList!, cnt_TabPage, X, Y);
-                    cnt_TabPage++;
-                }
-            }
-        }
-        
-        internal bool ControlCom(int i, int mode, int index)
-        {
-            if (CtrlItems![i] is cls_button)
-            {
-                cls_button? ctrl = CtrlItems[i] as cls_button;
-
-                if (mode == 0)
-                {
-                    ctrl!.ctrlBase.SetSelect(false);
-                }
-                else
-                {
-                    if (ctrl!.ctrlBase.GetSelected())
-                    {
-                        if (mode == 1)
-                        {
-                            ctrl.Deleate(this, ctrl);
-                            CtrlItems.Remove(ctrl);
-                        }
-                        else if (mode == 2)
-                        {
-                            SetProperty(i, index, false);
-                            ctrl.ctrlBase.SetSelect(true);
-                        }
-                        return true;
-                    }
-                }
-            }
-            else if (CtrlItems[i] is cls_label)
-            {
-                cls_label? ctrl = CtrlItems[i] as cls_label;
-                if (mode == 0)
-                {
-                    ctrl!.ctrlBase.SetSelect(false);
-                }
-                else
-                {
-                    if (ctrl!.ctrlBase.GetSelected())
-                    {
-                        if (mode == 1)
-                        {
-                            ctrl.Deleate(this, ctrl);
-                            CtrlItems.Remove(ctrl);
-                        }
-                        else if (mode == 2)
-                        {
-                            SetProperty(i, index, false);
-                            ctrl.ctrlBase.SetSelect(true);
-                        }
-                        return true;
-                    }
-                }
-            }
-            else if (CtrlItems[i] is cls_textbox)
-            {
-                cls_textbox? ctrl = CtrlItems[i] as cls_textbox;
-                if (mode == 0)
-                {
-                    ctrl!.ctrlBase.SetSelect(false);
-                }
-                else
-                {
-                    if (ctrl!.ctrlBase.GetSelected())
-                    {
-                        if (mode == 1)
-                        {
-                            ctrl.Deleate(this, ctrl);
-                            CtrlItems.Remove(ctrl);
-                        }
-                        else if (mode == 2)
-                        {
-                            SetProperty(i, index, false);
-                            ctrl.ctrlBase.SetSelect(true);
-                        }
-                        return true;
-                    }
-                }
-            }
-            else if (CtrlItems[i] is cls_listbox)
-            {
-                cls_listbox? ctrl = CtrlItems[i] as cls_listbox;
-                if (mode == 0)
-                {
-                    ctrl!.ctrlBase.SetSelect(false);
-                }
-                else
-                {
-                    if (ctrl!.ctrlBase.GetSelected())
-                    {
-                        if (mode == 1)
-                        {
-                            ctrl.Deleate(this, ctrl);
-                            CtrlItems.Remove(ctrl);
-                        }
-                        else if (mode == 2)
-                        {
-                            SetProperty(i, index, false);
-                            ctrl.ctrlBase.SetSelect(true);
-                        }
-                        return true;
-                    }
-                }
-            }
-            else if (CtrlItems[i] is cls_groupbox)
-            {
-                cls_groupbox? ctrl = CtrlItems[i] as cls_groupbox;
-                if (mode == 0)
-                {
-                    ctrl!.SetSelect(false);
-                }
-                else
-                {
-                    if (ctrl!.GetSelected())
-                    {
-                        if (mode == 1)
-                        {
-                            ctrl.Deleate(this);
-                            CtrlItems.Remove(ctrl);
-                        }
-                        else if (mode == 2)
-                        {
-                            SetProperty(i, index, false);
-                            ctrl.SetSelect(true);
-                        }
-                        return true;
-                    }
-                }
-            }
-            else if (CtrlItems[i] is cls_tabcontrol)
-            {
-                cls_tabcontrol? ctrl = CtrlItems[i] as cls_tabcontrol;
-                if (mode == 0)
-                {
-                    ctrl!.SetSelect(false);
-                }
-                else
-                {
-                    if (ctrl!.GetSelected())
-                    {
-                        if (mode == 1)
-                        {
-                            ctrl.Deleate(this);
-                            CtrlItems.Remove(ctrl);
-                        }
-                        else if (mode == 2)
-                        {
-                            SetProperty(i, index, false);
-                            ctrl.SetSelect(true);
-                        }
-                        return true;
-                    }
-                }
-            }
-            else if (CtrlItems[i] is cls_tabpage)
-            {
-                cls_tabpage? ctrl = CtrlItems[i] as cls_tabpage;
-                if (mode == 0)
-                {
-                    ctrl!.SetSelect(false);
-                }
-                else
-                {
-                    if (ctrl!.GetSelected())
-                    {
-                        if (mode == 1)
-                        {
-                            ctrl.Deleate(this);
-                            CtrlItems.Remove(ctrl);
-                        }
-                        else if (mode == 2)
-                        {
-                            SetProperty(i, index, false);
-                            ctrl.SetSelect(true);
-                        }
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-        // ****************************************************************************************
     }
 }
