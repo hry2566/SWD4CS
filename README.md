@@ -28,13 +28,5 @@
  ・TextBox  
  ・他のコントローラー等は必要になったら追加する。
 
-## コントロール追加方法
- * cls_button等を参考に追加したいコントロールを継承したクラスを作成  
+## コントロール追加方法 
  * 「// コントロール追加時に下記を編集すること」に追記。  
- cls_form.cs  
- cls_selectbox.cs  
- MainForm.cs  
- cls_groupbox.cs  
- cls_tabcontrol.cs  
- cls_tabpage.cs  
- * 追記は、コピーしてクラス名等を追加したクラスに変更するだけ。
