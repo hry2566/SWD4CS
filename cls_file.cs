@@ -9,8 +9,8 @@
 
         internal List<string>[] NewFile()
         {
-            List<string> source_base = new List<string>();
-            List<string> source_custom = new List<string>();
+            List<string> source_base = new();
+            List<string> source_custom = new();
             List<string>[] ret = new List<string>[2];
 
             source_base.Add("namespace WinFormsApp;");
@@ -64,18 +64,19 @@
             List<string> fileName = new List<string>();
             List<string>[] ret = new List<string>[3];
 
-            OpenFileDialog dlg = new OpenFileDialog();
-            dlg.InitialDirectory = @"C:\";
-            dlg.Filter = "Designer.csファイル(*.Designer.cs;*.Designer.cs)|*.Designer.cs;*.Designer.cs";
-            dlg.FilterIndex = 1;
-            dlg.Title = "開くファイルを選択してください";
-            dlg.RestoreDirectory = true;
+            OpenFileDialog dlg = new()
+            {
+                InitialDirectory = @"C:\",
+                Filter = "Designer.csファイル(*.Designer.cs;*.Designer.cs)|*.Designer.cs;*.Designer.cs",
+                FilterIndex = 1,
+                Title = "開くファイルを選択してください",
+                RestoreDirectory = true
+            };
 
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 bool flag = true;
-
 
                 foreach (string line in System.IO.File.ReadLines(dlg.FileName))
                 {
@@ -111,14 +112,15 @@
 
         internal void Save(string SourceCode)
         {
-            SaveFileDialog dlg = new SaveFileDialog();
-
-            dlg.FileName = "Form1.Designer.cs";
-            dlg.InitialDirectory = @"C:\";
-            dlg.Filter = "Designer.csファイル(*.Designer.cs;*.Designer.cs)|*.Designer.cs;*.Designer.cs";
-            dlg.FilterIndex = 1;
-            dlg.Title = "保存先のファイルを選択してください";
-            dlg.RestoreDirectory = true;
+            SaveFileDialog dlg = new()
+            {
+                FileName = "Form1.Designer.cs",
+                InitialDirectory = @"C:\",
+                Filter = "Designer.csファイル(*.Designer.cs;*.Designer.cs)|*.Designer.cs;*.Designer.cs",
+                FilterIndex = 1,
+                Title = "保存先のファイルを選択してください",
+                RestoreDirectory = true
+            };
 
             //ダイアログを表示する
             if (dlg.ShowDialog() == DialogResult.OK)
