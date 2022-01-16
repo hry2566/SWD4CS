@@ -26,6 +26,7 @@
  ・TabControl  
  ・TabPage  
  ・TextBox  
+ ・Designer.csファイルのRead/Write（ただし、SWD4CS以外で編集したものは開けない）  
  ・他のコントローラー等は必要になったら追加する。
 
 ## コントロール追加方法 
