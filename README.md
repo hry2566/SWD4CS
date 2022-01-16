@@ -20,7 +20,7 @@
  ・Button  
  ・ChechBox  
  ・ComboBox  
- ・GroupBox 
+ ・GroupBox  
  ・Label  
  ・ListBox  
  ・TabControl  
