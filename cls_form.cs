@@ -2,7 +2,7 @@
 {
     public partial class cls_form : Panel
     {
-        internal List<cls_control> CtrlItems = new List<cls_control>();
+        internal List<cls_control> CtrlItems = new();
         private cls_selectbox? selectBox;
         private Control? backPanel;
         private ListBox? toolList;
@@ -35,11 +35,10 @@
             this.backPanel = backPanel;
             this.toolList = toolList;
             this.propertyList = dataGridView1;
-
-            backPanel.Click += new System.EventHandler(Backpanel_Click);
             this.Click += new System.EventHandler(Form_Click);
             this.propertyList.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
 
+            backPanel.Click += new System.EventHandler(Backpanel_Click);
 
             selectBox = new cls_selectbox(this, backPanel);
         }
@@ -171,14 +170,8 @@
                 // Add 
                 int X = (int)(me.X / grid) * grid;
                 int Y = (int)(me.Y / grid) * grid;
+                _ = new cls_control(this, toolList!.Text, this, backPanel!, toolList, propertyList!, X, Y);
 
-                cls_control ctrl = new cls_control(this, toolList!.Text, this, backPanel!, toolList, propertyList!, X, Y);
-
-                if (toolList.Text == "TabControl")
-                {
-                    cls_control page1 = new cls_control(this, "TabPage", ctrl.ctrl!, backPanel!, toolList, propertyList!, X, Y);
-                    cls_control page2 = new cls_control(this, "TabPage", ctrl.ctrl!, backPanel!, toolList, propertyList!, X, Y);
-                }
                 toolList.SelectedIndex = -1;
             }
 
