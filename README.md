@@ -9,7 +9,7 @@
  * VisualStudio2022 C# → VSCode .net6.0
  
 ## 動画
- https://youtu.be/3KAt203qVsA
+ https://youtu.be/82qa0vOP_qk
  
 ## ブログ
  https://danpapa-hry.hateblo.jp/entry/2022/01/01/211917
