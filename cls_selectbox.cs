@@ -77,12 +77,25 @@ namespace SWD4CS
 
                 if (ctrl != null)
                 {
-                    x1 = ctrl.Left - 8;
-                    x2 = ctrl.Width / 2 + ctrl.Left - 4;
-                    x3 = ctrl.Width + ctrl.Left;
-                    y1 = ctrl.Top - 8;
-                    y2 = ctrl.Height / 2 + ctrl.Top - 4;
-                    y3 = ctrl.Height + ctrl.Top;
+                    if (ctrl.ctrl is TabPage)
+                    {
+                        x1 = ctrl.ctrl.Left;
+                        x2 = ctrl.ctrl.Width / 2 + ctrl.ctrl.Left - 8;
+                        x3 = ctrl.ctrl.Width + ctrl.ctrl.Left - 16;
+                        y1 = ctrl.ctrl.Top - 27;
+                        y2 = ctrl.ctrl.Height / 2 + ctrl.ctrl.Top - 35;
+                        y3 = ctrl.ctrl.Height + ctrl.ctrl.Top - 40;
+                    }
+                    else
+                    {
+                        x1 = ctrl.Left - 8;
+                        x2 = ctrl.Width / 2 + ctrl.Left - 4;
+                        x3 = ctrl.Width + ctrl.Left;
+                        y1 = ctrl.Top - 8;
+                        y2 = ctrl.Height / 2 + ctrl.Top - 4;
+                        y3 = ctrl.Height + ctrl.Top;
+                    }
+
                 }
                 else
                 {
