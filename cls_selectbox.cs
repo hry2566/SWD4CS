@@ -240,49 +240,6 @@ namespace SWD4CS
             }
 
             ctrl.Selected = true;
-
-
         }
-
-
-
-        // ****************************************************************************************
-        // コントロール追加時に下記を編集すること
-        // ****************************************************************************************
-        //if (this.ctrl is cls_button)
-        //{
-        //    cls_button? ctrl = this.ctrl as cls_button;
-        //    ctrl!.ctrlBase.SetSelect(true);
-        //}
-        //else if (this.ctrl is cls_label)
-        //{
-        //    cls_label? ctrl = this.ctrl as cls_label;
-        //    ctrl!.ctrlBase.SetSelect(true);
-        //}
-        //else if (this.ctrl is cls_textbox)
-        //{
-        //    cls_textbox? ctrl = this.ctrl as cls_textbox;
-        //    ctrl!.ctrlBase.SetSelect(true);
-        //}
-        //else if (this.ctrl is cls_listbox)
-        //{
-        //    cls_listbox? ctrl = this.ctrl as cls_listbox;
-        //    ctrl!.ctrlBase.SetSelect(true);
-        //}
-        //else if (this.ctrl is cls_groupbox)
-        //{
-        //    cls_groupbox? ctrl = this.ctrl as cls_groupbox;
-        //    ctrl!.SetSelect(true);
-        //}
-        //else if (this.ctrl is cls_tabcontrol)
-        //{
-        //    cls_tabcontrol? ctrl = this.ctrl as cls_tabcontrol;
-        //    ctrl!.SetSelect(true);
-        //}
-
-
-
-        // ****************************************************************************************
-
     }
 }
