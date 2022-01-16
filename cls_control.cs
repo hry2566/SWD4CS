@@ -34,7 +34,13 @@
                 this.form.CtrlItems!.Add(this);
                 parent.Controls.Add(this.form.CtrlItems[this.form.CtrlItems.Count - 1].ctrl);
 
-                if (className != "TabPage")
+                if (this.ctrl is TabControl)
+                {
+                    _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
+                    _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
+                }
+
+                if (this.ctrl is TabPage == false)
                 {
                     selectBox = new cls_selectbox(this, parent);
                     Selected = true;
@@ -44,7 +50,6 @@
                 this.ctrl.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
                 this.ctrl.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
                 backPanel.Click += new System.EventHandler(Backpanel_Click);
-
             }
         }
 
@@ -91,30 +96,30 @@
 
         private void Ctrl_Click(object? sender, EventArgs e)
         {
+            if (e.ToString() == "System.EventArgs")
+            {
+                return;
+            }
+
+            MouseEventArgs me = (MouseEventArgs)e;
+
             if (toolList!.Text == "")
             {
-                if (e.ToString() != "System.EventArgs")
+                if (me.Button == MouseButtons.Left)
                 {
-                    MouseEventArgs me = (MouseEventArgs)e;
-
-                    if (me.Button == MouseButtons.Left)
+                    if (Selected && changeFlag)
                     {
-                        if (Selected && changeFlag)
-                        {
-                            Selected = false;
-                        }
-                        else
-                        {
-                            form.SelectAllClear();
-                            Selected = true;
-                        }
+                        Selected = false;
+                    }
+                    else
+                    {
+                        form.SelectAllClear();
+                        Selected = true;
                     }
                 }
             }
             else
             {
-                MouseEventArgs me = (MouseEventArgs)e;
-
                 // unselect
                 form.SelectAllClear();
 
@@ -122,26 +127,11 @@
                 int X = (int)(me.X / grid) * grid;
                 int Y = (int)(me.Y / grid) * grid;
 
-                if (this.ctrl is TabControl)
+                if ((this.ctrl is TabControl && toolList!.Text == "TabPage") || (this.ctrl is TabControl == false && toolList!.Text != "TabPage"))
                 {
-                    if (toolList!.Text == "TabPage")
-                    {
-                        cls_control ctrl = new cls_control(form, toolList!.Text, this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
-                    }
+                    cls_control ctrl = new cls_control(form, toolList!.Text, this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
                 }
-                else
-                {
-                    if (toolList!.Text != "TabPage")
-                    {
-                        cls_control ctrl = new cls_control(form, toolList!.Text, this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
-                        if (toolList.Text == "TabControl")
-                        {
-                            cls_control page1 = new cls_control(form, "TabPage", ctrl.ctrl!, backPanel!, toolList, propertyList!, X, Y);
-                            cls_control page2 = new cls_control(form, "TabPage", ctrl.ctrl!, backPanel!, toolList, propertyList!, X, Y);
-                        }
-                    }
 
-                }
                 toolList.SelectedIndex = -1;
             }
 
