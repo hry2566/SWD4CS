@@ -2,9 +2,9 @@ namespace SWD4CS
 {
     public partial class MainForm : Form
     {
-        List<string> source_base = new List<string>();
-        List<string> source_custom = new List<string>();
-        string sourceFileName = "";
+        private List<string> source_base = new List<string>();
+        private List<string> source_custom = new List<string>();
+        private string sourceFileName = "";
 
         public MainForm()
         {
@@ -15,8 +15,9 @@ namespace SWD4CS
         {
             cls_design_form1.Init(tabPage5, listBox1, dataGridView1);
 
-            cls_file file = new cls_file();
+            cls_file file = new();
             List<string>[] ret = file.NewFile();
+
             source_base = ret[0];
             source_custom = ret[1];
         }
@@ -29,7 +30,7 @@ namespace SWD4CS
             }
         }
 
-        private void tabControl3_SelectedIndexChanged(object sender, EventArgs e)
+        private void TabControl3_SelectedIndexChanged(object sender, EventArgs e)
         {
             string name;
             int x;
@@ -75,14 +76,12 @@ namespace SWD4CS
                 int insertPos = 2;
                 int insertPos2 = 0;
                 int itemCount = cls_design_form1.CtrlItems!.Count;
+
                 for (int i = 0; i < itemCount; i++)
                 {
                     cls_control ctrl = cls_design_form1.CtrlItems[i];
-                    string ctrlClass = "";
-                    string parentName = ".";
-
-                    ctrlClass = ctrl.className;
-                    parentName += ctrl.parent!.Name;
+                    string ctrlClass = ctrl.className;
+                    string parentName = "." + ctrl.parent!.Name;
 
                     if (parentName == ".cls_design_form1")
                     {
@@ -155,7 +154,7 @@ namespace SWD4CS
             }
         }
 
-        private void readrToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ReadrToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //cls_file file = new cls_file();
             //List<string>[] ret = file.OpenFile();
@@ -189,9 +188,9 @@ namespace SWD4CS
 
         }
 
-        private void saveSToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveSToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            cls_file file = new cls_file();
+            cls_file file = new();
 
             tabControl3.SelectedIndex = 1;
 
