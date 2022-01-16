@@ -174,7 +174,7 @@
             this.tabControl3.SelectedIndex = 0;
             this.tabControl3.Size = new System.Drawing.Size(344, 422);
             this.tabControl3.TabIndex = 0;
-            this.tabControl3.SelectedIndexChanged += new System.EventHandler(this.tabControl3_SelectedIndexChanged);
+            this.tabControl3.SelectedIndexChanged += new System.EventHandler(this.TabControl3_SelectedIndexChanged);
             // 
             // tabPage5
             // 
@@ -329,14 +329,14 @@
             this.readrToolStripMenuItem.Name = "readrToolStripMenuItem";
             this.readrToolStripMenuItem.Size = new System.Drawing.Size(149, 26);
             this.readrToolStripMenuItem.Text = "Open(&O)";
-            this.readrToolStripMenuItem.Click += new System.EventHandler(this.readrToolStripMenuItem_Click);
+            this.readrToolStripMenuItem.Click += new System.EventHandler(this.ReadrToolStripMenuItem_Click);
             // 
             // saveSToolStripMenuItem
             // 
             this.saveSToolStripMenuItem.Name = "saveSToolStripMenuItem";
             this.saveSToolStripMenuItem.Size = new System.Drawing.Size(149, 26);
             this.saveSToolStripMenuItem.Text = "Save(&S)";
-            this.saveSToolStripMenuItem.Click += new System.EventHandler(this.saveSToolStripMenuItem_Click);
+            this.saveSToolStripMenuItem.Click += new System.EventHandler(this.SaveSToolStripMenuItem_Click);
             // 
             // closeCToolStripMenuItem
             // 
