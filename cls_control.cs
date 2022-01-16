@@ -40,7 +40,12 @@
                     _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
                 }
 
-                if (this.ctrl is TabPage == false)
+                if (this.ctrl is TabPage)
+                {
+                    selectBox = new cls_selectbox(this, this.ctrl);
+                    Selected = false;
+                }
+                else
                 {
                     selectBox = new cls_selectbox(this, parent);
                     Selected = true;
@@ -205,7 +210,6 @@
                     selectFlag = value;
                     selectBox!.SetSelectBoxPos(value);
                 }
-
 
                 if (value)
                 {
