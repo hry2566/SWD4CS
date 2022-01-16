@@ -177,6 +177,16 @@
 
         }
 
+        internal void CtrlAllClear()
+        {
+            for (int i = 0; i < CtrlItems!.Count; i++)
+            {
+                CtrlItems[i].Selected = true;
+            }
+
+            RemoveSelectedItem();
+        }
+
         internal void SelectAllClear()
         {
             SetSelect(false);
@@ -193,11 +203,131 @@
             {
                 if (CtrlItems[i].Selected)
                 {
-                    //コントロール削除（子含む）
-                    Delete(CtrlItems[i]);
-                    i--;
+                    if (CtrlItems[i].ctrl is TabPage)
+                    {
+                        int cnt = 0;
+                        for (int j = 0; j < CtrlItems.Count; j++)
+                        {
+                            if (CtrlItems[j].ctrl is TabPage)
+                            {
+                                cnt++;
+                            }
+                        }
+                        if (cnt > 1)
+                        {
+                            //コントロール削除（子含む）
+                            Delete(CtrlItems[i]);
+                            i--;
+                        }
+                    }
+                    else
+                    {
+                        //コントロール削除（子含む）
+                        Delete(CtrlItems[i]);
+                        i--;
+                    }
                 }
             }
+        }
+
+        internal void CreateControl(List<string> source_custom)
+        {
+            for (int i = 0; i < source_custom.Count; i++)
+            {
+                string[] split;
+                string dummy;
+                string ctrlClass;
+                int locationX;
+                int locationY;
+                string ctrlName;
+                int sizeX;
+                int sizeY;
+                int tabIndex;
+                string ctrlText;
+                string ctrlParent;
+
+                if (source_custom[i].IndexOf("new System.Windows.Forms.") > -1)
+                {
+                    split = source_custom[i].Split('.');
+                    dummy = split[split.Count() - 1];
+                    ctrlClass = dummy.Substring(0, dummy.IndexOf('('));
+
+                    split = source_custom[i + 1].Split('(');
+                    dummy = split[split.Count() - 1];
+                    split = dummy.Split(',');
+                    locationX = int.Parse(split[0]);
+                    dummy = split[1];
+                    locationY = int.Parse(dummy.Substring(0, dummy.IndexOf(')')));
+
+                    split = source_custom[i + 2].Split('"');
+                    ctrlName = split[split.Count() - 2];
+
+                    split = source_custom[i + 3].Split('(');
+                    dummy = split[split.Count() - 1];
+                    split = dummy.Split(',');
+                    sizeX = int.Parse(split[0]);
+                    dummy = split[1];
+                    sizeY = int.Parse(dummy.Substring(0, dummy.IndexOf(')')));
+
+                    split = source_custom[i + 4].Split('=');
+                    dummy = split[split.Count() - 1];
+                    split = dummy.Split(';');
+                    dummy = split[0];
+                    tabIndex = int.Parse(dummy);
+
+                    split = source_custom[i + 5].Split('"');
+                    ctrlText = split[split.Count() - 2];
+
+                    split = source_custom[i + 6].Split('.');
+                    ctrlParent = split[1];
+
+                    if (ctrlParent == "Controls")
+                    {
+                        _ = new cls_control(this, ctrlClass, this, backPanel!, toolList, propertyList!, locationX, locationY);
+                        if (ctrlClass == "TabControl")
+                        {
+                            Delete(CtrlItems[CtrlItems.Count - 1]);
+                            Delete(CtrlItems[CtrlItems.Count - 1]);
+                        }
+                    }
+                    else
+                    {
+                        for (int j = 0; j < CtrlItems.Count; j++)
+                        {
+                            if (CtrlItems[j].Name == ctrlParent)
+                            {
+                                _ = new cls_control(this, ctrlClass, CtrlItems[j].ctrl!, backPanel!, toolList, propertyList!, locationX, locationY);
+                                break;
+                            }
+                        }
+                    }
+
+                    CtrlItems[CtrlItems.Count - 1].Name = ctrlName;
+                    CtrlItems[CtrlItems.Count - 1].Width = sizeX;
+                    CtrlItems[CtrlItems.Count - 1].Height = sizeY;
+                    CtrlItems[CtrlItems.Count - 1].TabIndex = tabIndex;
+                    CtrlItems[CtrlItems.Count - 1].Text = ctrlText;
+                }
+
+                if (source_custom[i].IndexOf("this.ClientSize") > -1)
+                {
+                    split = source_custom[i].Split('(');
+                    dummy = split[split.Count() - 1];
+                    split = dummy.Split(',');
+                    sizeX = int.Parse(split[0]);
+                    dummy = split[1];
+                    sizeY = int.Parse(dummy.Substring(0, dummy.IndexOf(')')));
+
+                    split = source_custom[i + 1].Split('"');
+                    ctrlText = split[split.Count() - 2];
+
+                    this.Width = sizeX;
+                    this.Height = sizeY;
+                    this.Text = ctrlText;
+                }
+            }
+
+            SelectAllClear();
         }
 
         private void Delete(cls_control ctrl)
