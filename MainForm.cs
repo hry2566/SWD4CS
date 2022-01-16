@@ -156,35 +156,33 @@ namespace SWD4CS
 
         private void ReadrToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //cls_file file = new cls_file();
-            //List<string>[] ret = file.OpenFile();
+            cls_file file = new cls_file();
+            List<string>[] ret = file.OpenFile();
 
-            //if (ret[2] != null)
-            //{
-            //    source_base = ret[0];
-            //    source_custom = ret[1];
-            //    sourceFileName = ret[2][0];
+            if (ret[2] != null)
+            {
+                source_base = ret[0];
+                source_custom = ret[1];
+                sourceFileName = ret[2][0];
 
-            //    // コントロール全クリア
-            //    cls_design_form1.CtrlAllClear();
+                // 全コントロールクリア
+                cls_design_form1.CtrlAllClear();
 
-
-
-
+                cls_design_form1.CreateControl(source_custom);
 
 
-            //    //string source = "";
-            //    //for (int i = 0; i < source_base.Count; i++)
-            //    //{
-            //    //    source += source_base[i] + "\r\n";
-            //    //}
-            //    //for (int i = 0; i < source_custom.Count; i++)
-            //    //{
-            //    //    source += source_custom[i] + "\r\n"; ;
-            //    //}
+                //string source = "";
+                //for (int i = 0; i < source_base.Count; i++)
+                //{
+                //    source += source_base[i] + "\r\n";
+                //}
+                //for (int i = 0; i < source_custom.Count; i++)
+                //{
+                //    source += source_custom[i] + "\r\n"; ;
+                //}
 
-            //    //textBox2.Text = source;
-            //}
+                //textBox2.Text = source;
+            }
 
         }
 
@@ -193,6 +191,7 @@ namespace SWD4CS
             cls_file file = new();
 
             tabControl3.SelectedIndex = 1;
+            tabControl3.SelectedIndex = 0;
 
             if (sourceFileName != "")
             {
