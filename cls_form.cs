@@ -297,6 +297,11 @@
                             if (CtrlItems[j].Name == ctrlParent)
                             {
                                 _ = new cls_control(this, ctrlClass, CtrlItems[j].ctrl!, backPanel!, toolList, propertyList!, locationX, locationY);
+                                if (ctrlClass == "TabControl")
+                                {
+                                    Delete(CtrlItems[CtrlItems.Count - 1]);
+                                    Delete(CtrlItems[CtrlItems.Count - 1]);
+                                }
                                 break;
                             }
                         }
