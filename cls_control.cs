@@ -1,4 +1,8 @@
-﻿namespace SWD4CS
+﻿using System.ComponentModel;
+using System.Data;
+using System.Reflection;
+
+namespace SWD4CS
 {
     internal class cls_control
     {
@@ -15,7 +19,6 @@
         private Point memPos;
         private int grid = 8;
 
-
         public cls_control(cls_form form, string className, Control parent, Control backPanel, ListBox? toolList, DataGridView propertyList, int X, int Y)
         {
             this.form = form;
@@ -27,10 +30,12 @@
 
             if (Init(className))
             {
-                this.Name = className + this.TabIndex.ToString();
-                this.Text = className + this.TabIndex.ToString();
-                this.Location = new System.Drawing.Point(X, Y);
+                if (className == "TabPage" && parent == form)
+                {
+                    return;
+                }
 
+                this.ctrl!.Location = new System.Drawing.Point(X, Y);
                 this.form.CtrlItems!.Add(this);
                 parent.Controls.Add(this.form.CtrlItems[this.form.CtrlItems.Count - 1].ctrl);
 
@@ -148,63 +153,12 @@
             parent.Controls.Remove(ctrl);
         }
 
-        // ********************************************************************************
-        // プロパティ
-        // ********************************************************************************
-
-        public string Name
-        {
-            set
-            {
-                ctrl!.Name = value;
-
-            }
-            get
-            {
-                return ctrl!.Name;
-            }
-        }
-        public string Text
-        {
-            set
-            {
-                ctrl!.Text = value;
-
-            }
-            get
-            {
-                return ctrl!.Text;
-            }
-        }
-        public System.Drawing.Point Location
-        {
-            set
-            {
-                ctrl!.Location = value;
-
-            }
-            get
-            {
-                return ctrl!.Location;
-            }
-        }
-        public System.Drawing.Size Size
-        {
-            set
-            {
-                ctrl!.Size = value;
-
-            }
-            get
-            {
-                return ctrl!.Size;
-            }
-        }
-
         public bool Selected
         {
             set
             {
+                propertyList.Columns.Clear();
+
                 if (selectBox != null)
                 {
                     selectFlag = value;
@@ -213,18 +167,37 @@
 
                 if (value)
                 {
-                    propertyList!.Rows.Clear();
-                    propertyList.Rows.Add("Name", this.Name);
-                    propertyList.Rows.Add("Location.X", this.Location.X);
-                    propertyList.Rows.Add("Location.Y", this.Location.Y);
-                    propertyList.Rows.Add("Size.Width", this.Size.Width);
-                    propertyList.Rows.Add("Size.Height", this.Size.Height);
-                    propertyList.Rows.Add("TabIndex", this.TabIndex);
-                    propertyList.Rows.Add("Text", this.Text);
+                    DataTable table = new DataTable();
+                    table.Columns.Add("Property");
+                    table.Columns.Add("Value");
+
+                    foreach (PropertyInfo item in this.ctrl!.GetType().GetProperties())
+                    {
+                        if (HideProperty(item.Name))
+                        {
+                            DataRow row = table.NewRow();
+                            row[0] = item.Name;
+                            row[1] = item.GetValue(this.ctrl);
+
+                            table.Rows.Add(row);
+                        }
+                    }
+
+                    propertyList.DataSource = table;
+
+                    // sort
+                    propertyList.Sort(propertyList.Columns[0], ListSortDirection.Ascending);
+                    //propertyList.CurrentCell = propertyList[0, 0];
+
                 }
                 else
                 {
-                    propertyList!.Rows.Clear();
+                    propertyList.Columns.Clear();
+
+                    DataTable table = new DataTable();
+                    table.Columns.Add("Property");
+                    table.Columns.Add("Value");
+                    propertyList.DataSource = table;
                 }
             }
             get
@@ -233,132 +206,184 @@
             }
         }
 
-        public int Left
+        public bool HideProperty(string itemName)
         {
-            set
+            if (itemName != "AccessibilityObject" &&
+                itemName != "AccessibleDefaultActionDescription" &&
+                itemName != "AutoScrollOffset" &&
+                itemName != "BindingContext" &&
+                itemName != "Bottom" &&
+                itemName != "Bounds" &&
+                itemName != "CanFocus" &&
+                itemName != "CanSelect" &&
+                itemName != "Capture" &&
+                itemName != "ClientRectangle" &&
+                itemName != "ClientSize" &&
+                itemName != "CompanyName" &&
+                itemName != "Container" &&
+                itemName != "ContainsFocus" &&
+                itemName != "Controls" &&
+                itemName != "Created" &&
+                itemName != "DataBindings" &&
+                itemName != "DeviceDpi" &&
+                itemName != "DisplayRectangle" &&
+                itemName != "Disposing" &&
+                itemName != "Focused" &&
+                itemName != "Handle" &&
+                itemName != "HasChildren" &&
+                itemName != "Height" &&
+                itemName != "ImeMode" &&
+                itemName != "InvokeRequired" &&
+                itemName != "IsAccessible" &&
+                itemName != "IsAncestorSiteInDesignMode" &&
+                itemName != "IsDisposed" &&
+                itemName != "IsHandleCreated" &&
+                itemName != "IsMirrored" &&
+                itemName != "LayoutEngine" &&
+                itemName != "Left" &&
+                itemName != "Parent" &&
+                itemName != "PreferredSize" &&
+                itemName != "ProductName" &&
+                itemName != "ProductVersion" &&
+                itemName != "RecreatingHandle" &&
+                itemName != "Region" &&
+                itemName != "Right" &&
+                itemName != "Site" &&
+                itemName != "Top" &&
+                itemName != "TopLevelControl" &&
+                itemName != "Width" &&
+                itemName != "WindowTarget" &&
+                itemName != "Visible" &&
+                itemName != "TextLength" &&
+                itemName != "RowCount" &&
+                itemName != "TabCount" &&
+                itemName != "PreferredWidth" &&
+                itemName != "PreferredHeight" &&
+                itemName != "SelectedIndex" &&
+                itemName != "SelectedItem" &&
+                itemName != "SelectedText" &&
+                itemName != "SelectedValue" &&
+                itemName != "SelectionLength" &&
+                itemName != "SelectionStart" &&
+                itemName != "CustomTabOffsets" &&
+                itemName != "FormatInfo" &&
+                itemName != "SelectedIndices" &&
+                itemName != "SelectedItems" &&
+                itemName != "SelectedTab" &&
+                itemName != "CanUndo" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != ""
+                )
             {
-                ctrl!.Location = new System.Drawing.Point(value, ctrl!.Location.Y);
+                return true;
             }
-            get
+            else
             {
-                return ctrl!.Location.X;
-            }
-        }
-        public int Top
-        {
-            set
-            {
-                ctrl!.Location = new System.Drawing.Point(ctrl!.Location.X, value);
-            }
-            get
-            {
-                return ctrl!.Location.Y;
+                return false;
             }
         }
 
-        public int Width
-        {
-            set
-            {
-                ctrl!.Size = new System.Drawing.Size(value, ctrl!.Size.Height);
-            }
-            get
-            {
-                return ctrl!.Size.Width;
-            }
-        }
-
-        public int Height
-        {
-            set
-            {
-                ctrl!.Size = new System.Drawing.Size(ctrl!.Size.Width, value);
-            }
-            get
-            {
-                return ctrl!.Size.Height;
-            }
-        }
-
-        public int TabIndex
-        {
-            set
-            {
-                ctrl!.TabIndex = value;
-            }
-            get
-            {
-                return ctrl!.TabIndex;
-            }
-        }
-
-        // ****************************************************************************************
-        // コントロール追加時に下記を編集すること
-        // ****************************************************************************************
         private bool Init(string className)
         {
+            form.cnt_Control++;
+
+            // ****************************************************************************************
+            // コントロール追加時に下記を編集すること
+            // ****************************************************************************************
             switch (className)
             {
                 case "Button":
                     this.ctrl = new Button();
-                    this.Size = new System.Drawing.Size(96, 32);
-                    this.TabIndex = form.cnt_Button;
+                    this.ctrl.Size = new System.Drawing.Size(96, 32);
+                    this.ctrl!.Name = className + form.cnt_Button;
                     form.cnt_Button++;
-                    return true;
+                    break;
+
                 case "Label":
                     this.ctrl = new Label();
-                    this.Size = new System.Drawing.Size(80, 32);
-                    this.TabIndex = form.cnt_Label;
+                    this.ctrl.Size = new System.Drawing.Size(80, 32);
+                    this.ctrl!.Name = className + form.cnt_Label;
                     form.cnt_Label++;
-                    return true;
+                    break;
+
                 case "GroupBox":
                     this.ctrl = new GroupBox();
-                    this.Size = new System.Drawing.Size(250, 125);
-                    this.TabIndex = form.cnt_GroupBox;
+                    this.ctrl.Size = new System.Drawing.Size(250, 125);
+                    this.ctrl!.Name = className + form.cnt_GroupBox;
                     form.cnt_GroupBox++;
-                    return true;
+                    break;
+
                 case "TextBox":
                     this.ctrl = new TextBox();
-                    this.Size = new System.Drawing.Size(120, 32);
-                    this.TabIndex = form.cnt_TextBox;
+                    this.ctrl.Size = new System.Drawing.Size(120, 32);
+                    this.ctrl!.Name = className + form.cnt_TextBox;
                     form.cnt_TextBox++;
-                    return true;
+                    break;
+
                 case "ListBox":
                     this.ctrl = new ListBox();
-                    this.Size = new System.Drawing.Size(120, 104);
-                    this.TabIndex = form.cnt_ListBox;
+                    this.ctrl.Size = new System.Drawing.Size(120, 104);
+                    this.ctrl!.Name = className + form.cnt_ListBox;
                     form.cnt_ListBox++;
-                    return true;
+                    break;
+
                 case "TabControl":
                     this.ctrl = new TabControl();
-                    this.Size = new System.Drawing.Size(250, 125);
-                    this.TabIndex = form.cnt_TabControl;
+                    this.ctrl.Size = new System.Drawing.Size(250, 125);
+                    this.ctrl!.Name = className + form.cnt_TabControl;
                     form.cnt_TabControl++;
-                    return true;
+                    break;
+
                 case "TabPage":
                     this.ctrl = new TabPage();
-                    this.Size = new System.Drawing.Size(250, 125);
-                    this.TabIndex = form.cnt_TabPage;
+                    this.ctrl.Size = new System.Drawing.Size(250, 125);
+                    this.ctrl!.Name = className + form.cnt_TabPage;
                     form.cnt_TabPage++;
-                    return true;
+                    break;
+
                 case "CheckBox":
                     this.ctrl = new CheckBox();
-                    this.Size = new System.Drawing.Size(120, 32);
-                    this.TabIndex = form.cnt_CheckBox;
+                    this.ctrl.Size = new System.Drawing.Size(120, 32);
+                    this.ctrl!.Name = className + form.cnt_CheckBox;
                     form.cnt_CheckBox++;
-                    return true;
+                    break;
+
                 case "ComboBox":
                     this.ctrl = new ComboBox();
-                    this.Size = new System.Drawing.Size(120, 32);
-                    this.TabIndex = form.cnt_ComboBox;
+                    this.ctrl.Size = new System.Drawing.Size(120, 32);
+                    this.ctrl!.Name = className + form.cnt_ComboBox;
                     form.cnt_ComboBox++;
-                    return true;
+                    break;
 
                 default:
                     return false;
             }
+            // ****************************************************************************************
+
+            this.ctrl!.Text = this.ctrl!.Name;
+            this.ctrl!.TabIndex = form.cnt_Control;
+            return true;
         }
-        // ****************************************************************************************
+
 
     }
 }
