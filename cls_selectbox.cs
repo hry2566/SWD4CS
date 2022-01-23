@@ -88,14 +88,13 @@ namespace SWD4CS
                     }
                     else
                     {
-                        x1 = ctrl.Left - 8;
-                        x2 = ctrl.Width / 2 + ctrl.Left - 4;
-                        x3 = ctrl.Width + ctrl.Left;
-                        y1 = ctrl.Top - 8;
-                        y2 = ctrl.Height / 2 + ctrl.Top - 4;
-                        y3 = ctrl.Height + ctrl.Top;
+                        x1 = ctrl.ctrl!.Left - 8;
+                        x2 = ctrl.ctrl!.Width / 2 + ctrl.ctrl!.Left - 4;
+                        x3 = ctrl.ctrl!.Width + ctrl.ctrl!.Left;
+                        y1 = ctrl.ctrl!.Top - 8;
+                        y2 = ctrl.ctrl!.Height / 2 + ctrl.ctrl!.Top - 4;
+                        y3 = ctrl.ctrl!.Height + ctrl.ctrl!.Top;
                     }
-
                 }
                 else
                 {
@@ -195,61 +194,61 @@ namespace SWD4CS
             newPos.X = (int)(newPos.X / grid) * grid;
             newPos.Y = (int)(newPos.Y / grid) * grid;
 
-            int width = newPos.X - ctrl!.Left;
-            int height = newPos.Y - ctrl.Top;
-            int width2 = ctrl.Width - (newPos.X + 8 - ctrl.Left);
-            int height2 = ctrl.Height - (newPos.Y + 8 - ctrl.Top);
-            int memleft = ctrl.Left;
-            int memtop = ctrl.Top;
+            int width = newPos.X - ctrl!.ctrl!.Left;
+            int height = newPos.Y - ctrl.ctrl!.Top;
+            int width2 = ctrl.ctrl!.Width - (newPos.X + 8 - ctrl.ctrl!.Left);
+            int height2 = ctrl.ctrl!.Height - (newPos.Y + 8 - ctrl.ctrl!.Top);
+            int memleft = ctrl.ctrl!.Left;
+            int memtop = ctrl.ctrl!.Top;
 
             switch (index)
             {
                 case 0:
-                    ctrl.Left = newPos.X + 8;
-                    ctrl.Top = newPos.Y + 8;
-                    ctrl.Width = width2;
-                    ctrl.Height = height2;
+                    ctrl.ctrl!.Left = newPos.X + 8;
+                    ctrl.ctrl!.Top = newPos.Y + 8;
+                    ctrl.ctrl!.Width = width2;
+                    ctrl.ctrl!.Height = height2;
                     break;
                 case 1:
-                    ctrl.Top = newPos.Y + 8;
-                    ctrl.Height = height2;
+                    ctrl.ctrl!.Top = newPos.Y + 8;
+                    ctrl.ctrl!.Height = height2;
                     break;
                 case 2:
-                    ctrl.Top = newPos.Y + 8;
-                    ctrl.Height = height2;
-                    ctrl.Width = width;
+                    ctrl.ctrl!.Top = newPos.Y + 8;
+                    ctrl.ctrl!.Height = height2;
+                    ctrl.ctrl!.Width = width;
                     break;
                 case 3:
-                    ctrl.Left = newPos.X + 8;
-                    ctrl.Width = width2;
-                    ctrl.Height = height;
+                    ctrl.ctrl!.Left = newPos.X + 8;
+                    ctrl.ctrl!.Width = width2;
+                    ctrl.ctrl!.Height = height;
                     break;
                 case 4:
-                    ctrl.Height = height;
+                    ctrl.ctrl!.Height = height;
                     break;
                 case 5:
-                    ctrl.Width = width;
-                    ctrl.Height = height;
+                    ctrl.ctrl!.Width = width;
+                    ctrl.ctrl!.Height = height;
                     break;
                 case 6:
-                    ctrl.Left = newPos.X + 8;
-                    ctrl.Width = width2;
+                    ctrl.ctrl!.Left = newPos.X + 8;
+                    ctrl.ctrl!.Width = width2;
                     break;
                 case 7:
-                    ctrl.Width = width;
+                    ctrl.ctrl!.Width = width;
                     break;
             }
 
-            if (ctrl.Width < 24)
+            if (ctrl.ctrl!.Width < 24)
             {
-                ctrl.Width = 24;
-                ctrl.Left = memleft;
+                ctrl.ctrl!.Width = 24;
+                ctrl.ctrl!.Left = memleft;
             }
 
-            if (ctrl.Height < 24)
+            if (ctrl.ctrl!.Height < 24)
             {
-                ctrl.Height = 24;
-                ctrl.Top = memtop;
+                ctrl.ctrl!.Height = 24;
+                ctrl.ctrl!.Top = memtop;
             }
 
             ctrl.Selected = true;
