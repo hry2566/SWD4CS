@@ -9,7 +9,8 @@
  * VisualStudio2022 C# → VSCode .net6.0
  
 ## 動画
- https://youtu.be/82qa0vOP_qk
+ https://youtu.be/82qa0vOP_qk  
+ https://youtu.be/FkDaMW4hGyk
  
 ## ブログ
  https://danpapa-hry.hateblo.jp/entry/2022/01/01/211917
@@ -26,9 +27,10 @@
  ・TabControl  
  ・TabPage  
  ・TextBox  
+ ・Designer.csファイルのRead/Write（ただし、SWD4CS以外で編集したものは開けない）  
  ・他のコントローラー等は必要になったら追加する。
 
 ## コントロール追加方法 
  * 「// コントロール追加時に下記を編集すること」に追記。  
-・cls_form  
-・cls_control
+・cls_form.cs  
+・cls_control.cs  
