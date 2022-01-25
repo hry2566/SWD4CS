@@ -144,7 +144,6 @@ namespace SWD4CS
 
                 toolList.SelectedIndex = -1;
             }
-
         }
 
         public void Delete()
@@ -182,19 +181,14 @@ namespace SWD4CS
                             table.Rows.Add(row);
                         }
                     }
-
                     propertyList.DataSource = table;
-
-                    // sort
                     propertyList.Sort(propertyList.Columns[0], ListSortDirection.Ascending);
-                    //propertyList.CurrentCell = propertyList[0, 0];
-
                 }
                 else
                 {
-                    propertyList.Columns.Clear();
-
                     DataTable table = new DataTable();
+
+                    propertyList.Columns.Clear();
                     table.Columns.Add("Property");
                     table.Columns.Add("Value");
                     propertyList.DataSource = table;
@@ -373,6 +367,13 @@ namespace SWD4CS
                     this.ctrl!.Name = className + form.cnt_ComboBox;
                     form.cnt_ComboBox++;
                     break;
+                //case "SplitContainer":
+                //    this.ctrl = new SplitContainer();
+                //    this.ctrl.Size = new System.Drawing.Size(120, 32);
+                //    this.ctrl!.Name = className + form.cnt_SplitContainer;
+                //    this.ctrl.Dock = DockStyle.Fill;
+                //    form.cnt_SplitContainer++;
+                //    break;
 
                 default:
                     return false;
