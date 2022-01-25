@@ -8,6 +8,10 @@
  * Windows11 Home  
  * VisualStudio2022 C# → VSCode .net6.0
  
+## スクリーンショット  
+![image](https://user-images.githubusercontent.com/86605611/150677219-20862d08-581a-418c-9a52-ef7974751bdb.png)
+
+
 ## 動画
  https://youtu.be/82qa0vOP_qk  
  https://youtu.be/FkDaMW4hGyk
