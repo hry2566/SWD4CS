@@ -26,6 +26,7 @@ namespace SWD4CS
         public int cnt_TabPage;
         public int cnt_CheckBox;
         public int cnt_ComboBox;
+        //public int cnt_SplitContainer;
 
         // ****************************************************************************************
 
@@ -40,217 +41,287 @@ namespace SWD4CS
             this.toolList = toolList;
             this.propertyList = dataGridView1;
             this.Click += new System.EventHandler(Form_Click);
-            this.propertyList.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
+            this.propertyList.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView1_CellValueChanged);
 
             backPanel.Click += new System.EventHandler(Backpanel_Click);
 
             selectBox = new cls_selectbox(this, backPanel);
+            SetSelect(true);
         }
 
         private void SetProperty(int i, int index, bool formFlag)
         {
             string? propertyName;
-            string? propertyValue = "";
+            string? propertyValue;
 
-            if (propertyList!.Rows[index].Cells[0].Value == null)
-            {
-                return;
-            }
-            else
+            if (propertyList!.Rows[index].Cells[0].Value != null && propertyList.Rows[index].Cells[1].Value != null)
             {
                 propertyName = propertyList.Rows[index].Cells[0].Value.ToString();
-            }
-
-            if (propertyList.Rows[index].Cells[1].Value != null)
-            {
                 propertyValue = propertyList.Rows[index].Cells[1].Value.ToString();
+
+                if (formFlag)
+                {
+                    SetFormProperty(propertyName, propertyValue);
+                }
+                else
+                {
+                    SetCtrlProperty(CtrlItems[i].ctrl, propertyName, propertyValue);
+                }
+            }
+        }
+
+        private static void SetCtrlProperty(Control? ctrl, string? propertyName, string? propertyValue)
+        {
+            Type type;
+            PropertyInfo? property = ctrl!.GetType().GetProperty(propertyName!);
+
+            try
+            {
+                type = property!.GetValue(ctrl)!.GetType();
+            }
+            catch
+            {
+                return;
             }
 
-            if (formFlag)
+            switch (type)
             {
-                if (propertyName == "Size.Width")
-                {
-                    this.Width = int.Parse(propertyValue!);
-                }
-                else if (propertyName == "Size.Height")
-                {
-                    this.Height = int.Parse(propertyValue!);
-                }
-                else if (propertyName == "Text")
-                {
-                    this.Text = propertyValue;
-                }
-                return;
+                case Type t when t == typeof(System.String):
+                    property.SetValue(ctrl, propertyValue);
+                    break;
+
+                case Type t when t == typeof(System.Boolean):
+                    try
+                    {
+                        bool b = System.Convert.ToBoolean(propertyValue);
+                        property.SetValue(ctrl, b);
+                    }
+                    catch { }
+                    break;
+
+                case Type t when t == typeof(System.Windows.Forms.DockStyle):
+                    property.SetValue(ctrl, String2DockStyle(propertyValue));
+                    break;
+
+                case Type t when t == typeof(System.Windows.Forms.AnchorStyles):
+                    property.SetValue(ctrl, String2AnchorStyles(propertyValue!));
+                    break;
+
+                case Type t when t == typeof(System.Drawing.Point):
+                    try
+                    {
+                        property.SetValue(ctrl, String2Point(propertyValue!));
+                    }
+                    catch { }
+                    break;
+
+                case Type t when t == typeof(System.Drawing.Size):
+                    try
+                    {
+                        property.SetValue(ctrl, String2Size(propertyValue!));
+                    }
+                    catch { }
+                    break;
+
+                case Type t when t == typeof(System.Int32):
+                    try
+                    {
+                        property.SetValue(ctrl, int.Parse(propertyValue!));
+                    }
+                    catch { }
+                    break;
+
+                case Type t when t == typeof(System.Drawing.ContentAlignment):
+                    property.SetValue(ctrl, String2ContentAlignment(propertyValue));
+                    break;
+
+                case Type t when t == typeof(System.Windows.Forms.ScrollBars):
+                    property.SetValue(ctrl, String2ScrollBars(propertyValue));
+                    break;
+            }
+        }
+
+        private void SetFormProperty(string? propertyName, string? propertyValue)
+        {
+            if (propertyName == "Size.Width")
+            {
+                this.Width = int.Parse(propertyValue!);
+            }
+            else if (propertyName == "Size.Height")
+            {
+                this.Height = int.Parse(propertyValue!);
+            }
+            else if (propertyName == "Text")
+            {
+                this.Text = propertyValue;
+            }
+        }
+
+        private static int String2ScrollBars(string? propertyValue)
+        {
+            int style = 0;
+
+            if (propertyValue!.IndexOf("System.Windows.Forms.ScrollBars") > -1)
+            {
+                string[] split = propertyValue.Split(".");
+                split = split[split.Count() - 1].Split(";");
+                propertyValue = split[0];
+            }
+
+            switch (propertyValue!.ToLower())
+            {
+                case "both":
+                    style = 3;
+                    break;
+                case "horizontal":
+                    style = 1;
+                    break;
+                case "vertical":
+                    style = 2;
+                    break;
+            }
+            return style;
+        }
+
+        private static int String2ContentAlignment(string? propertyValue)
+        {
+            int style = 32;
+
+            switch (propertyValue!.ToLower())
+            {
+                case "bottomcenter":
+                    style = 512;
+                    break;
+                case "bottomleft":
+                    style = 256;
+                    break;
+                case "bottomright":
+                    style = 1024;
+                    break;
+                case "middleleft":
+                    style = 16;
+                    break;
+                case "middleright":
+                    style = 64;
+                    break;
+                case "topcenter":
+                    style = 2;
+                    break;
+                case "topleft":
+                    style = 1;
+                    break;
+                case "topright":
+                    style = 4;
+                    break;
+            }
+            return style;
+        }
+
+        private static Size String2Size(string propertyValue)
+        {
+            string[] split;
+            string dummy;
+
+            if (propertyValue.IndexOf("{Width=") >= 1)
+            {
+                split = propertyValue!.Split(',');
+                split[0] = split[0].Replace("{Width=", "");
+                split[1] = split[1].Replace("Height=", "");
+                split[1] = split[1].Replace("}", "");
             }
             else
             {
-                Type type;
-                PropertyInfo? property = CtrlItems[i].ctrl!.GetType().GetProperty(propertyName!);
+                split = propertyValue.Split("(");
+                dummy = split[1];
+                split = dummy.Split(")");
+                dummy = split[0];
+                split = dummy.Split(",");
+            }
 
-                try
+            Size size = new(int.Parse(split[0]), int.Parse(split[1]));
+            return size;
+        }
+
+        private static Point String2Point(string propertyValue)
+        {
+            string[] split;
+            string dummy;
+
+            if (propertyValue.IndexOf("{X=") > -1)
+            {
+                split = propertyValue!.Split(',');
+                split[0] = split[0].Replace("{X=", "");
+                split[1] = split[1].Replace("Y=", "");
+                split[1] = split[1].Replace("}", "");
+            }
+            else
+            {
+                split = propertyValue.Split("(");
+                dummy = split[1];
+                split = dummy.Split(")");
+                dummy = split[0];
+                split = dummy.Split(",");
+            }
+            Point point = new(int.Parse(split[0]), int.Parse(split[1]));
+            return point;
+        }
+
+        private static int String2AnchorStyles(string propertyValue)
+        {
+            int style = 0;
+            string[] split = propertyValue!.Split(',');
+
+            for (int j = 0; j < split.Length; j++)
+            {
+                switch (split[j].Trim().ToLower())
                 {
-                    type = property!.GetValue(CtrlItems[i].ctrl)!.GetType();
-                }
-                catch
-                {
-                    return;
-                }
-
-                //Console.WriteLine(type);
-
-                string[] split;
-                int style;
-
-                switch (type)
-                {
-                    case Type t when t == typeof(System.String):
-                        property.SetValue(CtrlItems[i].ctrl, propertyValue);
+                    case "bottom":
+                        style += 2;
                         break;
-
-                    case Type t when t == typeof(System.Boolean):
-                        try
-                        {
-                            bool b = System.Convert.ToBoolean(propertyValue);
-                            property.SetValue(CtrlItems[i].ctrl, b);
-                        }
-                        catch { }
+                    case "left":
+                        style += 4;
                         break;
-
-                    case Type t when t == typeof(System.Windows.Forms.DockStyle):
-                        style = 0;
-                        switch (propertyValue!.ToLower())
-                        {
-                            case "fill":
-                                style = 5;
-                                break;
-                            case "bottom":
-                                style = 2;
-                                break;
-                            case "left":
-                                style = 3;
-                                break;
-                            case "right":
-                                style = 4;
-                                break;
-                            case "top":
-                                style = 1;
-                                break;
-                        }
-                        property.SetValue(CtrlItems[i].ctrl, style);
+                    case "right":
+                        style += 8;
                         break;
-
-                    case Type t when t == typeof(System.Windows.Forms.AnchorStyles):
-                        style = 0;
-                        split = propertyValue!.Split(',');
-
-                        for (int j = 0; j < split.Length; j++)
-                        {
-                            switch (split[j].Trim().ToLower())
-                            {
-                                case "bottom":
-                                    style += 2;
-                                    break;
-                                case "left":
-                                    style += 4;
-                                    break;
-                                case "right":
-                                    style += 8;
-                                    break;
-                                case "top":
-                                    style += 1;
-                                    break;
-                            }
-                        }
-                        property.SetValue(CtrlItems[i].ctrl, style);
-                        break;
-
-                    case Type t when t == typeof(System.Drawing.Point):
-                        try
-                        {
-                            split = propertyValue!.Split(',');
-                            split[0] = split[0].Replace("{X=", "");
-                            split[1] = split[1].Replace("Y=", "");
-                            split[1] = split[1].Replace("}", "");
-
-                            Point point = new(int.Parse(split[0]), int.Parse(split[1]));
-                            property.SetValue(CtrlItems[i].ctrl, point);
-                        }
-                        catch { }
-                        break;
-
-                    case Type t when t == typeof(System.Drawing.Size):
-                        try
-                        {
-                            split = propertyValue!.Split(',');
-                            split[0] = split[0].Replace("{Width=", "");
-                            split[1] = split[1].Replace("Height=", "");
-                            split[1] = split[1].Replace("}", "");
-
-                            Size size = new(int.Parse(split[0]), int.Parse(split[1]));
-                            property.SetValue(CtrlItems[i].ctrl, size);
-                        }
-                        catch { }
-                        break;
-
-                    case Type t when t == typeof(System.Int32):
-                        try
-                        {
-                            int value = int.Parse(propertyValue!);
-                            property.SetValue(CtrlItems[i].ctrl, value);
-                        }
-                        catch { }
-                        break;
-
-                    case Type t when t == typeof(System.Drawing.ContentAlignment):
-                        style = 32;
-                        switch (propertyValue!.ToLower())
-                        {
-                            case "bottomcenter":
-                                style = 512;
-                                break;
-                            case "bottomleft":
-                                style = 256;
-                                break;
-                            case "bottomright":
-                                style = 1024;
-                                break;
-                            case "middleleft":
-                                style = 16;
-                                break;
-                            case "middleright":
-                                style = 64;
-                                break;
-                            case "topcenter":
-                                style = 2;
-                                break;
-                            case "topleft":
-                                style = 1;
-                                break;
-                            case "topright":
-                                style = 4;
-                                break;
-                        }
-                        property.SetValue(CtrlItems[i].ctrl, style);
-                        break;
-
-                    case Type t when t == typeof(System.Windows.Forms.ScrollBars):
-                        style = 0;
-                        switch (propertyValue!.ToLower())
-                        {
-                            case "both":
-                                style = 3;
-                                break;
-                            case "horizontal":
-                                style = 1;
-                                break;
-                            case "vertical":
-                                style = 2;
-                                break;
-                        }
-                        property.SetValue(CtrlItems[i].ctrl, style);
+                    case "top":
+                        style += 1;
                         break;
                 }
             }
+            return style;
+        }
+
+        private static int String2DockStyle(string? propertyValue)
+        {
+            int style = 0;
+
+            if (propertyValue!.IndexOf("System.Windows.Forms.DockStyle") >= 1)
+            {
+                string[] split = propertyValue.Split(".");
+                split = split[split.Count() - 1].Split(";");
+                propertyValue = split[0];
+            }
+
+            switch (propertyValue!.ToLower())
+            {
+                case "fill":
+                    style = 5;
+                    break;
+                case "bottom":
+                    style = 2;
+                    break;
+                case "left":
+                    style = 3;
+                    break;
+                case "right":
+                    style = 4;
+                    break;
+                case "top":
+                    style = 1;
+                    break;
+            }
+            return style;
         }
 
         private void Backpanel_Click(object? sender, EventArgs e)
@@ -271,14 +342,12 @@ namespace SWD4CS
             selectFlag = flag;
             selectBox!.SetSelectBoxPos(selectFlag);
 
-            // 選択されていたらプロパティ表示
             if (flag)
             {
                 propertyList!.Columns.Clear();
                 DataTable table = new DataTable();
                 table.Columns.Add("Property");
                 table.Columns.Add("Value");
-
 
                 DataRow row = table.NewRow();
                 row[0] = "Name";
@@ -336,17 +405,13 @@ namespace SWD4CS
             {
                 MouseEventArgs me = (MouseEventArgs)e;
 
-                // unselect
                 SelectAllClear();
 
-                // Add 
                 int X = (int)(me.X / grid) * grid;
                 int Y = (int)(me.Y / grid) * grid;
                 _ = new cls_control(this, toolList!.Text, this, backPanel!, toolList, propertyList!, X, Y);
-
                 toolList.SelectedIndex = -1;
             }
-
         }
 
         internal void CtrlAllClear()
@@ -355,7 +420,6 @@ namespace SWD4CS
             {
                 CtrlItems[i].Selected = true;
             }
-
             RemoveSelectedItem();
         }
 
@@ -387,14 +451,12 @@ namespace SWD4CS
                         }
                         if (cnt > 1)
                         {
-                            //コントロール削除（子含む）
                             Delete(CtrlItems[i]);
                             i--;
                         }
                     }
                     else
                     {
-                        //コントロール削除（子含む）
                         Delete(CtrlItems[i]);
                         i--;
                     }
@@ -406,19 +468,17 @@ namespace SWD4CS
         {
             bool flag = false;
             bool formflag = false;
-            List<string> formaProperty = new();
-
-            //Console.Clear();
+            List<string> formProperty = new();
 
             for (int i = 0; i < source_custom.Count; i++)
             {
                 if (source_custom[i].IndexOf("this.") > -1 && formflag == false)
                 {
-                    formaProperty.Add(source_custom[i]);
+                    formProperty.Add(source_custom[i]);
 
                     if (source_custom[i + 1].IndexOf("this.") == -1)
                     {
-                        Code2Property(formaProperty, true);
+                        Code2Property(formProperty, true);
                         formflag = true;
                     }
                 }
@@ -490,7 +550,7 @@ namespace SWD4CS
             string[] split;
             string dummy;
             string propertyName;
-            Control ctrl = new();
+            Control ctrl;
 
             if (formFlag)
             {
@@ -522,28 +582,26 @@ namespace SWD4CS
                     }
                     else if (strLine[j].IndexOf("false") > -1 || strLine[j].IndexOf("true") > -1)    //boolean
                     {
-
                         split = dummy.Split(";");
                         propertyinfo.SetValue(ctrl, Boolean.Parse(split[0]));
                     }
                     else if (strLine[j].IndexOf("System.Drawing.Point") > 0)    //point
                     {
-                        split = dummy.Split("(");
-                        dummy = split[1];
-                        split = dummy.Split(")");
-                        dummy = split[0];
-                        split = dummy.Split(",");
-                        propertyinfo.SetValue(ctrl, new Point(int.Parse(split[0]), int.Parse(split[1])));
+                        propertyinfo.SetValue(ctrl, String2Point(dummy));
                     }
                     else if (strLine[j].IndexOf("System.Drawing.Size") > 0)    //size
                     {
-                        split = dummy.Split("(");
-                        dummy = split[1];
-                        split = dummy.Split(")");
-                        dummy = split[0];
-                        split = dummy.Split(",");
-                        propertyinfo.SetValue(ctrl, new Size(int.Parse(split[0]), int.Parse(split[1])));
+                        propertyinfo.SetValue(ctrl, String2Size(dummy));
                     }
+                    else if (strLine[j].IndexOf("System.Windows.Forms.ScrollBars") > 0)    //ScrollBars
+                    {
+                        propertyinfo.SetValue(ctrl, String2ScrollBars(dummy));
+                    }
+                    else if (strLine[j].IndexOf("System.Windows.Forms.DockStyle") > 0)    //DockStyle
+                    {
+                        propertyinfo.SetValue(ctrl, String2DockStyle(dummy));
+                    }
+                    // System.Windows.Forms.DockStyle
                     else // int
                     {
                         split = dummy.Split(";");
@@ -567,7 +625,7 @@ namespace SWD4CS
             CtrlItems.Remove(ctrl);
         }
 
-        private void dataGridView1_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
+        private void DataGridView1_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
         {
             int index = e.RowIndex;
 
