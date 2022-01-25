@@ -60,7 +60,6 @@ namespace SWD4CS
 
                 cls_design_form1.CreateControl(source_custom);
             }
-
         }
 
         private void SaveSToolStripMenuItem_Click(object sender, EventArgs e)
@@ -287,7 +286,6 @@ namespace SWD4CS
                                         }
                                         else
                                         {
-                                            //string ancho = "(" + type.ToString() + ")";
                                             string ancho = "";
 
                                             for (int j = 0; j < split.Length; j++)
@@ -300,7 +298,6 @@ namespace SWD4CS
                                                 {
                                                     ancho = "(" + ancho + " | " + type.ToString() + "." + split[j].Trim() + ")";
                                                 }
-
                                             }
 
                                             ancho = "(" + type.ToString() + ")" + ancho + ";";
