@@ -106,43 +106,53 @@ namespace SWD4CS
 
         private void Ctrl_Click(object? sender, EventArgs e)
         {
+            MouseEventArgs me = (MouseEventArgs)e;
+
             if (e.ToString() == "System.EventArgs")
             {
                 return;
             }
 
-            MouseEventArgs me = (MouseEventArgs)e;
-
             if (toolList!.Text == "")
             {
-                if (me.Button == MouseButtons.Left)
-                {
-                    if (Selected && changeFlag)
-                    {
-                        Selected = false;
-                    }
-                    else
-                    {
-                        form.SelectAllClear();
-                        Selected = true;
-                    }
-                }
+                SetSelected(me);
             }
             else
             {
-                // unselect
-                form.SelectAllClear();
+                AddControls(me);
+            }
+        }
 
-                // Add 
-                int X = (int)(me.X / grid) * grid;
-                int Y = (int)(me.Y / grid) * grid;
+        private void AddControls(MouseEventArgs me)
+        {
+            // unselect
+            form.SelectAllClear();
 
-                if ((this.ctrl is TabControl && toolList!.Text == "TabPage") || (this.ctrl is TabControl == false && toolList!.Text != "TabPage"))
+            // Add 
+            int X = (int)(me.X / grid) * grid;
+            int Y = (int)(me.Y / grid) * grid;
+
+            if ((this.ctrl is TabControl && toolList!.Text == "TabPage") || (this.ctrl is TabControl == false && toolList!.Text != "TabPage"))
+            {
+                cls_control ctrl = new cls_control(form, toolList!.Text, this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
+            }
+
+            toolList!.SelectedIndex = -1;
+        }
+
+        private void SetSelected(MouseEventArgs me)
+        {
+            if (me.Button == MouseButtons.Left)
+            {
+                if (Selected && changeFlag)
                 {
-                    cls_control ctrl = new cls_control(form, toolList!.Text, this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
+                    Selected = false;
                 }
-
-                toolList.SelectedIndex = -1;
+                else
+                {
+                    form.SelectAllClear();
+                    Selected = true;
+                }
             }
         }
 
@@ -152,47 +162,18 @@ namespace SWD4CS
             parent.Controls.Remove(ctrl);
         }
 
+
         public bool Selected
         {
             set
             {
-                propertyList.Columns.Clear();
-
                 if (selectBox != null)
                 {
                     selectFlag = value;
                     selectBox!.SetSelectBoxPos(value);
                 }
 
-                if (value)
-                {
-                    DataTable table = new DataTable();
-                    table.Columns.Add("Property");
-                    table.Columns.Add("Value");
-
-                    foreach (PropertyInfo item in this.ctrl!.GetType().GetProperties())
-                    {
-                        if (HideProperty(item.Name))
-                        {
-                            DataRow row = table.NewRow();
-                            row[0] = item.Name;
-                            row[1] = item.GetValue(this.ctrl);
-
-                            table.Rows.Add(row);
-                        }
-                    }
-                    propertyList.DataSource = table;
-                    propertyList.Sort(propertyList.Columns[0], ListSortDirection.Ascending);
-                }
-                else
-                {
-                    DataTable table = new DataTable();
-
-                    propertyList.Columns.Clear();
-                    table.Columns.Add("Property");
-                    table.Columns.Add("Value");
-                    propertyList.DataSource = table;
-                }
+                ShowProperty(value);
             }
             get
             {
@@ -200,7 +181,33 @@ namespace SWD4CS
             }
         }
 
-        public bool HideProperty(string itemName)
+        private void ShowProperty(bool value)
+        {
+            DataTable table = new DataTable();
+
+            propertyList.Columns.Clear();
+            table.Columns.Add("Property");
+            table.Columns.Add("Value");
+
+            if (value)
+            {
+                foreach (PropertyInfo item in this.ctrl!.GetType().GetProperties())
+                {
+                    if (HideProperty(item.Name))
+                    {
+                        DataRow row = table.NewRow();
+                        row[0] = item.Name;
+                        row[1] = item.GetValue(this.ctrl);
+
+                        table.Rows.Add(row);
+                    }
+                }
+            }
+            propertyList.DataSource = table;
+            propertyList.Sort(propertyList.Columns[0], ListSortDirection.Ascending);
+        }
+
+        public static bool HideProperty(string itemName)
         {
             if (itemName != "AccessibilityObject" &&
                 itemName != "AccessibleDefaultActionDescription" &&
@@ -311,56 +318,48 @@ namespace SWD4CS
                     this.ctrl!.Name = className + form.cnt_Button;
                     form.cnt_Button++;
                     break;
-
                 case "Label":
                     this.ctrl = new Label();
                     this.ctrl.Size = new System.Drawing.Size(80, 32);
                     this.ctrl!.Name = className + form.cnt_Label;
                     form.cnt_Label++;
                     break;
-
                 case "GroupBox":
                     this.ctrl = new GroupBox();
                     this.ctrl.Size = new System.Drawing.Size(250, 125);
                     this.ctrl!.Name = className + form.cnt_GroupBox;
                     form.cnt_GroupBox++;
                     break;
-
                 case "TextBox":
                     this.ctrl = new TextBox();
                     this.ctrl.Size = new System.Drawing.Size(120, 32);
                     this.ctrl!.Name = className + form.cnt_TextBox;
                     form.cnt_TextBox++;
                     break;
-
                 case "ListBox":
                     this.ctrl = new ListBox();
                     this.ctrl.Size = new System.Drawing.Size(120, 104);
                     this.ctrl!.Name = className + form.cnt_ListBox;
                     form.cnt_ListBox++;
                     break;
-
                 case "TabControl":
                     this.ctrl = new TabControl();
                     this.ctrl.Size = new System.Drawing.Size(250, 125);
                     this.ctrl!.Name = className + form.cnt_TabControl;
                     form.cnt_TabControl++;
                     break;
-
                 case "TabPage":
                     this.ctrl = new TabPage();
                     this.ctrl.Size = new System.Drawing.Size(250, 125);
                     this.ctrl!.Name = className + form.cnt_TabPage;
                     form.cnt_TabPage++;
                     break;
-
                 case "CheckBox":
                     this.ctrl = new CheckBox();
                     this.ctrl.Size = new System.Drawing.Size(120, 32);
                     this.ctrl!.Name = className + form.cnt_CheckBox;
                     form.cnt_CheckBox++;
                     break;
-
                 case "ComboBox":
                     this.ctrl = new ComboBox();
                     this.ctrl.Size = new System.Drawing.Size(120, 32);
