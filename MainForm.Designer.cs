@@ -44,8 +44,6 @@
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -125,10 +123,10 @@
             "GroupBox",
             "Label",
             "ListBox",
+            "SplitContainer",
             "TabControl",
             "TabPage",
-            "TextBox",
-            "SplitContainer"});
+            "TextBox"});
             this.listBox1.Location = new System.Drawing.Point(3, 3);
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(144, 879);
@@ -268,9 +266,6 @@
             // 
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Column1,
-            this.Column2});
             this.dataGridView1.Cursor = System.Windows.Forms.Cursors.Default;
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
@@ -280,19 +275,6 @@
             this.dataGridView1.RowTemplate.Height = 29;
             this.dataGridView1.Size = new System.Drawing.Size(342, 879);
             this.dataGridView1.TabIndex = 0;
-            // 
-            // Column1
-            // 
-            this.Column1.HeaderText = "Property";
-            this.Column1.MinimumWidth = 6;
-            this.Column1.Name = "Column1";
-            this.Column1.ReadOnly = true;
-            // 
-            // Column2
-            // 
-            this.Column2.HeaderText = "Value";
-            this.Column2.MinimumWidth = 6;
-            this.Column2.Name = "Column2";
             // 
             // tabPage4
             // 
@@ -405,8 +387,6 @@
         private TabPage tabPage7;
         private TextBox textBox2;
         private DataGridView dataGridView1;
-        private DataGridViewTextBoxColumn Column1;
-        private DataGridViewTextBoxColumn Column2;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem fileFToolStripMenuItem;
         private ToolStripMenuItem readrToolStripMenuItem;
