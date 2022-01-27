@@ -383,7 +383,5 @@ namespace SWD4CS
             this.ctrl!.TabIndex = form.cnt_Control;
             return true;
         }
-
-
     }
 }
