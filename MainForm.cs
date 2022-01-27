@@ -187,10 +187,8 @@ namespace SWD4CS
                 {
                     if (cls_control.HideProperty(item.Name))
                     {
-                        Control? baseCtrl = GetBaseCtrl(ctrl);
+                        Control? baseCtrl = cls_design_form1.GetBaseCtrl(ctrl);
 
-                        //try
-                        //{
                         if (item.GetValue(ctrl.ctrl) != null && item.GetValue(ctrl.ctrl)!.ToString() != item.GetValue(baseCtrl)!.ToString())
                         {
                             string str1 = "        this." + ctrl!.ctrl!.Name + "." + item.Name;
@@ -202,8 +200,6 @@ namespace SWD4CS
                                 insertPos++;
                             }
                         }
-                        //}
-                        //catch { }
                     }
                 }
 
@@ -301,49 +297,6 @@ namespace SWD4CS
             }
 
             return strProperty;
-        }
-
-        private static Control? GetBaseCtrl(cls_control ctrl)
-        {
-            Control? baseCtrl = new();
-            Type type = ctrl.ctrl!.GetType();
-
-            // ****************************************************************************************
-            // コントロール追加時に下記を編集すること
-            // ****************************************************************************************
-            switch (type)
-            {
-                case Type t when t == typeof(System.Windows.Forms.Button):
-                    baseCtrl = new Button();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.Label):
-                    baseCtrl = new Label();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.GroupBox):
-                    baseCtrl = new GroupBox();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.TextBox):
-                    baseCtrl = new TextBox();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.ListBox):
-                    baseCtrl = new ListBox();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.TabControl):
-                    baseCtrl = new TabControl();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.TabPage):
-                    baseCtrl = new TabPage();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.CheckBox):
-                    baseCtrl = new CheckBox();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.ComboBox):
-                    baseCtrl = new ComboBox();
-                    break;
-
-                    // ****************************************************************************************
-            }
-            return baseCtrl;
         }
     }
 }
