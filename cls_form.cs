@@ -70,260 +70,6 @@ namespace SWD4CS
             }
         }
 
-        private static void SetCtrlProperty(Control? ctrl, string? propertyName, string? propertyValue)
-        {
-            Type type;
-            PropertyInfo? property = ctrl!.GetType().GetProperty(propertyName!);
-
-            try
-            {
-                type = property!.GetValue(ctrl)!.GetType();
-            }
-            catch
-            {
-                return;
-            }
-
-            switch (type)
-            {
-                case Type t when t == typeof(System.String):
-                    property.SetValue(ctrl, propertyValue);
-                    break;
-
-                case Type t when t == typeof(System.Boolean):
-                    try
-                    {
-                        bool b = System.Convert.ToBoolean(propertyValue);
-                        property.SetValue(ctrl, b);
-                    }
-                    catch { }
-                    break;
-
-                case Type t when t == typeof(System.Windows.Forms.DockStyle):
-                    property.SetValue(ctrl, String2DockStyle(propertyValue));
-                    break;
-
-                case Type t when t == typeof(System.Windows.Forms.AnchorStyles):
-                    property.SetValue(ctrl, String2AnchorStyles(propertyValue!));
-                    break;
-
-                case Type t when t == typeof(System.Drawing.Point):
-                    try
-                    {
-                        property.SetValue(ctrl, String2Point(propertyValue!));
-                    }
-                    catch { }
-                    break;
-
-                case Type t when t == typeof(System.Drawing.Size):
-                    try
-                    {
-                        property.SetValue(ctrl, String2Size(propertyValue!));
-                    }
-                    catch { }
-                    break;
-
-                case Type t when t == typeof(System.Int32):
-                    try
-                    {
-                        property.SetValue(ctrl, int.Parse(propertyValue!));
-                    }
-                    catch { }
-                    break;
-
-                case Type t when t == typeof(System.Drawing.ContentAlignment):
-                    property.SetValue(ctrl, String2ContentAlignment(propertyValue));
-                    break;
-
-                case Type t when t == typeof(System.Windows.Forms.ScrollBars):
-                    property.SetValue(ctrl, String2ScrollBars(propertyValue));
-                    break;
-            }
-        }
-
-        private void SetFormProperty(string? propertyName, string? propertyValue)
-        {
-            if (propertyName == "Size.Width")
-            {
-                this.Width = int.Parse(propertyValue!);
-            }
-            else if (propertyName == "Size.Height")
-            {
-                this.Height = int.Parse(propertyValue!);
-            }
-            else if (propertyName == "Text")
-            {
-                this.Text = propertyValue;
-            }
-        }
-
-        private static int String2ScrollBars(string? propertyValue)
-        {
-            int style = 0;
-
-            if (propertyValue!.IndexOf("System.Windows.Forms.ScrollBars") > -1)
-            {
-                string[] split = propertyValue.Split(".");
-                split = split[split.Count() - 1].Split(";");
-                propertyValue = split[0];
-            }
-
-            switch (propertyValue!.ToLower())
-            {
-                case "both":
-                    style = 3;
-                    break;
-                case "horizontal":
-                    style = 1;
-                    break;
-                case "vertical":
-                    style = 2;
-                    break;
-            }
-            return style;
-        }
-
-        private static int String2ContentAlignment(string? propertyValue)
-        {
-            int style = 32;
-
-            switch (propertyValue!.ToLower())
-            {
-                case "bottomcenter":
-                    style = 512;
-                    break;
-                case "bottomleft":
-                    style = 256;
-                    break;
-                case "bottomright":
-                    style = 1024;
-                    break;
-                case "middleleft":
-                    style = 16;
-                    break;
-                case "middleright":
-                    style = 64;
-                    break;
-                case "topcenter":
-                    style = 2;
-                    break;
-                case "topleft":
-                    style = 1;
-                    break;
-                case "topright":
-                    style = 4;
-                    break;
-            }
-            return style;
-        }
-
-        private static Size String2Size(string propertyValue)
-        {
-            string[] split;
-            string dummy;
-
-            if (propertyValue.IndexOf("{Width=") >= 1)
-            {
-                split = propertyValue!.Split(',');
-                split[0] = split[0].Replace("{Width=", "");
-                split[1] = split[1].Replace("Height=", "");
-                split[1] = split[1].Replace("}", "");
-            }
-            else
-            {
-                split = propertyValue.Split("(");
-                dummy = split[1];
-                split = dummy.Split(")");
-                dummy = split[0];
-                split = dummy.Split(",");
-            }
-
-            Size size = new(int.Parse(split[0]), int.Parse(split[1]));
-            return size;
-        }
-
-        private static Point String2Point(string propertyValue)
-        {
-            string[] split;
-            string dummy;
-
-            if (propertyValue.IndexOf("{X=") > -1)
-            {
-                split = propertyValue!.Split(',');
-                split[0] = split[0].Replace("{X=", "");
-                split[1] = split[1].Replace("Y=", "");
-                split[1] = split[1].Replace("}", "");
-            }
-            else
-            {
-                split = propertyValue.Split("(");
-                dummy = split[1];
-                split = dummy.Split(")");
-                dummy = split[0];
-                split = dummy.Split(",");
-            }
-            Point point = new(int.Parse(split[0]), int.Parse(split[1]));
-            return point;
-        }
-
-        private static int String2AnchorStyles(string propertyValue)
-        {
-            int style = 0;
-            string[] split = propertyValue!.Split(',');
-
-            for (int j = 0; j < split.Length; j++)
-            {
-                switch (split[j].Trim().ToLower())
-                {
-                    case "bottom":
-                        style += 2;
-                        break;
-                    case "left":
-                        style += 4;
-                        break;
-                    case "right":
-                        style += 8;
-                        break;
-                    case "top":
-                        style += 1;
-                        break;
-                }
-            }
-            return style;
-        }
-
-        private static int String2DockStyle(string? propertyValue)
-        {
-            int style = 0;
-
-            if (propertyValue!.IndexOf("System.Windows.Forms.DockStyle") >= 1)
-            {
-                string[] split = propertyValue.Split(".");
-                split = split[split.Count() - 1].Split(";");
-                propertyValue = split[0];
-            }
-
-            switch (propertyValue!.ToLower())
-            {
-                case "fill":
-                    style = 5;
-                    break;
-                case "bottom":
-                    style = 2;
-                    break;
-                case "left":
-                    style = 3;
-                    break;
-                case "right":
-                    style = 4;
-                    break;
-                case "top":
-                    style = 1;
-                    break;
-            }
-            return style;
-        }
-
         private void Backpanel_Click(object? sender, EventArgs e)
         {
             MouseEventArgs me = (MouseEventArgs)e;
@@ -341,14 +87,19 @@ namespace SWD4CS
         {
             selectFlag = flag;
             selectBox!.SetSelectBoxPos(selectFlag);
+            ShowProperty(flag);
+        }
+
+        private void ShowProperty(bool flag)
+        {
+            DataTable table = new DataTable();
+
+            propertyList!.Columns.Clear();
+            table.Columns.Add("Property");
+            table.Columns.Add("Value");
 
             if (flag)
             {
-                propertyList!.Columns.Clear();
-                DataTable table = new DataTable();
-                table.Columns.Add("Property");
-                table.Columns.Add("Value");
-
                 DataRow row = table.NewRow();
                 row[0] = "Name";
                 row[1] = "From1";
@@ -368,18 +119,8 @@ namespace SWD4CS
                 row[0] = "Text";
                 row[1] = this.Text;
                 table.Rows.Add(row);
-
-                propertyList.DataSource = table;
             }
-            else
-            {
-                propertyList!.Columns.Clear();
-
-                DataTable table = new DataTable();
-                table.Columns.Add("Property");
-                table.Columns.Add("Value");
-                propertyList.DataSource = table;
-            }
+            propertyList.DataSource = table;
         }
 
         private void Form_Click(object? sender, EventArgs e)
@@ -530,85 +271,16 @@ namespace SWD4CS
                             {
                                 Delete(CtrlItems[CtrlItems.Count - 1]);
                                 Delete(CtrlItems[CtrlItems.Count - 1]);
+                                cnt_Control -= 2;
                             }
-
                             Code2Property(strLine, false);
-
                             break;
                         }
                     }
-
                     flag = false;
                 }
             }
-
             SelectAllClear();
-        }
-
-        private void Code2Property(List<string> strLine, bool formFlag)
-        {
-            string[] split;
-            string dummy;
-            string propertyName;
-            Control ctrl;
-
-            if (formFlag)
-            {
-                ctrl = this;
-            }
-            else
-            {
-                ctrl = CtrlItems[CtrlItems.Count - 1].ctrl!;
-            }
-
-            for (int j = 0; j < strLine.Count - 1; j++)
-            {
-                split = strLine[j].Split(" = ");
-                dummy = split[0];
-                split = dummy.Split(".");
-                propertyName = split[split.Length - 1];
-
-                PropertyInfo? propertyinfo = ctrl.GetType().GetProperty(propertyName);
-
-                if (propertyinfo != null)
-                {
-                    split = strLine[j].Split(" = ");
-                    dummy = split[1];
-
-                    if (strLine[j].IndexOf("\";") > 0)    //string
-                    {
-                        split = dummy.Split("\"");
-                        propertyinfo.SetValue(ctrl, split[1]);
-                    }
-                    else if (strLine[j].IndexOf("false") > -1 || strLine[j].IndexOf("true") > -1)    //boolean
-                    {
-                        split = dummy.Split(";");
-                        propertyinfo.SetValue(ctrl, Boolean.Parse(split[0]));
-                    }
-                    else if (strLine[j].IndexOf("System.Drawing.Point") > 0)    //point
-                    {
-                        propertyinfo.SetValue(ctrl, String2Point(dummy));
-                    }
-                    else if (strLine[j].IndexOf("System.Drawing.Size") > 0)    //size
-                    {
-                        propertyinfo.SetValue(ctrl, String2Size(dummy));
-                    }
-                    else if (strLine[j].IndexOf("System.Windows.Forms.ScrollBars") > 0)    //ScrollBars
-                    {
-                        propertyinfo.SetValue(ctrl, String2ScrollBars(dummy));
-                    }
-                    else if (strLine[j].IndexOf("System.Windows.Forms.DockStyle") > 0)    //DockStyle
-                    {
-                        propertyinfo.SetValue(ctrl, String2DockStyle(dummy));
-                    }
-                    // System.Windows.Forms.DockStyle
-                    else // int
-                    {
-                        split = dummy.Split(";");
-                        propertyinfo.SetValue(ctrl, int.Parse(split[0]));
-                    }
-                }
-            }
         }
 
         private void Delete(cls_control ctrl)
@@ -644,6 +316,329 @@ namespace SWD4CS
                         CtrlItems[i].Selected = true;
                         break;
                     }
+                }
+            }
+        }
+
+        private void SetFormProperty(string? propertyName, string? propertyValue)
+        {
+            if (propertyName == "Size.Width")
+            {
+                this.Width = int.Parse(propertyValue!);
+            }
+            else if (propertyName == "Size.Height")
+            {
+                this.Height = int.Parse(propertyValue!);
+            }
+            else if (propertyName == "Text")
+            {
+                this.Text = propertyValue;
+            }
+        }
+
+        private void Code2Property(List<string> strLine, bool formFlag)
+        {
+            string[] split;
+            string propertyName;
+            string propertyValue;
+            Control ctrl;
+
+            if (formFlag)
+            {
+                ctrl = this;
+            }
+            else
+            {
+                ctrl = CtrlItems[CtrlItems.Count - 1].ctrl!;
+            }
+
+            for (int j = 0; j < strLine.Count - 1; j++)
+            {
+                split = strLine[j].Split(" = ");
+                propertyValue = split[1].Replace(";", "").Replace("\"", "").Trim();
+
+                split = split[0].Split(".");
+                propertyName = split[split.Length - 1];
+
+                SetCtrlProperty(ctrl, propertyName, propertyValue);
+            }
+        }
+
+        private static int String2ScrollBars(string? propertyValue)
+        {
+            int style = 0;
+
+            if (propertyValue!.IndexOf("System.Windows.Forms.ScrollBars") > -1)
+            {
+                string[] split = propertyValue.Split(".");
+                split = split[split.Count() - 1].Split(";");
+                propertyValue = split[0];
+            }
+
+            switch (propertyValue!.ToLower())
+            {
+                case "both":
+                    style = 3;
+                    break;
+                case "horizontal":
+                    style = 1;
+                    break;
+                case "vertical":
+                    style = 2;
+                    break;
+            }
+            return style;
+        }
+
+        private static int String2ContentAlignment(string? propertyValue)
+        {
+            int style = 32;
+
+            if (propertyValue!.IndexOf("System.Drawing.ContentAlignment") > -1)
+            {
+                string[] split = propertyValue.Split(".");
+                propertyValue = split[split.Count() - 1].Replace(";", "");
+            }
+
+            switch (propertyValue!.ToLower())
+            {
+                case "bottomcenter":
+                    style = 512;
+                    break;
+                case "bottomleft":
+                    style = 256;
+                    break;
+                case "bottomright":
+                    style = 1024;
+                    break;
+                case "middleleft":
+                    style = 16;
+                    break;
+                case "middleright":
+                    style = 64;
+                    break;
+                case "topcenter":
+                    style = 2;
+                    break;
+                case "topleft":
+                    style = 1;
+                    break;
+                case "topright":
+                    style = 4;
+                    break;
+            }
+            return style;
+        }
+
+        private static Size String2Size(string propertyValue)
+        {
+            string[] split;
+            string dummy;
+
+            if (propertyValue.IndexOf("{Width=") >= 1)
+            {
+                split = propertyValue!.Split(',');
+                split[0] = split[0].Replace("{Width=", "");
+                split[1] = split[1].Replace("Height=", "").Replace("}", "");
+            }
+            else
+            {
+                split = propertyValue.Split("(");
+                dummy = split[1];
+                split = dummy.Split(")");
+                dummy = split[0];
+                split = dummy.Split(",");
+            }
+
+            Size size = new(int.Parse(split[0]), int.Parse(split[1]));
+            return size;
+        }
+
+        private static Point String2Point(string propertyValue)
+        {
+            string[] split;
+            string dummy;
+
+            if (propertyValue.IndexOf("{X=") > -1)
+            {
+                split = propertyValue!.Split(',');
+                split[0] = split[0].Replace("{X=", "");
+                split[1] = split[1].Replace("Y=", "").Replace("}", "");
+            }
+            else
+            {
+                split = propertyValue.Split("(");
+                dummy = split[1];
+                split = dummy.Split(")");
+                dummy = split[0];
+                split = dummy.Split(",");
+            }
+            Point point = new(int.Parse(split[0]), int.Parse(split[1]));
+            return point;
+        }
+
+        private static int String2AnchorStyles(string propertyValue)
+        {
+            int style = 0;
+
+            if (propertyValue.IndexOf("System.Windows.Forms.AnchorStyles") > -1)
+            {
+                string dummy = propertyValue.Replace("System.Windows.Forms.AnchorStyles", "").Replace("(", "").Replace(")", "").Replace(";", "");
+                string[] split2 = dummy.Split(" | ");
+
+                propertyValue = "";
+                for (int i = 0; i < split2.Count(); i++)
+                {
+                    string[] split3 = split2[i].Split(".");
+                    if (propertyValue == "")
+                    {
+                        propertyValue += split3[split3.Count() - 1];
+                    }
+                    else
+                    {
+                        propertyValue += "," + split3[split3.Count() - 1];
+                    }
+                }
+            }
+
+            string[] split = propertyValue!.Split(',');
+
+            for (int j = 0; j < split.Length; j++)
+            {
+                switch (split[j].Trim().ToLower())
+                {
+                    case "bottom":
+                        style += 2;
+                        break;
+                    case "left":
+                        style += 4;
+                        break;
+                    case "right":
+                        style += 8;
+                        break;
+                    case "top":
+                        style += 1;
+                        break;
+                }
+            }
+            return style;
+        }
+
+        private static int String2DockStyle(string? propertyValue)
+        {
+            int style = 0;
+
+            if (propertyValue!.IndexOf("System.Windows.Forms.DockStyle") > -1)
+            {
+                string[] split = propertyValue.Split(".");
+                split = split[split.Count() - 1].Split(";");
+                propertyValue = split[0];
+            }
+
+            switch (propertyValue!.ToLower())
+            {
+                case "fill":
+                    style = 5;
+                    break;
+                case "bottom":
+                    style = 2;
+                    break;
+                case "left":
+                    style = 3;
+                    break;
+                case "right":
+                    style = 4;
+                    break;
+                case "top":
+                    style = 1;
+                    break;
+            }
+            return style;
+        }
+
+        private static int String2HorizontalAlignment(string? propertyValue)
+        {
+            int style = 0;
+
+            if (propertyValue!.IndexOf("System.Windows.Forms.HorizontalAlignment") > -1)
+            {
+                string[] split = propertyValue.Split(".");
+                propertyValue = split[split.Count() - 1];
+            }
+
+            switch (propertyValue!.ToLower())
+            {
+                case "left":
+                    style = 0;
+                    break;
+                case "right":
+                    style = 1;
+                    break;
+                case "center":
+                    style = 2;
+                    break;
+            }
+            return style;
+        }
+
+        private static void SetCtrlProperty(Control? ctrl, string? propertyName, string? propertyValue)
+        {
+            Type type;
+            PropertyInfo? property = ctrl!.GetType().GetProperty(propertyName!);
+
+            if (property != null && property!.GetValue(ctrl) != null)
+            {
+                type = property!.GetValue(ctrl)!.GetType();
+
+                switch (type)
+                {
+                    case Type t when t == typeof(System.String):
+                        property.SetValue(ctrl, propertyValue);
+                        break;
+                    case Type t when t == typeof(System.Boolean):
+                        try
+                        {
+                            bool b = System.Convert.ToBoolean(propertyValue);
+                            property.SetValue(ctrl, b);
+                        }
+                        catch { }
+                        break;
+                    case Type t when t == typeof(System.Windows.Forms.DockStyle):
+                        property.SetValue(ctrl, String2DockStyle(propertyValue));
+                        break;
+                    case Type t when t == typeof(System.Windows.Forms.AnchorStyles):
+                        property.SetValue(ctrl, String2AnchorStyles(propertyValue!));
+                        break;
+                    case Type t when t == typeof(System.Drawing.Point):
+                        try
+                        {
+                            property.SetValue(ctrl, String2Point(propertyValue!));
+                        }
+                        catch { }
+                        break;
+                    case Type t when t == typeof(System.Drawing.Size):
+                        try
+                        {
+                            property.SetValue(ctrl, String2Size(propertyValue!));
+                        }
+                        catch { }
+                        break;
+                    case Type t when t == typeof(System.Int32):
+                        try
+                        {
+                            property.SetValue(ctrl, int.Parse(propertyValue!));
+                        }
+                        catch { }
+                        break;
+                    case Type t when t == typeof(System.Drawing.ContentAlignment):
+                        property.SetValue(ctrl, String2ContentAlignment(propertyValue));
+                        break;
+                    case Type t when t == typeof(System.Windows.Forms.ScrollBars):
+                        property.SetValue(ctrl, String2ScrollBars(propertyValue));
+                        break;
+                    case Type t when t == typeof(System.Windows.Forms.HorizontalAlignment):
+                        property.SetValue(ctrl, String2HorizontalAlignment(propertyValue));
+                        break;
                 }
             }
         }
