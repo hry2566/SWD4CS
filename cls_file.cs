@@ -2,12 +2,12 @@
 {
     internal class cls_file
     {
-        public cls_file()
-        {
+        //public cls_file()
+        //{
 
-        }
+        //}
 
-        internal List<string>[] NewFile()
+        internal static List<string>[] NewFile()
         {
             List<string> source_base = new();
             List<string> source_custom = new();
