@@ -28,6 +28,43 @@ namespace SWD4CS
         public int cnt_ComboBox;
         //public int cnt_SplitContainer;
 
+        internal Control? GetBaseCtrl(cls_control ctrl)
+        {
+            Control? baseCtrl = new();
+            Type type = ctrl.ctrl!.GetType();
+
+            switch (type)
+            {
+                case Type t when t == typeof(System.Windows.Forms.Button):
+                    baseCtrl = new Button();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.Label):
+                    baseCtrl = new Label();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.GroupBox):
+                    baseCtrl = new GroupBox();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.TextBox):
+                    baseCtrl = new TextBox();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.ListBox):
+                    baseCtrl = new ListBox();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.TabControl):
+                    baseCtrl = new TabControl();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.TabPage):
+                    baseCtrl = new TabPage();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.CheckBox):
+                    baseCtrl = new CheckBox();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.ComboBox):
+                    baseCtrl = new ComboBox();
+                    break;
+            }
+            return baseCtrl;
+        }
         // ****************************************************************************************
 
         public cls_form()
