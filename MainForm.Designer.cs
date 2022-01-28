@@ -177,6 +177,7 @@
             // 
             // tabPage5
             // 
+            this.tabPage5.BackColor = System.Drawing.Color.DarkGray;
             this.tabPage5.Controls.Add(this.cls_design_form1);
             this.tabPage5.Cursor = System.Windows.Forms.Cursors.Default;
             this.tabPage5.Location = new System.Drawing.Point(4, 29);
@@ -185,7 +186,6 @@
             this.tabPage5.Size = new System.Drawing.Size(718, 885);
             this.tabPage5.TabIndex = 0;
             this.tabPage5.Text = "Design";
-            this.tabPage5.UseVisualStyleBackColor = true;
             // 
             // cls_design_form1
             // 
