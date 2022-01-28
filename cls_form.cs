@@ -26,9 +26,9 @@ namespace SWD4CS
         public int cnt_TabPage;
         public int cnt_CheckBox;
         public int cnt_ComboBox;
-        //public int cnt_SplitContainer;
+        public int cnt_SplitContainer;
 
-        internal Control? GetBaseCtrl(cls_control ctrl)
+        internal static Control? GetBaseCtrl(cls_control ctrl)
         {
             Control? baseCtrl = new();
             Type type = ctrl.ctrl!.GetType();
@@ -61,6 +61,9 @@ namespace SWD4CS
                     break;
                 case Type t when t == typeof(System.Windows.Forms.ComboBox):
                     baseCtrl = new ComboBox();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.SplitContainer):
+                    baseCtrl = new SplitContainer();
                     break;
             }
             return baseCtrl;
@@ -285,20 +288,56 @@ namespace SWD4CS
 
                         if (source_custom[i].IndexOf("Controls.Add") > -1)
                         {
-                            split = strLine[strLine.Count - 1].Split(".");
+                            split = strLine[strLine.Count - 1].Split("(");
+                            split = split[0].Split(".Controls.Add");
+                            split = split[0].Split("this");
+
                             strParent = split[1];
 
-                            if (strParent == "Controls")
+                            if (strParent == "")
                             {
                                 _ = new cls_control(this, ctrlClass, this, backPanel!, toolList, propertyList!, 0, 0);
                             }
                             else
                             {
+                                if (strParent.Substring(0, 1) == ".")
+                                {
+                                    strParent = strParent.Substring(1, strParent.Length - 1);
+                                }
+
+                                bool splitcontainer_flag = false;
+                                string[] split2 = strParent.Split(".");
+                                if (split2.Count() == 2)
+                                {
+                                    strParent = split2[0];
+                                    splitcontainer_flag = true;
+                                }
+
                                 for (int k = 0; k < CtrlItems.Count; k++)
                                 {
                                     if (CtrlItems[k].ctrl!.Name == strParent)
                                     {
-                                        _ = new cls_control(this, ctrlClass, CtrlItems[k].ctrl!, backPanel!, toolList, propertyList!, 0, 0);
+                                        if (splitcontainer_flag)
+                                        {
+                                            SplitContainer? splcontainer = CtrlItems[k].ctrl as SplitContainer;
+                                            SplitterPanel splpanel;
+                                            if (split2[1] == "Panel1")
+                                            {
+                                                splpanel = splcontainer!.Panel1;
+                                                splpanel.Name = splcontainer.Name + ".Panel1";
+                                                _ = new cls_control(this, ctrlClass, splcontainer!.Panel1, backPanel!, toolList, propertyList!, 0, 0);
+                                            }
+                                            else
+                                            {
+                                                splpanel = splcontainer!.Panel2;
+                                                splpanel.Name = splcontainer.Name + ".Panel2";
+                                                _ = new cls_control(this, ctrlClass, splcontainer!.Panel2, backPanel!, toolList, propertyList!, 0, 0);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            _ = new cls_control(this, ctrlClass, CtrlItems[k].ctrl!, backPanel!, toolList, propertyList!, 0, 0);
+                                        }
                                         break;
                                     }
                                 }
