@@ -165,10 +165,10 @@ namespace SWD4CS
 
         private void Form_Click(object? sender, EventArgs e)
         {
+            MouseEventArgs me = (MouseEventArgs)e;
+
             if (toolList!.Text == "")
             {
-                MouseEventArgs me = (MouseEventArgs)e;
-
                 if (me.Button == MouseButtons.Left)
                 {
                     if (selectFlag)
@@ -184,8 +184,6 @@ namespace SWD4CS
             }
             else
             {
-                MouseEventArgs me = (MouseEventArgs)e;
-
                 SelectAllClear();
 
                 int X = (int)(me.X / grid) * grid;
@@ -248,38 +246,25 @@ namespace SWD4CS
         internal void CreateControl(List<string> source_custom)
         {
             bool flag = false;
-            bool formflag = false;
-            List<string> formProperty = new();
+            string ctrlClass = "";
+            int cnt = Code2Form(source_custom);
 
-            for (int i = 0; i < source_custom.Count; i++)
+            for (int i = cnt; i < source_custom.Count; i++)
             {
-                if (source_custom[i].IndexOf("this.") > -1 && formflag == false)
-                {
-                    formProperty.Add(source_custom[i]);
-
-                    if (source_custom[i + 1].IndexOf("this.") == -1)
-                    {
-                        Code2Property(formProperty, true);
-                        formflag = true;
-                    }
-                }
-
                 if (source_custom[i].IndexOf("new System.Windows.Forms.") > -1)
                 {
+                    string[] split;
+                    string dummy;
+
+                    split = source_custom[i].Split('.');
+                    dummy = split[split.Count() - 1];
+                    ctrlClass = dummy.Substring(0, dummy.IndexOf('('));
                     flag = true;
                 }
 
                 if (flag)
                 {
-                    string[] split;
-                    string dummy;
-                    string ctrlClass;
-                    string strParent;
                     List<string> strLine = new();
-
-                    split = source_custom[i].Split('.');
-                    dummy = split[split.Count() - 1];
-                    ctrlClass = dummy.Substring(0, dummy.IndexOf('('));
 
                     while (true)
                     {
@@ -288,75 +273,117 @@ namespace SWD4CS
 
                         if (source_custom[i].IndexOf("Controls.Add") > -1)
                         {
-                            split = strLine[strLine.Count - 1].Split("(");
-                            split = split[0].Split(".Controls.Add");
-                            split = split[0].Split("this");
-
-                            strParent = split[1];
-
-                            if (strParent == "")
-                            {
-                                _ = new cls_control(this, ctrlClass, this, backPanel!, toolList, propertyList!, 0, 0);
-                            }
-                            else
-                            {
-                                if (strParent.Substring(0, 1) == ".")
-                                {
-                                    strParent = strParent.Substring(1, strParent.Length - 1);
-                                }
-
-                                bool splitcontainer_flag = false;
-                                string[] split2 = strParent.Split(".");
-                                if (split2.Count() == 2)
-                                {
-                                    strParent = split2[0];
-                                    splitcontainer_flag = true;
-                                }
-
-                                for (int k = 0; k < CtrlItems.Count; k++)
-                                {
-                                    if (CtrlItems[k].ctrl!.Name == strParent)
-                                    {
-                                        if (splitcontainer_flag)
-                                        {
-                                            SplitContainer? splcontainer = CtrlItems[k].ctrl as SplitContainer;
-                                            SplitterPanel splpanel;
-                                            if (split2[1] == "Panel1")
-                                            {
-                                                splpanel = splcontainer!.Panel1;
-                                                splpanel.Name = splcontainer.Name + ".Panel1";
-                                                _ = new cls_control(this, ctrlClass, splcontainer!.Panel1, backPanel!, toolList, propertyList!, 0, 0);
-                                            }
-                                            else
-                                            {
-                                                splpanel = splcontainer!.Panel2;
-                                                splpanel.Name = splcontainer.Name + ".Panel2";
-                                                _ = new cls_control(this, ctrlClass, splcontainer!.Panel2, backPanel!, toolList, propertyList!, 0, 0);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            _ = new cls_control(this, ctrlClass, CtrlItems[k].ctrl!, backPanel!, toolList, propertyList!, 0, 0);
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (ctrlClass == "TabControl")
-                            {
-                                Delete(CtrlItems[CtrlItems.Count - 1]);
-                                Delete(CtrlItems[CtrlItems.Count - 1]);
-                                cnt_Control -= 2;
-                            }
-                            Code2Property(strLine, false);
                             break;
                         }
                     }
+                    Code2Control(ctrlClass, strLine);
                     flag = false;
                 }
             }
             SelectAllClear();
+        }
+
+        private void Code2Control(string ctrlClass, List<string> strLine)
+        {
+            string[] split;
+            string[] split2;
+            string strParent;
+
+            split = strLine[strLine.Count - 1].Split("(");
+            split = split[0].Split(".Controls.Add");
+            split = split[0].Split("this");
+            strParent = split[1];
+
+            if (strParent == "")
+            {
+                _ = new cls_control(this, ctrlClass, this, backPanel!, toolList, propertyList!, 0, 0);
+            }
+            else
+            {
+                if (strParent.Substring(0, 1) == ".")
+                {
+                    strParent = strParent.Substring(1, strParent.Length - 1);
+                }
+
+                split2 = strParent.Split(".");
+                if (split2.Count() == 2)
+                {
+                    CreateOnSplitContainer(ctrlClass, split2);
+                }
+                else
+                {
+                    CreateOnParent(ctrlClass, strParent);
+                }
+            }
+
+            if (ctrlClass == "TabControl")
+            {
+                Delete(CtrlItems[CtrlItems.Count - 1]);
+                Delete(CtrlItems[CtrlItems.Count - 1]);
+                cnt_Control -= 2;
+            }
+            Code2Property(strLine, false);
+        }
+
+        private void CreateOnParent(string ctrlClass, string strParent)
+        {
+            for (int k = 0; k < CtrlItems.Count; k++)
+            {
+                if (CtrlItems[k].ctrl!.Name == strParent)
+                {
+                    _ = new cls_control(this, ctrlClass, CtrlItems[k].ctrl!, backPanel!, toolList, propertyList!, 0, 0);
+                    break;
+                }
+            }
+        }
+
+        private void CreateOnSplitContainer(string ctrlClass, string[] split2)
+        {
+            string strParent = split2[0];
+
+            for (int k = 0; k < CtrlItems.Count; k++)
+            {
+                if (CtrlItems[k].ctrl!.Name == strParent)
+                {
+                    SplitContainer? splcontainer = CtrlItems[k].ctrl as SplitContainer;
+                    SplitterPanel splpanel;
+                    if (split2[1] == "Panel1")
+                    {
+                        splpanel = splcontainer!.Panel1;
+                        splpanel.Name = splcontainer.Name + ".Panel1";
+                        _ = new cls_control(this, ctrlClass, splcontainer!.Panel1, backPanel!, toolList, propertyList!, 0, 0);
+                    }
+                    else
+                    {
+                        splpanel = splcontainer!.Panel2;
+                        splpanel.Name = splcontainer.Name + ".Panel2";
+                        _ = new cls_control(this, ctrlClass, splcontainer!.Panel2, backPanel!, toolList, propertyList!, 0, 0);
+                    }
+                    break;
+                }
+            }
+        }
+
+        private int Code2Form(List<string> source_custom)
+        {
+            int cnt = 0;
+            List<string> formProperty = new();
+
+            for (int i = 0; i < source_custom.Count; i++)
+            {
+                if (source_custom[i].IndexOf("this.") > -1)
+                {
+                    formProperty.Add(source_custom[i]);
+
+                    if (source_custom[i + 1].IndexOf("this.") == -1)
+                    {
+                        Code2Property(formProperty, true);
+                        cnt = i + 1;
+                        break;
+                    }
+                }
+            }
+            return cnt;
         }
 
         private void Delete(cls_control ctrl)
