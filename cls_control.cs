@@ -123,7 +123,7 @@ namespace SWD4CS
             }
         }
 
-        private void AddControls(MouseEventArgs me)
+        private void AddControls(MouseEventArgs me, SplitterPanel? splitpanel = null)
         {
             // unselect
             form.SelectAllClear();
@@ -134,7 +134,14 @@ namespace SWD4CS
 
             if ((this.ctrl is TabControl && toolList!.Text == "TabPage") || (this.ctrl is TabControl == false && toolList!.Text != "TabPage"))
             {
-                cls_control ctrl = new cls_control(form, toolList!.Text, this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
+                if (splitpanel == null)
+                {
+                    _ = new cls_control(form, toolList!.Text, this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
+                }
+                else
+                {
+                    _ = new cls_control(form, toolList!.Text, splitpanel!, backPanel!, toolList, propertyList!, X, Y);
+                }
             }
 
             toolList!.SelectedIndex = -1;
@@ -272,7 +279,7 @@ namespace SWD4CS
                 itemName != "SelectedItems" &&
                 itemName != "SelectedTab" &&
                 itemName != "CanUndo" &&
-                itemName != "" &&
+                itemName != "ParentForm" &&
                 itemName != "" &&
                 itemName != "" &&
                 itemName != "" &&
@@ -300,6 +307,54 @@ namespace SWD4CS
             else
             {
                 return false;
+            }
+        }
+
+        private void SplitContainerPanel1Click(object? sender, EventArgs e)
+        {
+            SplitterPanel? panel = sender as SplitterPanel;
+            SplitContainer? container = panel!.Parent as SplitContainer;
+
+            MouseEventArgs me = (MouseEventArgs)e;
+
+            panel.Name = container!.Name + ".Panel1";
+
+            if (e.ToString() == "System.EventArgs")
+            {
+                return;
+            }
+
+            if (toolList!.Text == "")
+            {
+                SetSelected(me);
+            }
+            else
+            {
+                AddControls(me, panel);
+            }
+        }
+
+        private void SplitContainerPanel2Click(object? sender, EventArgs e)
+        {
+            SplitterPanel? panel = sender as SplitterPanel;
+            SplitContainer? container = panel!.Parent as SplitContainer;
+
+            MouseEventArgs me = (MouseEventArgs)e;
+
+            panel.Name = container!.Name + ".Panel2";
+
+            if (e.ToString() == "System.EventArgs")
+            {
+                return;
+            }
+
+            if (toolList!.Text == "")
+            {
+                SetSelected(me);
+            }
+            else
+            {
+                AddControls(me, panel);
             }
         }
 
@@ -366,13 +421,19 @@ namespace SWD4CS
                     this.ctrl!.Name = className + form.cnt_ComboBox;
                     form.cnt_ComboBox++;
                     break;
-                //case "SplitContainer":
-                //    this.ctrl = new SplitContainer();
-                //    this.ctrl.Size = new System.Drawing.Size(120, 32);
-                //    this.ctrl!.Name = className + form.cnt_SplitContainer;
-                //    this.ctrl.Dock = DockStyle.Fill;
-                //    form.cnt_SplitContainer++;
-                //    break;
+                case "SplitContainer":
+                    this.ctrl = new SplitContainer();
+                    this.ctrl.Size = new System.Drawing.Size(120, 32);
+                    this.ctrl!.Name = className + form.cnt_SplitContainer;
+                    //this.ctrl.Dock = DockStyle.Fill;
+                    this.ctrl.Size = new System.Drawing.Size(250, 125);
+
+                    SplitContainer? splitcontainer = this.ctrl as SplitContainer;
+                    splitcontainer!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+                    splitcontainer.Panel1.Click += new System.EventHandler(this.SplitContainerPanel1Click);
+                    splitcontainer.Panel2.Click += new System.EventHandler(this.SplitContainerPanel2Click);
+                    form.cnt_SplitContainer++;
+                    break;
 
                 default:
                     return false;
