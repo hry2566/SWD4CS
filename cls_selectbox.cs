@@ -52,6 +52,7 @@ namespace SWD4CS
                 }
 
                 this.selectbox[i].BorderStyle = BorderStyle.FixedSingle;
+                this.selectbox[i].BackColor = System.Drawing.Color.White;
                 this.selectbox[i].Size = new Size(8, 8);
                 this.selectbox[i].Visible = false;
                 this.selectbox[i].TabIndex = i;
