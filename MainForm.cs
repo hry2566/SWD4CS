@@ -166,6 +166,7 @@ namespace SWD4CS
             {
                 cls_control ctrl = cls_design_form1.CtrlItems[i];
                 string ctrlClass = ctrl.className;
+
                 string parentName = "." + ctrl.parent!.Name;
 
                 if (parentName == ".cls_design_form1")
@@ -187,7 +188,7 @@ namespace SWD4CS
                 {
                     if (cls_control.HideProperty(item.Name))
                     {
-                        Control? baseCtrl = cls_design_form1.GetBaseCtrl(ctrl);
+                        Control? baseCtrl = cls_form.GetBaseCtrl(ctrl);
 
                         if (item.GetValue(ctrl.ctrl) != null && item.GetValue(ctrl.ctrl)!.ToString() != item.GetValue(baseCtrl)!.ToString())
                         {
@@ -276,22 +277,17 @@ namespace SWD4CS
                 case Type t when t == typeof(System.Boolean):
                     strProperty = " =  " + str2.ToLower() + ";";
                     break;
-                case Type t when t == typeof(System.Windows.Forms.DockStyle):
-                    strProperty = " =  " + type.ToString() + "." + str2 + ";";
-                    break;
                 case Type t when t == typeof(System.Windows.Forms.AnchorStyles):
                     strProperty = AnchorStyles2String(item.GetValue(ctrl.ctrl));
                     break;
                 case Type t when t == typeof(System.Int32):
                     strProperty = " = " + int.Parse(str2) + ";";
                     break;
-                case Type t when t == typeof(System.Drawing.ContentAlignment):
-                    strProperty = " = " + type.ToString() + "." + str2 + ";";
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.ScrollBars):
-                    strProperty = " = " + type.ToString() + "." + str2 + ";";
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.HorizontalAlignment):
+                case Type t when t == typeof(System.Windows.Forms.DockStyle) |
+                                 t == typeof(System.Drawing.ContentAlignment) |
+                                 t == typeof(System.Windows.Forms.ScrollBars) |
+                                 t == typeof(System.Windows.Forms.HorizontalAlignment):
+
                     strProperty = " = " + type.ToString() + "." + str2 + ";";
                     break;
             }
