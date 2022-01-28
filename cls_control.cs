@@ -431,7 +431,11 @@ namespace SWD4CS
                     SplitContainer? splitcontainer = this.ctrl as SplitContainer;
                     splitcontainer!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
                     splitcontainer.Panel1.Click += new System.EventHandler(this.SplitContainerPanel1Click);
+                    splitcontainer.Panel1.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
+                    splitcontainer.Panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
                     splitcontainer.Panel2.Click += new System.EventHandler(this.SplitContainerPanel2Click);
+                    splitcontainer.Panel2.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
+                    splitcontainer.Panel2.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
                     form.cnt_SplitContainer++;
                     break;
 
