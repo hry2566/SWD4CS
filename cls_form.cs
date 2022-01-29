@@ -403,6 +403,20 @@ namespace SWD4CS
                     Delete(CtrlItems[i]);
                     i--;
                 }
+
+                if (ctrl.ctrl is SplitContainer)
+                {
+                    SplitContainer? splcontainer = ctrl.ctrl as SplitContainer;
+
+                    for (int j = 0; j < CtrlItems.Count; j++)
+                    {
+                        if (splcontainer!.Panel1 == CtrlItems[j].ctrl!.Parent || splcontainer!.Panel2 == CtrlItems[j].ctrl!.Parent)
+                        {
+                            Delete(CtrlItems[j]);
+                            i--;
+                        }
+                    }
+                }
             }
             ctrl.Delete();
             CtrlItems.Remove(ctrl);
