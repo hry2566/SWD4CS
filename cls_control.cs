@@ -44,8 +44,7 @@ namespace SWD4CS
                     _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
                     _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
                 }
-
-                if (this.ctrl is TabPage)
+                else if (this.ctrl is TabPage)
                 {
                     selectBox = new cls_selectbox(this, this.ctrl);
                     Selected = false;
@@ -60,7 +59,18 @@ namespace SWD4CS
                 this.ctrl.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
                 this.ctrl.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
                 backPanel.Click += new System.EventHandler(Backpanel_Click);
+                EnableDoubleBuffering(this.ctrl);
             }
+        }
+
+        private static void EnableDoubleBuffering(Control control)
+        {
+            control.GetType().InvokeMember(
+               "DoubleBuffered",
+               BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
+               null,
+               control,
+               new object[] { true });
         }
 
         private void Backpanel_Click(object? sender, EventArgs e)
@@ -89,11 +99,9 @@ namespace SWD4CS
         {
             if (e.Button == MouseButtons.Left && Selected)
             {
-                Point pos = new Point(0, 0);
-                pos.X = (int)(e.X / grid) * grid;
-                pos.Y = (int)(e.Y / grid) * grid;
+                Point pos = new((int)(e.X / grid) * grid, (int)(e.Y / grid) * grid);
+                Point newPos = new(pos.X - memPos.X + ctrl!.Location.X, pos.Y - memPos.Y + ctrl.Location.Y);
 
-                Point newPos = new Point(pos.X - memPos.X + ctrl!.Location.X, pos.Y - memPos.Y + ctrl.Location.Y);
                 ctrl.Location = newPos;
                 Selected = true;
                 changeFlag = false;
@@ -125,12 +133,10 @@ namespace SWD4CS
 
         private void AddControls(MouseEventArgs me, SplitterPanel? splitpanel = null)
         {
-            // unselect
-            form.SelectAllClear();
-
-            // Add 
             int X = (int)(me.X / grid) * grid;
             int Y = (int)(me.Y / grid) * grid;
+
+            form.SelectAllClear();
 
             if ((this.ctrl is TabControl && toolList!.Text == "TabPage") || (this.ctrl is TabControl == false && toolList!.Text != "TabPage"))
             {
@@ -143,7 +149,6 @@ namespace SWD4CS
                     _ = new cls_control(form, toolList!.Text, splitpanel!, backPanel!, toolList, propertyList!, X, Y);
                 }
             }
-
             toolList!.SelectedIndex = -1;
         }
 
@@ -169,7 +174,6 @@ namespace SWD4CS
             parent.Controls.Remove(ctrl);
         }
 
-
         public bool Selected
         {
             set
@@ -179,7 +183,6 @@ namespace SWD4CS
                     selectFlag = value;
                     selectBox!.SetSelectBoxPos(value);
                 }
-
                 ShowProperty(value);
             }
             get
@@ -190,7 +193,7 @@ namespace SWD4CS
 
         private void ShowProperty(bool value)
         {
-            DataTable table = new DataTable();
+            DataTable table = new();
 
             propertyList.Columns.Clear();
             table.Columns.Add("Property");
@@ -203,9 +206,9 @@ namespace SWD4CS
                     if (HideProperty(item.Name))
                     {
                         DataRow row = table.NewRow();
+
                         row[0] = item.Name;
                         row[1] = item.GetValue(this.ctrl);
-
                         table.Rows.Add(row);
                     }
                 }
@@ -327,38 +330,10 @@ namespace SWD4CS
             }
         }
 
-        private void SplitContainerPanel1Click(object? sender, EventArgs e)
+        private void SplitContainerPanelClick(object? sender, EventArgs e)
         {
-            SplitterPanel? panel = sender as SplitterPanel;
-            SplitContainer? container = panel!.Parent as SplitContainer;
-
             MouseEventArgs me = (MouseEventArgs)e;
-
-            panel.Name = container!.Name + ".Panel1";
-
-            if (e.ToString() == "System.EventArgs")
-            {
-                return;
-            }
-
-            if (toolList!.Text == "")
-            {
-                SetSelected(me);
-            }
-            else
-            {
-                AddControls(me, panel);
-            }
-        }
-
-        private void SplitContainerPanel2Click(object? sender, EventArgs e)
-        {
             SplitterPanel? panel = sender as SplitterPanel;
-            SplitContainer? container = panel!.Parent as SplitContainer;
-
-            MouseEventArgs me = (MouseEventArgs)e;
-
-            panel.Name = container!.Name + ".Panel2";
 
             if (e.ToString() == "System.EventArgs")
             {
@@ -446,10 +421,12 @@ namespace SWD4CS
 
                     SplitContainer? splitcontainer = this.ctrl as SplitContainer;
                     splitcontainer!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-                    splitcontainer.Panel1.Click += new System.EventHandler(this.SplitContainerPanel1Click);
+                    splitcontainer.Panel1.Name = this.ctrl.Name + ".Panel1";
+                    splitcontainer.Panel1.Click += new System.EventHandler(this.SplitContainerPanelClick);
                     splitcontainer.Panel1.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
                     splitcontainer.Panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
-                    splitcontainer.Panel2.Click += new System.EventHandler(this.SplitContainerPanel2Click);
+                    splitcontainer.Panel2.Name = this.ctrl.Name + ".Panel2";
+                    splitcontainer.Panel2.Click += new System.EventHandler(this.SplitContainerPanelClick);
                     splitcontainer.Panel2.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
                     splitcontainer.Panel2.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
                     form.cnt_SplitContainer++;
