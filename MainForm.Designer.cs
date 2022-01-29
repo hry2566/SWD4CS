@@ -50,6 +50,8 @@
             this.readrToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.controlsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -292,7 +294,8 @@
             // 
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileFToolStripMenuItem});
+            this.fileFToolStripMenuItem,
+            this.controlsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1248, 28);
@@ -330,6 +333,21 @@
             this.closeCToolStripMenuItem.Text = "Quit(&Q)";
             this.closeCToolStripMenuItem.Click += new System.EventHandler(this.closeCToolStripMenuItem_Click);
             // 
+            // controlsToolStripMenuItem
+            // 
+            this.controlsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.deleteToolStripMenuItem});
+            this.controlsToolStripMenuItem.Name = "controlsToolStripMenuItem";
+            this.controlsToolStripMenuItem.Size = new System.Drawing.Size(78, 24);
+            this.controlsToolStripMenuItem.Text = "Controls";
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.deleteToolStripMenuItem.Text = "Delete (Alt + Dell)";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
@@ -342,7 +360,6 @@
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SWD4CS";
-            this.Load += new System.EventHandler(this.MainForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
@@ -394,5 +411,7 @@
         private ToolStripMenuItem readrToolStripMenuItem;
         private ToolStripMenuItem saveSToolStripMenuItem;
         private ToolStripMenuItem closeCToolStripMenuItem;
+        private ToolStripMenuItem controlsToolStripMenuItem;
+        private ToolStripMenuItem deleteToolStripMenuItem;
     }
 }
