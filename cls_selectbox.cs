@@ -1,4 +1,6 @@
 ﻿
+using System.Reflection;
+
 namespace SWD4CS
 {
     internal class cls_selectbox
@@ -27,9 +29,6 @@ namespace SWD4CS
 
         private void Init()
         {
-            // 
-            // selectbox
-            // 
             for (int i = 0; i < 8; i++)
             {
                 this.selectbox[i] = new Label();
@@ -57,12 +56,22 @@ namespace SWD4CS
                 this.selectbox[i].Visible = false;
                 this.selectbox[i].TabIndex = i;
 
-                //event_handler
                 this.selectbox[i].MouseDown += new MouseEventHandler(SelectboxMouseDown!);
                 this.selectbox[i].MouseMove += new MouseEventHandler(SelectboxMouseMove!);
-            }
 
+                EnableDoubleBuffering(this.selectbox[i]);
+            }
             parent.Controls.AddRange(this.selectbox);
+        }
+
+        private static void EnableDoubleBuffering(Control control)
+        {
+            control.GetType().InvokeMember(
+               "DoubleBuffered",
+               BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
+               null,
+               control,
+               new object[] { true });
         }
 
         public void SetSelectBoxPos(bool flag)
@@ -110,11 +119,9 @@ namespace SWD4CS
                 this.selectbox[0].Location = new Point(x1, y1);
                 this.selectbox[1].Location = new Point(x2, y1);
                 this.selectbox[2].Location = new Point(x3, y1);
-
                 this.selectbox[3].Location = new Point(x1, y3);
                 this.selectbox[4].Location = new Point(x2, y3);
                 this.selectbox[5].Location = new Point(x3, y3);
-
                 this.selectbox[6].Location = new Point(x1, y2);
                 this.selectbox[7].Location = new Point(x3, y2);
             }
@@ -153,11 +160,9 @@ namespace SWD4CS
             }
         }
 
-        private void SetFormSize(Point newPos, int index)
+        private void SetFormSize(Point pos, int index)
         {
-            newPos.X = (int)(newPos.X / grid) * grid;
-            newPos.Y = (int)(newPos.Y / grid) * grid;
-
+            Point newPos = new((int)(pos.X / grid) * grid, (int)(pos.Y / grid) * grid);
             int width = newPos.X - form!.Left;
             int height = newPos.Y - form.Top;
 
@@ -186,15 +191,12 @@ namespace SWD4CS
             {
                 form.Height = 40;
             }
-
             form.SetSelect(true);
         }
 
-        private void SetControlSize(Point newPos, int index)
+        private void SetControlSize(Point pos, int index)
         {
-            newPos.X = (int)(newPos.X / grid) * grid;
-            newPos.Y = (int)(newPos.Y / grid) * grid;
-
+            Point newPos = new((int)(pos.X / grid) * grid, (int)(pos.Y / grid) * grid);
             int width = newPos.X - ctrl!.ctrl!.Left;
             int height = newPos.Y - ctrl.ctrl!.Top;
             int width2 = ctrl.ctrl!.Width - (newPos.X + 8 - ctrl.ctrl!.Left);
@@ -251,7 +253,6 @@ namespace SWD4CS
                 ctrl.ctrl!.Height = 24;
                 ctrl.ctrl!.Top = memtop;
             }
-
             ctrl.Selected = true;
         }
     }
