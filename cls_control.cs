@@ -280,18 +280,35 @@ namespace SWD4CS
                 itemName != "SelectedTab" &&
                 itemName != "CanUndo" &&
                 itemName != "ParentForm" &&
-                itemName != "" &&
-                itemName != "" &&
-                itemName != "" &&
-                itemName != "" &&
-                itemName != "" &&
-                itemName != "" &&
-                itemName != "" &&
-                itemName != "" &&
-                itemName != "" &&
-                itemName != "" &&
-                itemName != "" &&
-                itemName != "" &&
+                itemName != "Item" &&
+                itemName != "AdjustedTopLeftHeaderBorderStyle" &&
+                itemName != "AdvancedCellBorderStyle" &&
+                itemName != "AdvancedColumnHeadersBorderStyle" &&
+                itemName != "AdvancedRowHeadersBorderStyle" &&
+                itemName != "AutoGenerateColumns" &&
+                itemName != "ColumnCount" &&
+                itemName != "CurrentCell" &&
+                itemName != "CurrentCellAddress" &&
+                itemName != "CurrentRow" &&
+                itemName != "EditingControl" &&
+                itemName != "EditingPanel" &&
+                itemName != "FirstDisplayedCell" &&
+                itemName != "FirstDisplayedScrollingColumnHiddenWidth" &&
+                itemName != "FirstDisplayedScrollingColumnIndex" &&
+                itemName != "FirstDisplayedScrollingRowIndex" &&
+                itemName != "HorizontalScrollingOffset" &&
+                itemName != "IsCurrentCellDirty" &&
+                itemName != "IsCurrentCellInEditMode" &&
+                itemName != "IsCurrentRowDirty" &&
+                itemName != "NewRowIndex" &&
+                itemName != "Rows" &&
+                itemName != "SelectedCells" &&
+                itemName != "SelectedRows" &&
+                itemName != "SortedColumn" &&
+                itemName != "SortOrder" &&
+                itemName != "TopLeftHeaderCell" &&
+                itemName != "VerticalScrollingOffset" &&
+                itemName != "VirtualMode" &&
                 itemName != "" &&
                 itemName != "" &&
                 itemName != "" &&
@@ -425,7 +442,6 @@ namespace SWD4CS
                     this.ctrl = new SplitContainer();
                     this.ctrl.Size = new System.Drawing.Size(120, 32);
                     this.ctrl!.Name = className + form.cnt_SplitContainer;
-                    //this.ctrl.Dock = DockStyle.Fill;
                     this.ctrl.Size = new System.Drawing.Size(250, 125);
 
                     SplitContainer? splitcontainer = this.ctrl as SplitContainer;
@@ -437,6 +453,21 @@ namespace SWD4CS
                     splitcontainer.Panel2.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
                     splitcontainer.Panel2.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
                     form.cnt_SplitContainer++;
+                    break;
+                case "DataGridView":
+                    this.ctrl = new DataGridView();
+                    this.ctrl.Size = new System.Drawing.Size(304, 192);
+                    this.ctrl!.Name = className + form.cnt_DataGridView;
+                    form.cnt_DataGridView++;
+                    break;
+                case "Panel":
+                    this.ctrl = new Panel();
+                    this.ctrl.Size = new System.Drawing.Size(304, 192);
+                    this.ctrl!.Name = className + form.cnt_Panel;
+
+                    Panel? panel = this.ctrl as Panel;
+                    panel!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+                    form.cnt_Panel++;
                     break;
 
                 default:
