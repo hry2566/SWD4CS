@@ -27,6 +27,8 @@ namespace SWD4CS
         public int cnt_CheckBox;
         public int cnt_ComboBox;
         public int cnt_SplitContainer;
+        public int cnt_DataGridView;
+        public int cnt_Panel;
 
         internal static Control? GetBaseCtrl(cls_control ctrl)
         {
@@ -64,6 +66,12 @@ namespace SWD4CS
                     break;
                 case Type t when t == typeof(System.Windows.Forms.SplitContainer):
                     baseCtrl = new SplitContainer();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.DataGridView):
+                    baseCtrl = new DataGridView();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.Panel):
+                    baseCtrl = new Panel();
                     break;
             }
             return baseCtrl;
@@ -538,7 +546,7 @@ namespace SWD4CS
             string[] split;
             string dummy;
 
-            if (propertyValue.IndexOf("{Width=") >= 1)
+            if (propertyValue.IndexOf("{Width=") > -1)
             {
                 split = propertyValue!.Split(',');
                 split[0] = split[0].Replace("{Width=", "");
