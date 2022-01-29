@@ -11,18 +11,14 @@ namespace SWD4CS
         public MainForm()
         {
             InitializeComponent();
-        }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-            cls_design_form1.Init(tabPage5, listBox1, dataGridView1);
 
             cls_file file = new();
             List<string>[] ret = cls_file.NewFile();
 
             source_base = ret[0];
             source_custom = ret[1];
-
+            cls_design_form1.Init(tabPage5, listBox1, dataGridView1);
+            EnableDoubleBuffering(this);
             EnableDoubleBuffering(dataGridView1);
         }
 
@@ -38,10 +34,16 @@ namespace SWD4CS
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Delete)
+            if (e.Alt && e.KeyCode == Keys.Delete && tabControl3.SelectedIndex == 0)
             {
                 cls_design_form1.RemoveSelectedItem();
             }
+        }
+
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            KeyEventArgs keyevents = new(Keys.Alt | Keys.Delete);
+            MainForm_KeyDown(sender, keyevents);
         }
 
         private void ReadrToolStripMenuItem_Click(object sender, EventArgs e)
@@ -54,10 +56,7 @@ namespace SWD4CS
                 source_base = ret[0];
                 source_custom = ret[1];
                 sourceFileName = ret[2][0];
-
-                // 全コントロールクリア
                 cls_design_form1.CtrlAllClear();
-
                 cls_design_form1.CreateControl(source_custom);
             }
         }
@@ -71,12 +70,10 @@ namespace SWD4CS
 
             if (sourceFileName != "")
             {
-                // 上書き保存
                 file.SaveAs(sourceFileName, textBox1.Text);
             }
             else
             {
-                // 新規保存
                 file.Save(textBox1.Text);
             }
         }
@@ -91,7 +88,6 @@ namespace SWD4CS
             if (tabControl3.SelectedIndex == 1)
             {
                 InitSourceCode();
-
                 textBox1.Text = CreateSourcecCode();
             }
         }
@@ -136,7 +132,6 @@ namespace SWD4CS
             int h;
             string text;
             string source = "";
-
             int insertPos = 2;
             int insertPos2 = 0;
             int itemCount = cls_design_form1.CtrlItems!.Count;
@@ -166,7 +161,6 @@ namespace SWD4CS
             {
                 cls_control ctrl = cls_design_form1.CtrlItems[i];
                 string ctrlClass = ctrl.className;
-
                 string parentName = "." + ctrl.parent!.Name;
 
                 if (parentName == ".cls_design_form1")
@@ -183,7 +177,6 @@ namespace SWD4CS
                 source_custom.Insert(insertPos, "        this." + ctrl.ctrl.Name + " = new System.Windows.Forms." + ctrlClass + "();");
                 insertPos++;
 
-                //property
                 foreach (PropertyInfo item in ctrl.ctrl!.GetType().GetProperties())
                 {
                     if (cls_control.HideProperty(item.Name))
@@ -257,7 +250,6 @@ namespace SWD4CS
         private string Property2String(cls_control ctrl, PropertyInfo item)
         {
             string strProperty = "";
-
             Type type = item.GetValue(ctrl.ctrl)!.GetType();
             string str2 = item.GetValue(ctrl.ctrl)!.ToString()!;
 
@@ -291,7 +283,6 @@ namespace SWD4CS
                     strProperty = " = " + type.ToString() + "." + str2 + ";";
                     break;
             }
-
             return strProperty;
         }
     }
