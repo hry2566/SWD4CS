@@ -44,7 +44,8 @@ namespace SWD4CS
                     _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
                     _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
                 }
-                else if (this.ctrl is TabPage)
+
+                if (this.ctrl is TabPage)
                 {
                     selectBox = new cls_selectbox(this, this.ctrl);
                     Selected = false;
