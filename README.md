@@ -9,7 +9,7 @@
  * VisualStudio2022 C# → VSCode .net6.0
  
 ## スクリーンショット  
-![image](https://user-images.githubusercontent.com/86605611/150677219-20862d08-581a-418c-9a52-ef7974751bdb.png)
+![SWD4CS](https://user-images.githubusercontent.com/86605611/151697881-3f0cbf3e-ee29-4226-b419-5a3b5a6b1136.png)
 
 
 ## 動画
