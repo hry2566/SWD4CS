@@ -30,7 +30,7 @@ namespace SWD4CS
 
             if (Init(className))
             {
-                if (className == "TabPage" && parent == form)
+                if ((className == "TabPage" && parent == form) || (parent is StatusStrip))
                 {
                     return;
                 }
@@ -303,9 +303,9 @@ namespace SWD4CS
                 itemName != "TopLeftHeaderCell" &&
                 itemName != "VerticalScrollingOffset" &&
                 itemName != "VirtualMode" &&
-                itemName != "" &&
-                itemName != "" &&
-                itemName != "" &&
+                itemName != "DataSource" &&
+                itemName != "TopItem" &&
+                itemName != "Rtf" &&
                 itemName != "" &&
                 itemName != "" &&
                 itemName != "" &&
@@ -378,6 +378,9 @@ namespace SWD4CS
                     this.ctrl = new ListBox();
                     this.ctrl.Size = new System.Drawing.Size(120, 104);
                     this.ctrl!.Name = className + form.cnt_ListBox;
+
+                    ListBox? listbox = this.ctrl as ListBox;
+                    listbox!.Items.Add("ListBox");
                     form.cnt_ListBox++;
                     break;
                 case "TabControl":
@@ -426,6 +429,14 @@ namespace SWD4CS
                     this.ctrl = new DataGridView();
                     this.ctrl.Size = new System.Drawing.Size(304, 192);
                     this.ctrl!.Name = className + form.cnt_DataGridView;
+
+                    DataTable table = new DataTable();
+                    propertyList!.Columns.Clear();
+                    table.Columns.Add("Column1");
+                    table.Columns.Add("Column2");
+
+                    DataGridView? datagridview = this.ctrl as DataGridView;
+                    datagridview!.DataSource = table;
                     form.cnt_DataGridView++;
                     break;
                 case "Panel":
@@ -437,6 +448,97 @@ namespace SWD4CS
                     panel!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
                     form.cnt_Panel++;
                     break;
+                case "CheckedListBox":
+                    this.ctrl = new CheckedListBox();
+                    this.ctrl.Size = new System.Drawing.Size(152, 112);
+                    this.ctrl!.Name = className + form.cnt_CheckedListBox;
+
+                    CheckedListBox? checkedlistbox = this.ctrl as CheckedListBox;
+                    checkedlistbox!.FormattingEnabled = true;
+                    checkedlistbox.Items.Add("CheckedListBox");
+                    form.cnt_CheckedListBox++;
+                    break;
+                case "LinkLabel":
+                    this.ctrl = new LinkLabel();
+                    this.ctrl.Size = new System.Drawing.Size(120, 32);
+                    this.ctrl!.Name = className + form.cnt_LinkLabel;
+
+                    LinkLabel? linklabel = this.ctrl as LinkLabel;
+                    linklabel!.AutoSize = true;
+                    form.cnt_LinkLabel++;
+                    break;
+                case "PictureBox":
+                    this.ctrl = new PictureBox();
+                    this.ctrl.Size = new System.Drawing.Size(125, 62);
+                    this.ctrl!.Name = className + form.cnt_PictureBox;
+
+                    PictureBox? picbox = this.ctrl as PictureBox;
+                    picbox!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+                    form.cnt_PictureBox++;
+                    break;
+                case "ProgressBar":
+                    this.ctrl = new ProgressBar();
+                    this.ctrl.Size = new System.Drawing.Size(125, 29);
+                    this.ctrl!.Name = className + form.cnt_ProgressBar;
+
+                    ProgressBar? prgressbar = this.ctrl as ProgressBar;
+                    prgressbar!.Value = 50;
+                    form.cnt_ProgressBar++;
+                    break;
+                case "RadioButton":
+                    this.ctrl = new RadioButton();
+                    this.ctrl.Size = new System.Drawing.Size(125, 29);
+                    this.ctrl!.Name = className + form.cnt_RadioButton;
+
+                    RadioButton? radiobutton = this.ctrl as RadioButton;
+                    radiobutton!.AutoSize = true;
+                    form.cnt_RadioButton++;
+                    break;
+                case "RichTextBox":
+                    this.ctrl = new RichTextBox();
+                    this.ctrl.Size = new System.Drawing.Size(125, 120);
+                    this.ctrl!.Name = className + form.cnt_RichTextBox;
+                    form.cnt_RichTextBox++;
+                    break;
+                case "StatusStrip":
+                    this.ctrl = new StatusStrip();
+                    this.ctrl.Size = new System.Drawing.Size(125, 120);
+                    this.ctrl!.Name = className + form.cnt_StatusStrip;
+                    form.cnt_StatusStrip++;
+                    break;
+
+
+
+                //case "ListView":
+                //    this.ctrl = new ListView();
+                //    this.ctrl.Size = new System.Drawing.Size(151, 121);
+                //    this.ctrl!.Name = className + form.cnt_ListView;
+                //    form.cnt_ListView++;
+                //    break;
+                //case "TreeView":
+                //    this.ctrl = new TreeView();
+                //    this.ctrl.Size = new System.Drawing.Size(151, 121);
+                //    this.ctrl!.Name = className + form.cnt_TreeView;
+                //    form.cnt_TreeView++;
+                //    break;
+                //case "MonthCalendar":
+                //    this.ctrl = new MonthCalendar();
+                //    this.ctrl.Size = new System.Drawing.Size(151, 121);
+                //    this.ctrl!.Name = className + form.cnt_MonthCalendar;
+                //    form.cnt_MonthCalendar++;
+                //    break;
+                //case "HScrollBar":
+                //    this.ctrl = new HScrollBar();
+                //    this.ctrl.Size = new System.Drawing.Size(120, 32);
+                //    this.ctrl!.Name = className + form.cnt_HScrollBar;
+                //    form.cnt_HScrollBar++;
+                //    break;
+                //case "VScrollBar":
+                //    this.ctrl = new VScrollBar();
+                //    this.ctrl.Size = new System.Drawing.Size(32, 120);
+                //    this.ctrl!.Name = className + form.cnt_VScrollBar;
+                //    form.cnt_VScrollBar++;
+                //    break;
 
                 default:
                     return false;
