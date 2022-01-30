@@ -83,7 +83,17 @@ namespace SWD4CS
             InitializeComponent();
         }
 
-        public void Init(Control backPanel, ListBox toolList, DataGridView dataGridView1)
+        internal static void EnableDoubleBuffering(Control control)
+        {
+            control.GetType().InvokeMember(
+               "DoubleBuffered",
+               BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
+               null,
+               control,
+               new object[] { true });
+        }
+
+        internal void Init(Control backPanel, ListBox toolList, DataGridView dataGridView1)
         {
             this.backPanel = backPanel;
             this.toolList = toolList;
@@ -95,6 +105,9 @@ namespace SWD4CS
 
             selectBox = new cls_selectbox(this, backPanel);
             SetSelect(true);
+
+            EnableDoubleBuffering(this);
+            EnableDoubleBuffering(propertyList);
         }
 
         private void SetProperty(int i, int index, bool formFlag)
@@ -131,7 +144,7 @@ namespace SWD4CS
             }
         }
 
-        public void SetSelect(bool flag)
+        internal void SetSelect(bool flag)
         {
             selectFlag = flag;
             selectBox!.SetSelectBoxPos(selectFlag);
@@ -228,15 +241,9 @@ namespace SWD4CS
                 {
                     if (CtrlItems[i].ctrl is TabPage)
                     {
-                        int cnt = 0;
-                        for (int j = 0; j < CtrlItems.Count; j++)
-                        {
-                            if (CtrlItems[j].ctrl is TabPage)
-                            {
-                                cnt++;
-                            }
-                        }
-                        if (cnt > 1)
+                        TabControl? tabctrl = CtrlItems[i].ctrl!.Parent as TabControl;
+
+                        if (tabctrl!.TabPages.Count > 1)
                         {
                             Delete(CtrlItems[i]);
                             i--;
