@@ -60,18 +60,8 @@ namespace SWD4CS
                 this.ctrl.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
                 this.ctrl.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
                 backPanel.Click += new System.EventHandler(Backpanel_Click);
-                EnableDoubleBuffering(this.ctrl);
+                cls_form.EnableDoubleBuffering(this.ctrl);
             }
-        }
-
-        private static void EnableDoubleBuffering(Control control)
-        {
-            control.GetType().InvokeMember(
-               "DoubleBuffered",
-               BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
-               null,
-               control,
-               new object[] { true });
         }
 
         private void Backpanel_Click(object? sender, EventArgs e)
@@ -169,13 +159,13 @@ namespace SWD4CS
             }
         }
 
-        public void Delete()
+        internal void Delete()
         {
             Selected = false;
             parent.Controls.Remove(ctrl);
         }
 
-        public bool Selected
+        internal bool Selected
         {
             set
             {
@@ -218,7 +208,7 @@ namespace SWD4CS
             propertyList.Sort(propertyList.Columns[0], ListSortDirection.Ascending);
         }
 
-        public static bool HideProperty(string itemName)
+        internal static bool HideProperty(string itemName)
         {
             if (itemName != "AccessibilityObject" &&
                 itemName != "AccessibleDefaultActionDescription" &&
