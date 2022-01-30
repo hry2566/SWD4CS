@@ -121,13 +121,20 @@
             "",
             "Button",
             "CheckBox",
+            "CheckedListBox",
             "ComboBox",
             "DataGridView",
             "GroupBox",
             "Label",
+            "LinkLabel",
             "ListBox",
             "Panel",
+            "PictureBox",
+            "ProgressBar",
+            "RadioButton",
+            "RichTextBox",
             "SplitContainer",
+            "StatusStrip",
             "TabControl",
             "TabPage",
             "TextBox"});
@@ -344,7 +351,7 @@
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
             this.deleteToolStripMenuItem.Text = "Delete (Alt + Dell)";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
