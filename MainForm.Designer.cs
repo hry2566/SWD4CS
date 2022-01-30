@@ -137,6 +137,11 @@
             "StatusStrip",
             "TabControl",
             "TabPage",
+            "HScrollBar",
+            "VScrollBar",
+            "MonthCalendar",
+            "ListView",
+            "TreeView",
             "TextBox"});
             this.listBox1.Location = new System.Drawing.Point(3, 3);
             this.listBox1.Name = "listBox1";
