@@ -36,12 +36,11 @@ namespace SWD4CS
         internal int cnt_RadioButton;
         internal int cnt_RichTextBox;
         internal int cnt_StatusStrip;
-
-        //internal int cnt_ListView;
-        //internal int cnt_TreeView;
-        //internal int cnt_MonthCalendar;
-        //internal int cnt_HScrollBar;
-        //internal int cnt_VScrollBar;
+        internal int cnt_ListView;
+        internal int cnt_TreeView;
+        internal int cnt_MonthCalendar;
+        internal int cnt_HScrollBar;
+        internal int cnt_VScrollBar;
 
         internal static Control? GetBaseCtrl(cls_control ctrl)
         {
@@ -107,23 +106,21 @@ namespace SWD4CS
                 case Type t when t == typeof(System.Windows.Forms.StatusStrip):
                     baseCtrl = new StatusStrip();
                     break;
-
-
-                    //case Type t when t == typeof(System.Windows.Forms.ListView):
-                    //    baseCtrl = new ListView();
-                    //    break;
-                    //case Type t when t == typeof(System.Windows.Forms.TreeView):
-                    //    baseCtrl = new TreeView();
-                    //    break;
-                    //case Type t when t == typeof(System.Windows.Forms.MonthCalendar):
-                    //    baseCtrl = new MonthCalendar();
-                    //    break;
-                    //case Type t when t == typeof(System.Windows.Forms.HScrollBar):
-                    //    baseCtrl = new HScrollBar();
-                    //    break;
-                    //case Type t when t == typeof(System.Windows.Forms.VScrollBar):
-                    //    baseCtrl = new VScrollBar();
-                    //    break;
+                case Type t when t == typeof(System.Windows.Forms.ListView):
+                    baseCtrl = new ListView();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.TreeView):
+                    baseCtrl = new TreeView();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.MonthCalendar):
+                    baseCtrl = new MonthCalendar();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.HScrollBar):
+                    baseCtrl = new HScrollBar();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.VScrollBar):
+                    baseCtrl = new VScrollBar();
+                    break;
             }
             return baseCtrl;
         }
