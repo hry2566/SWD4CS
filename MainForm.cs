@@ -49,8 +49,6 @@ namespace SWD4CS
 
         private void SaveSToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //cls_file file = new();
-
             tabControl3.SelectedIndex = 1;
             tabControl3.SelectedIndex = 0;
 
