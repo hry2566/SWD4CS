@@ -155,10 +155,8 @@ namespace SWD4CS
             backPanel.Click += new System.EventHandler(Backpanel_Click);
 
             selectBox = new cls_selectbox(this, backPanel);
-            SetSelect(true);
-
-            EnableDoubleBuffering(this);
             EnableDoubleBuffering(propertyList);
+            SetSelect(true);
         }
 
         private void SetProperty(int i, int index, bool formFlag)
