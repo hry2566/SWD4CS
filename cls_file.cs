@@ -57,7 +57,7 @@
 
             return ret;
         }
-        internal List<string>[] OpenFile()
+        internal static List<string>[] OpenFile()
         {
             List<string> source_base = new List<string>();
             List<string> source_custom = new List<string>();
@@ -105,12 +105,12 @@
             return ret;
         }
 
-        internal void SaveAs(string FileName, string SourceCode)
+        internal static void SaveAs(string FileName, string SourceCode)
         {
             File.WriteAllText(FileName, SourceCode);
         }
 
-        internal void Save(string SourceCode)
+        internal static void Save(string SourceCode)
         {
             SaveFileDialog dlg = new()
             {
