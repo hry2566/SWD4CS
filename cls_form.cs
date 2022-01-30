@@ -16,19 +16,32 @@ namespace SWD4CS
         // ****************************************************************************************
         // コントロール追加時に下記を編集すること
         // ****************************************************************************************
-        public int cnt_Control = -1;
-        public int cnt_Button;
-        public int cnt_Label;
-        public int cnt_TextBox;
-        public int cnt_ListBox;
-        public int cnt_GroupBox;
-        public int cnt_TabControl;
-        public int cnt_TabPage;
-        public int cnt_CheckBox;
-        public int cnt_ComboBox;
-        public int cnt_SplitContainer;
-        public int cnt_DataGridView;
-        public int cnt_Panel;
+        internal int cnt_Control = -1;
+        internal int cnt_Button;
+        internal int cnt_Label;
+        internal int cnt_TextBox;
+        internal int cnt_ListBox;
+        internal int cnt_GroupBox;
+        internal int cnt_TabControl;
+        internal int cnt_TabPage;
+        internal int cnt_CheckBox;
+        internal int cnt_ComboBox;
+        internal int cnt_SplitContainer;
+        internal int cnt_DataGridView;
+        internal int cnt_Panel;
+        internal int cnt_CheckedListBox;
+        internal int cnt_LinkLabel;
+        internal int cnt_PictureBox;
+        internal int cnt_ProgressBar;
+        internal int cnt_RadioButton;
+        internal int cnt_RichTextBox;
+        internal int cnt_StatusStrip;
+
+        //internal int cnt_ListView;
+        //internal int cnt_TreeView;
+        //internal int cnt_MonthCalendar;
+        //internal int cnt_HScrollBar;
+        //internal int cnt_VScrollBar;
 
         internal static Control? GetBaseCtrl(cls_control ctrl)
         {
@@ -73,6 +86,44 @@ namespace SWD4CS
                 case Type t when t == typeof(System.Windows.Forms.Panel):
                     baseCtrl = new Panel();
                     break;
+                case Type t when t == typeof(System.Windows.Forms.CheckedListBox):
+                    baseCtrl = new CheckedListBox();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.LinkLabel):
+                    baseCtrl = new LinkLabel();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.PictureBox):
+                    baseCtrl = new PictureBox();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.ProgressBar):
+                    baseCtrl = new ProgressBar();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.RadioButton):
+                    baseCtrl = new RadioButton();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.RichTextBox):
+                    baseCtrl = new RichTextBox();
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.StatusStrip):
+                    baseCtrl = new StatusStrip();
+                    break;
+
+
+                    //case Type t when t == typeof(System.Windows.Forms.ListView):
+                    //    baseCtrl = new ListView();
+                    //    break;
+                    //case Type t when t == typeof(System.Windows.Forms.TreeView):
+                    //    baseCtrl = new TreeView();
+                    //    break;
+                    //case Type t when t == typeof(System.Windows.Forms.MonthCalendar):
+                    //    baseCtrl = new MonthCalendar();
+                    //    break;
+                    //case Type t when t == typeof(System.Windows.Forms.HScrollBar):
+                    //    baseCtrl = new HScrollBar();
+                    //    break;
+                    //case Type t when t == typeof(System.Windows.Forms.VScrollBar):
+                    //    baseCtrl = new VScrollBar();
+                    //    break;
             }
             return baseCtrl;
         }
