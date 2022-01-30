@@ -359,8 +359,8 @@ namespace SWD4CS
                     break;
                 case "Label":
                     this.ctrl = new Label();
-                    this.ctrl.Size = new System.Drawing.Size(80, 32);
                     this.ctrl!.Name = className + form.cnt_Label;
+                    this.ctrl!.AutoSize = true;
                     form.cnt_Label++;
                     break;
                 case "GroupBox":
@@ -371,7 +371,6 @@ namespace SWD4CS
                     break;
                 case "TextBox":
                     this.ctrl = new TextBox();
-                    this.ctrl.Size = new System.Drawing.Size(120, 32);
                     this.ctrl!.Name = className + form.cnt_TextBox;
                     form.cnt_TextBox++;
                     break;
@@ -379,7 +378,6 @@ namespace SWD4CS
                     this.ctrl = new ListBox();
                     this.ctrl.Size = new System.Drawing.Size(120, 104);
                     this.ctrl!.Name = className + form.cnt_ListBox;
-
                     ListBox? listbox = this.ctrl as ListBox;
                     listbox!.Items.Add("ListBox");
                     form.cnt_ListBox++;
@@ -398,13 +396,12 @@ namespace SWD4CS
                     break;
                 case "CheckBox":
                     this.ctrl = new CheckBox();
-                    this.ctrl.Size = new System.Drawing.Size(120, 32);
                     this.ctrl!.Name = className + form.cnt_CheckBox;
+                    this.ctrl!.AutoSize = true;
                     form.cnt_CheckBox++;
                     break;
                 case "ComboBox":
                     this.ctrl = new ComboBox();
-                    this.ctrl.Size = new System.Drawing.Size(120, 32);
                     this.ctrl!.Name = className + form.cnt_ComboBox;
                     form.cnt_ComboBox++;
                     break;
@@ -413,7 +410,6 @@ namespace SWD4CS
                     this.ctrl.Size = new System.Drawing.Size(120, 32);
                     this.ctrl!.Name = className + form.cnt_SplitContainer;
                     this.ctrl.Size = new System.Drawing.Size(250, 125);
-
                     SplitContainer? splitcontainer = this.ctrl as SplitContainer;
                     splitcontainer!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
                     splitcontainer.Panel1.Name = this.ctrl.Name + ".Panel1";
@@ -430,12 +426,10 @@ namespace SWD4CS
                     this.ctrl = new DataGridView();
                     this.ctrl.Size = new System.Drawing.Size(304, 192);
                     this.ctrl!.Name = className + form.cnt_DataGridView;
-
                     DataTable table = new DataTable();
                     propertyList!.Columns.Clear();
                     table.Columns.Add("Column1");
                     table.Columns.Add("Column2");
-
                     DataGridView? datagridview = this.ctrl as DataGridView;
                     datagridview!.DataSource = table;
                     form.cnt_DataGridView++;
@@ -444,7 +438,6 @@ namespace SWD4CS
                     this.ctrl = new Panel();
                     this.ctrl.Size = new System.Drawing.Size(304, 192);
                     this.ctrl!.Name = className + form.cnt_Panel;
-
                     Panel? panel = this.ctrl as Panel;
                     panel!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
                     form.cnt_Panel++;
@@ -453,26 +446,21 @@ namespace SWD4CS
                     this.ctrl = new CheckedListBox();
                     this.ctrl.Size = new System.Drawing.Size(152, 112);
                     this.ctrl!.Name = className + form.cnt_CheckedListBox;
-
                     CheckedListBox? checkedlistbox = this.ctrl as CheckedListBox;
-                    checkedlistbox!.FormattingEnabled = true;
-                    checkedlistbox.Items.Add("CheckedListBox");
+                    checkedlistbox!.Items.Add("CheckedListBox");
                     form.cnt_CheckedListBox++;
                     break;
                 case "LinkLabel":
                     this.ctrl = new LinkLabel();
                     this.ctrl.Size = new System.Drawing.Size(120, 32);
                     this.ctrl!.Name = className + form.cnt_LinkLabel;
-
-                    LinkLabel? linklabel = this.ctrl as LinkLabel;
-                    linklabel!.AutoSize = true;
+                    this.ctrl!.AutoSize = true;
                     form.cnt_LinkLabel++;
                     break;
                 case "PictureBox":
                     this.ctrl = new PictureBox();
                     this.ctrl.Size = new System.Drawing.Size(125, 62);
                     this.ctrl!.Name = className + form.cnt_PictureBox;
-
                     PictureBox? picbox = this.ctrl as PictureBox;
                     picbox!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
                     form.cnt_PictureBox++;
@@ -481,7 +469,6 @@ namespace SWD4CS
                     this.ctrl = new ProgressBar();
                     this.ctrl.Size = new System.Drawing.Size(125, 29);
                     this.ctrl!.Name = className + form.cnt_ProgressBar;
-
                     ProgressBar? prgressbar = this.ctrl as ProgressBar;
                     prgressbar!.Value = 50;
                     form.cnt_ProgressBar++;
@@ -490,9 +477,7 @@ namespace SWD4CS
                     this.ctrl = new RadioButton();
                     this.ctrl.Size = new System.Drawing.Size(125, 29);
                     this.ctrl!.Name = className + form.cnt_RadioButton;
-
-                    RadioButton? radiobutton = this.ctrl as RadioButton;
-                    radiobutton!.AutoSize = true;
+                    this.ctrl!.AutoSize = true;
                     form.cnt_RadioButton++;
                     break;
                 case "RichTextBox":
@@ -507,40 +492,41 @@ namespace SWD4CS
                     this.ctrl!.Name = className + form.cnt_StatusStrip;
                     form.cnt_StatusStrip++;
                     break;
-
-
-
-                //case "ListView":
-                //    this.ctrl = new ListView();
-                //    this.ctrl.Size = new System.Drawing.Size(151, 121);
-                //    this.ctrl!.Name = className + form.cnt_ListView;
-                //    form.cnt_ListView++;
-                //    break;
-                //case "TreeView":
-                //    this.ctrl = new TreeView();
-                //    this.ctrl.Size = new System.Drawing.Size(151, 121);
-                //    this.ctrl!.Name = className + form.cnt_TreeView;
-                //    form.cnt_TreeView++;
-                //    break;
-                //case "MonthCalendar":
-                //    this.ctrl = new MonthCalendar();
-                //    this.ctrl.Size = new System.Drawing.Size(151, 121);
-                //    this.ctrl!.Name = className + form.cnt_MonthCalendar;
-                //    form.cnt_MonthCalendar++;
-                //    break;
-                //case "HScrollBar":
-                //    this.ctrl = new HScrollBar();
-                //    this.ctrl.Size = new System.Drawing.Size(120, 32);
-                //    this.ctrl!.Name = className + form.cnt_HScrollBar;
-                //    form.cnt_HScrollBar++;
-                //    break;
-                //case "VScrollBar":
-                //    this.ctrl = new VScrollBar();
-                //    this.ctrl.Size = new System.Drawing.Size(32, 120);
-                //    this.ctrl!.Name = className + form.cnt_VScrollBar;
-                //    form.cnt_VScrollBar++;
-                //    break;
-
+                case "HScrollBar":
+                    this.ctrl = new HScrollBar();
+                    this.ctrl.Size = new System.Drawing.Size(120, 32);
+                    this.ctrl!.Name = className + form.cnt_HScrollBar;
+                    CreatePickBox(this.ctrl);
+                    form.cnt_HScrollBar++;
+                    break;
+                case "VScrollBar":
+                    this.ctrl = new VScrollBar();
+                    this.ctrl.Size = new System.Drawing.Size(32, 120);
+                    this.ctrl!.Name = className + form.cnt_VScrollBar;
+                    CreatePickBox(this.ctrl);
+                    form.cnt_VScrollBar++;
+                    break;
+                case "MonthCalendar":
+                    this.ctrl = new MonthCalendar();
+                    this.ctrl.Size = new System.Drawing.Size(151, 121);
+                    this.ctrl!.Name = className + form.cnt_MonthCalendar;
+                    CreatePickBox(this.ctrl);
+                    form.cnt_MonthCalendar++;
+                    break;
+                case "ListView":
+                    this.ctrl = new ListView();
+                    this.ctrl.Size = new System.Drawing.Size(151, 121);
+                    this.ctrl!.Name = className + form.cnt_ListView;
+                    CreatePickBox(this.ctrl);
+                    form.cnt_ListView++;
+                    break;
+                case "TreeView":
+                    this.ctrl = new TreeView();
+                    this.ctrl.Size = new System.Drawing.Size(151, 121);
+                    this.ctrl!.Name = className + form.cnt_TreeView;
+                    CreatePickBox(this.ctrl);
+                    form.cnt_TreeView++;
+                    break;
                 default:
                     return false;
             }
@@ -549,6 +535,18 @@ namespace SWD4CS
             this.ctrl!.Text = this.ctrl!.Name;
             this.ctrl!.TabIndex = form.cnt_Control;
             return true;
+        }
+
+        private void CreatePickBox(Control ctrl)
+        {
+            Button pickbox = new();
+            pickbox = new();
+            pickbox.Size = new System.Drawing.Size(24, 24);
+            pickbox.Text = "▼";
+            pickbox.Click += new System.EventHandler(Ctrl_Click);
+            pickbox.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
+            pickbox.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
+            ctrl.Controls.Add(pickbox);
         }
     }
 }
