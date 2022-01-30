@@ -1,7 +1,4 @@
-﻿
-using System.Reflection;
-
-namespace SWD4CS
+﻿namespace SWD4CS
 {
     internal class cls_selectbox
     {
@@ -59,22 +56,12 @@ namespace SWD4CS
                 this.selectbox[i].MouseDown += new MouseEventHandler(SelectboxMouseDown!);
                 this.selectbox[i].MouseMove += new MouseEventHandler(SelectboxMouseMove!);
 
-                EnableDoubleBuffering(this.selectbox[i]);
+                cls_form.EnableDoubleBuffering(this.selectbox[i]);
             }
             parent.Controls.AddRange(this.selectbox);
         }
 
-        private static void EnableDoubleBuffering(Control control)
-        {
-            control.GetType().InvokeMember(
-               "DoubleBuffered",
-               BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
-               null,
-               control,
-               new object[] { true });
-        }
-
-        public void SetSelectBoxPos(bool flag)
+        internal void SetSelectBoxPos(bool flag)
         {
             if (flag)
             {
