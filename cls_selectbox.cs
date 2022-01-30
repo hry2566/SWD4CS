@@ -56,7 +56,7 @@
                 this.selectbox[i].MouseDown += new MouseEventHandler(SelectboxMouseDown!);
                 this.selectbox[i].MouseMove += new MouseEventHandler(SelectboxMouseMove!);
 
-                cls_form.EnableDoubleBuffering(this.selectbox[i]);
+                //cls_form.EnableDoubleBuffering(this.selectbox[i]);
             }
             parent.Controls.AddRange(this.selectbox);
         }
@@ -144,6 +144,8 @@
                 {
                     SetControlSize(newPos, move_selectbox.TabIndex);
                 }
+
+                //System.Windows.Forms.Application.DoEvents();
             }
         }
 
@@ -183,6 +185,8 @@
 
         private void SetControlSize(Point pos, int index)
         {
+            Point point = new(ctrl!.ctrl!.Left, ctrl.ctrl!.Top);
+            Size size = new(ctrl.ctrl!.Width, ctrl.ctrl!.Height);
             Point newPos = new((int)(pos.X / grid) * grid, (int)(pos.Y / grid) * grid);
             int width = newPos.X - ctrl!.ctrl!.Left;
             int height = newPos.Y - ctrl.ctrl!.Top;
@@ -194,52 +198,56 @@
             switch (index)
             {
                 case 0:
-                    ctrl.ctrl!.Left = newPos.X + 8;
-                    ctrl.ctrl!.Top = newPos.Y + 8;
-                    ctrl.ctrl!.Width = width2;
-                    ctrl.ctrl!.Height = height2;
+                    point.X = newPos.X + 8;
+                    point.Y = newPos.Y + 8;
+                    size.Width = width2;
+                    size.Height = height2;
                     break;
                 case 1:
-                    ctrl.ctrl!.Top = newPos.Y + 8;
-                    ctrl.ctrl!.Height = height2;
+                    point.Y = newPos.Y + 8;
+                    size.Height = height2;
                     break;
                 case 2:
-                    ctrl.ctrl!.Top = newPos.Y + 8;
-                    ctrl.ctrl!.Height = height2;
-                    ctrl.ctrl!.Width = width;
+                    point.Y = newPos.Y + 8;
+                    size.Height = height2;
+                    size.Width = width;
                     break;
                 case 3:
-                    ctrl.ctrl!.Left = newPos.X + 8;
-                    ctrl.ctrl!.Width = width2;
-                    ctrl.ctrl!.Height = height;
+                    point.X = newPos.X + 8;
+                    size.Width = width2;
+                    size.Height = height;
                     break;
                 case 4:
-                    ctrl.ctrl!.Height = height;
+                    size.Height = height;
                     break;
                 case 5:
-                    ctrl.ctrl!.Width = width;
-                    ctrl.ctrl!.Height = height;
+                    size.Width = width;
+                    size.Height = height;
                     break;
                 case 6:
-                    ctrl.ctrl!.Left = newPos.X + 8;
-                    ctrl.ctrl!.Width = width2;
+                    point.X = newPos.X + 8;
+                    size.Width = width2;
                     break;
                 case 7:
-                    ctrl.ctrl!.Width = width;
+                    size.Width = width;
                     break;
             }
 
             if (ctrl.ctrl!.Width < 24)
             {
-                ctrl.ctrl!.Width = 24;
-                ctrl.ctrl!.Left = memleft;
+                size.Width = 24;
+                point.X = memleft;
             }
 
             if (ctrl.ctrl!.Height < 24)
             {
-                ctrl.ctrl!.Height = 24;
-                ctrl.ctrl!.Top = memtop;
+                size.Height = 24;
+                point.Y = memtop;
             }
+
+            ctrl.ctrl.Location = point;
+            ctrl.ctrl.Size = size;
+
             ctrl.Selected = true;
         }
     }
