@@ -60,7 +60,6 @@ namespace SWD4CS
                 this.ctrl.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
                 this.ctrl.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
                 backPanel.Click += new System.EventHandler(Backpanel_Click);
-                cls_form.EnableDoubleBuffering(this.ctrl);
             }
         }
 
@@ -96,6 +95,8 @@ namespace SWD4CS
                 ctrl.Location = newPos;
                 Selected = true;
                 changeFlag = false;
+
+                //System.Windows.Forms.Application.DoEvents();
             }
             else
             {
