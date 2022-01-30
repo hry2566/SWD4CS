@@ -5,7 +5,7 @@
         private cls_form? form;
         private cls_control? ctrl;
         private Control parent;
-        private Label[] selectbox = new Label[8];
+        private Panel[] selectbox = new Panel[8];
         private Point memPos;
         private int grid = 8;
 
@@ -28,7 +28,7 @@
         {
             for (int i = 0; i < 8; i++)
             {
-                this.selectbox[i] = new Label();
+                this.selectbox[i] = new Panel();
 
                 if (i == 2 || i == 3)
                 {
@@ -129,7 +129,7 @@
 
         private void SelectboxMouseMove(object sender, MouseEventArgs e)
         {
-            var move_selectbox = (Label)sender;
+            var move_selectbox = (Panel)sender;
 
             if (e.Button == MouseButtons.Left)
             {
