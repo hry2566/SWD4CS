@@ -23,14 +23,21 @@
  ・ポトペタ  
  ・一部のプロパティ変更  
  ・Button  
- ・ChechBox  
+ ・CheckBox  
+ ・CheckedListBox  
  ・ComboBox  
  ・DataGridView  
  ・GroupBox  
  ・Label  
+ ・LinkLabel  
  ・ListBox  
  ・Panel  
+ ・PictureBox  
+ ・ProgressBar  
+ ・RadioButton  
+ ・RichText  
  ・SplitContainer  
+ ・StatusStrip  
  ・TabControl  
  ・TabPage  
  ・TextBox  
