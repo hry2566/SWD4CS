@@ -12,24 +12,11 @@ namespace SWD4CS
         {
             InitializeComponent();
 
-            cls_file file = new();
             List<string>[] ret = cls_file.NewFile();
 
             source_base = ret[0];
             source_custom = ret[1];
             cls_design_form1.Init(tabPage5, listBox1, dataGridView1);
-            EnableDoubleBuffering(this);
-            EnableDoubleBuffering(dataGridView1);
-        }
-
-        private static void EnableDoubleBuffering(Control control)
-        {
-            control.GetType().InvokeMember(
-               "DoubleBuffered",
-               BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
-               null,
-               control,
-               new object[] { true });
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
@@ -48,8 +35,7 @@ namespace SWD4CS
 
         private void ReadrToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            cls_file file = new();
-            List<string>[] ret = file.OpenFile();
+            List<string>[] ret = cls_file.OpenFile();
 
             if (ret[2] != null)
             {
@@ -63,18 +49,18 @@ namespace SWD4CS
 
         private void SaveSToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            cls_file file = new();
+            //cls_file file = new();
 
             tabControl3.SelectedIndex = 1;
             tabControl3.SelectedIndex = 0;
 
             if (sourceFileName != "")
             {
-                file.SaveAs(sourceFileName, textBox1.Text);
+                cls_file.SaveAs(sourceFileName, textBox1.Text);
             }
             else
             {
-                file.Save(textBox1.Text);
+                cls_file.Save(textBox1.Text);
             }
         }
 
