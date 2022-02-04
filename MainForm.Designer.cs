@@ -43,7 +43,7 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.dataGridView1 = new SWD4CS.cls_datagridview();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -125,9 +125,12 @@
             "ComboBox",
             "DataGridView",
             "GroupBox",
+            "HScrollBar",
             "Label",
             "LinkLabel",
             "ListBox",
+            "ListView",
+            "MonthCalendar",
             "Panel",
             "PictureBox",
             "ProgressBar",
@@ -137,12 +140,9 @@
             "StatusStrip",
             "TabControl",
             "TabPage",
-            "HScrollBar",
-            "VScrollBar",
-            "MonthCalendar",
-            "ListView",
+            "TextBox",
             "TreeView",
-            "TextBox"});
+            "VScrollBar"});
             this.listBox1.Location = new System.Drawing.Point(3, 3);
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(144, 879);
@@ -417,7 +417,6 @@
         private TextBox textBox1;
         private TabPage tabPage7;
         private TextBox textBox2;
-        private DataGridView dataGridView1;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem fileFToolStripMenuItem;
         private ToolStripMenuItem readrToolStripMenuItem;
@@ -425,5 +424,6 @@
         private ToolStripMenuItem closeCToolStripMenuItem;
         private ToolStripMenuItem controlsToolStripMenuItem;
         private ToolStripMenuItem deleteToolStripMenuItem;
+        private cls_datagridview dataGridView1;
     }
 }
