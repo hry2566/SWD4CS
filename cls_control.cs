@@ -7,9 +7,9 @@ namespace SWD4CS
     internal class cls_control
     {
         private cls_form form;
-        public string className;
-        public Control? ctrl;
-        public Control parent;
+        internal string className;
+        internal Control? ctrl;
+        internal Control parent;
         private Control backPanel;
         private cls_selectbox? selectBox;
         private ListBox? toolList;
@@ -154,7 +154,10 @@ namespace SWD4CS
                 }
                 else
                 {
-                    form.SelectAllClear();
+                    if ((Control.ModifierKeys & Keys.Control) != Keys.Control)
+                    {
+                        form.SelectAllClear();
+                    }
                     Selected = true;
                 }
             }
@@ -367,6 +370,25 @@ namespace SWD4CS
                 itemName != "SizeGripBounds" &&
                 itemName != "VisibleCount" &&
                 itemName != "SingleMonthSize" &&
+                itemName != "BackgroundImage" &&
+                itemName != "AccessibleDescription" &&
+                itemName != "AccessibleName" &&
+                itemName != "ContextMenuStrip" &&
+                itemName != "Image" &&
+                itemName != "ImageList" &&
+                itemName != "Tag" &&
+                itemName != "GroupImageList" &&
+                itemName != "LargeImageList" &&
+                itemName != "SmallImageList" &&
+                itemName != "StateImageList" &&
+                itemName != "ImageLocation" &&
+                itemName != "ActiveControl" &&
+                itemName != "SelectedNode" &&
+                itemName != "TopNode" &&
+                itemName != "TreeViewNodeSorter" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
                 itemName != ""
                 )
             {
