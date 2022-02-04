@@ -496,22 +496,30 @@ namespace SWD4CS
                     }
                 }
             }
+            propertyList!.Rows[0].Cells[0].Selected = false;
+            propertyList.Rows[index + 1].Cells[0].Selected = true;
+            propertyList.FirstDisplayedScrollingRowIndex = index;
         }
 
         private void SetFormProperty(string? propertyName, string? propertyValue)
         {
-            if (propertyName == "Size.Width")
+            try
             {
-                this.Width = int.Parse(propertyValue!);
+                if (propertyName == "Size.Width")
+                {
+                    this.Width = int.Parse(propertyValue!);
+                }
+                else if (propertyName == "Size.Height")
+                {
+                    this.Height = int.Parse(propertyValue!);
+                }
+                else if (propertyName == "Text")
+                {
+                    this.Text = propertyValue;
+                }
             }
-            else if (propertyName == "Size.Height")
-            {
-                this.Height = int.Parse(propertyValue!);
-            }
-            else if (propertyName == "Text")
-            {
-                this.Text = propertyValue;
-            }
+            catch { }
+
         }
 
         private void Code2Property(List<string> strLine, bool formFlag)
@@ -610,7 +618,7 @@ namespace SWD4CS
 
         private static Size String2Size(string propertyValue)
         {
-            string[] split;
+            string[] split = new string[1];
             string dummy;
 
             if (propertyValue.IndexOf("{Width=") > -1)
@@ -619,13 +627,17 @@ namespace SWD4CS
                 split[0] = split[0].Replace("{Width=", "");
                 split[1] = split[1].Replace("Height=", "").Replace("}", "");
             }
-            else
+            else if (propertyValue.IndexOf("System.Drawing.Size") > -1)
             {
                 split = propertyValue.Split("(");
                 dummy = split[1];
                 split = dummy.Split(")");
                 dummy = split[0];
                 split = dummy.Split(",");
+            }
+            else
+            {
+                split = propertyValue.Split(",");
             }
 
             Size size = new(int.Parse(split[0]), int.Parse(split[1]));
@@ -634,7 +646,7 @@ namespace SWD4CS
 
         private static Point String2Point(string propertyValue)
         {
-            string[] split;
+            string[] split = new string[1];
             string dummy;
 
             if (propertyValue.IndexOf("{X=") > -1)
@@ -643,7 +655,7 @@ namespace SWD4CS
                 split[0] = split[0].Replace("{X=", "");
                 split[1] = split[1].Replace("Y=", "").Replace("}", "");
             }
-            else
+            else if (propertyValue.IndexOf("System.Drawing.Point") > 1)
             {
                 split = propertyValue.Split("(");
                 dummy = split[1];
@@ -651,6 +663,11 @@ namespace SWD4CS
                 dummy = split[0];
                 split = dummy.Split(",");
             }
+            else
+            {
+                split = propertyValue.Split(",");
+            }
+
             Point point = new(int.Parse(split[0]), int.Parse(split[1]));
             return point;
         }
