@@ -17,6 +17,8 @@ namespace SWD4CS
             source_base = ret[0];
             source_custom = ret[1];
             cls_design_form1.Init(tabPage5, listBox1, dataGridView1);
+
+            dataGridView1.Init(cls_design_form1);
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
