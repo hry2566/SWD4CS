@@ -194,6 +194,7 @@
             // 
             // tabPage5
             // 
+            this.tabPage5.AutoScroll = true;
             this.tabPage5.BackColor = System.Drawing.Color.DarkGray;
             this.tabPage5.Controls.Add(this.cls_design_form1);
             this.tabPage5.Cursor = System.Windows.Forms.Cursors.Default;
