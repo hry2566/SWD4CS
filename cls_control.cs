@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-using System.Data;
-using System.Reflection;
+﻿using System.Data;
 
 namespace SWD4CS
 {
@@ -13,20 +11,22 @@ namespace SWD4CS
         private Control backPanel;
         private cls_selectbox? selectBox;
         private ListBox? toolList;
-        private DataGridView propertyList;
+        private PropertyGrid propertyGrid;
+        private TextBox? propertyCtrlName;
         private bool selectFlag;
         private bool changeFlag;
         private Point memPos;
         private int grid = 8;
 
-        public cls_control(cls_form form, string className, Control parent, Control backPanel, ListBox? toolList, DataGridView propertyList, int X, int Y)
+        public cls_control(cls_form form, string className, Control parent, Control backPanel, ListBox? toolList, PropertyGrid propertyGrid, TextBox propertyCtrlName, int X, int Y)
         {
             this.form = form;
             this.className = className;
             this.parent = parent;
             this.backPanel = backPanel;
             this.toolList = toolList;
-            this.propertyList = propertyList;
+            this.propertyGrid = propertyGrid;
+            this.propertyCtrlName = propertyCtrlName;
 
             if (Init(className))
             {
@@ -41,8 +41,8 @@ namespace SWD4CS
 
                 if (this.ctrl is TabControl)
                 {
-                    _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
-                    _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
+                    _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyGrid!, propertyCtrlName, X, Y);
+                    _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyGrid!, propertyCtrlName, X, Y);
                 }
 
                 if (this.ctrl is TabPage)
@@ -95,8 +95,6 @@ namespace SWD4CS
                 ctrl.Location = newPos;
                 Selected = true;
                 changeFlag = false;
-
-                //System.Windows.Forms.Application.DoEvents();
             }
             else
             {
@@ -106,20 +104,18 @@ namespace SWD4CS
 
         private void Ctrl_Click(object? sender, EventArgs e)
         {
-            MouseEventArgs me = (MouseEventArgs)e;
+            if (e.ToString() != "System.EventArgs")
+            {
+                MouseEventArgs me = (MouseEventArgs)e;
 
-            if (e.ToString() == "System.EventArgs")
-            {
-                return;
-            }
-
-            if (toolList!.Text == "")
-            {
-                SetSelected(me);
-            }
-            else
-            {
-                AddControls(me);
+                if (toolList!.Text == "")
+                {
+                    SetSelected(me);
+                }
+                else
+                {
+                    AddControls(me);
+                }
             }
         }
 
@@ -134,11 +130,11 @@ namespace SWD4CS
             {
                 if (splitpanel == null)
                 {
-                    _ = new cls_control(form, toolList!.Text, this.ctrl!, backPanel!, toolList, propertyList!, X, Y);
+                    _ = new cls_control(form, toolList!.Text, this.ctrl!, backPanel!, toolList, propertyGrid!, propertyCtrlName!, X, Y);
                 }
                 else
                 {
-                    _ = new cls_control(form, toolList!.Text, splitpanel!, backPanel!, toolList, propertyList!, X, Y);
+                    _ = new cls_control(form, toolList!.Text, splitpanel!, backPanel!, toolList, propertyGrid!, propertyCtrlName!, X, Y);
                 }
             }
             toolList!.SelectedIndex = -1;
@@ -186,30 +182,17 @@ namespace SWD4CS
             }
         }
 
-        private void ShowProperty(bool value)
+        private void ShowProperty(bool flag)
         {
-            DataTable table = new();
-
-            propertyList.Columns.Clear();
-            table.Columns.Add("Property");
-            table.Columns.Add("Value");
-
-            if (value)
+            if (flag)
             {
-                foreach (PropertyInfo item in this.ctrl!.GetType().GetProperties())
-                {
-                    if (HideProperty(item.Name))
-                    {
-                        DataRow row = table.NewRow();
-
-                        row[0] = item.Name;
-                        row[1] = item.GetValue(this.ctrl);
-                        table.Rows.Add(row);
-                    }
-                }
+                propertyGrid!.SelectedObject = this.ctrl;
+                propertyCtrlName!.Text = this.ctrl!.Name;
             }
-            propertyList.DataSource = table;
-            propertyList.Sort(propertyList.Columns[0], ListSortDirection.Ascending);
+            else
+            {
+                propertyGrid!.SelectedObject = null;
+            }
         }
 
         internal static bool HideProperty(string itemName)
@@ -505,7 +488,6 @@ namespace SWD4CS
                     this.ctrl.Size = new System.Drawing.Size(304, 192);
                     this.ctrl!.Name = className + form.cnt_DataGridView;
                     DataTable table = new DataTable();
-                    propertyList!.Columns.Clear();
                     table.Columns.Add("Column1");
                     table.Columns.Add("Column2");
                     DataGridView? datagridview = this.ctrl as DataGridView;
