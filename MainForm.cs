@@ -167,15 +167,18 @@ namespace SWD4CS
                     {
                         Control? baseCtrl = cls_form.GetBaseCtrl(ctrl);
 
-                        if (item.GetValue(ctrl.ctrl) != null && item.GetValue(ctrl.ctrl)!.ToString() != item.GetValue(baseCtrl)!.ToString())
+                        if (item.GetValue(ctrl.ctrl) != null && item.GetValue(baseCtrl) != null)
                         {
-                            string str1 = "        this." + ctrl!.ctrl!.Name + "." + item.Name;
-                            string strProperty = Property2String(ctrl, item);
-
-                            if (strProperty != "")
+                            if (item.GetValue(ctrl.ctrl)!.ToString() != item.GetValue(baseCtrl)!.ToString())
                             {
-                                source_custom.Insert(insertPos, str1 + strProperty);
-                                insertPos++;
+                                string str1 = "        this." + ctrl!.ctrl!.Name + "." + item.Name;
+                                string strProperty = Property2String(ctrl, item);
+
+                                if (strProperty != "")
+                                {
+                                    source_custom.Insert(insertPos, str1 + strProperty);
+                                    insertPos++;
+                                }
                             }
                         }
                     }
