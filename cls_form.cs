@@ -1,5 +1,4 @@
-﻿using System.Data;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace SWD4CS
 {
@@ -9,9 +8,11 @@ namespace SWD4CS
         private cls_selectbox? selectBox;
         private Control? backPanel;
         private ListBox? toolList;
-        private DataGridView? propertyList;
+        private PropertyGrid? propertyGrid;
+        private TextBox? propertyCtrlName;
         private bool selectFlag = false;
         private int grid = 8;
+        private Form memForm = new();
 
         // ****************************************************************************************
         // コントロール追加時に下記を編集すること
@@ -131,49 +132,257 @@ namespace SWD4CS
             InitializeComponent();
         }
 
-        internal static void EnableDoubleBuffering(Control control)
-        {
-            control.GetType().InvokeMember(
-               "DoubleBuffered",
-               BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
-               null,
-               control,
-               new object[] { true });
-        }
-
-        internal void Init(Control backPanel, ListBox toolList, DataGridView dataGridView1)
+        internal void Init(Control backPanel, ListBox toolList, PropertyGrid propertyGrid, TextBox propertyCtrlName)
         {
             this.backPanel = backPanel;
             this.toolList = toolList;
-            this.propertyList = dataGridView1;
+            this.propertyGrid = propertyGrid;
+            this.propertyCtrlName = propertyCtrlName;
             this.Click += new System.EventHandler(Form_Click);
-            this.propertyList.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView1_CellValueChanged);
 
             backPanel.Click += new System.EventHandler(Backpanel_Click);
 
+            propertyGrid.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(PropertyValueChanged);
+            propertyCtrlName.TextChanged += new System.EventHandler(NameTextChanged);
+            this.Resize += new System.EventHandler(formResize);
+
             selectBox = new cls_selectbox(this, backPanel);
-            EnableDoubleBuffering(propertyList);
+
+            memForm.Location = this.Location;
+            memForm.Size = this.Size;
+            memForm.Name = "Form1";
             SetSelect(true);
         }
 
-        private void SetProperty(int i, int index, bool formFlag)
+        private void formResize(object? sender, EventArgs e)
         {
-            string? propertyName;
-            string? propertyValue;
+            memForm.Size = this.Size;
+        }
 
-            if (propertyList!.Rows[index].Cells[0].Value != null && propertyList.Rows[index].Cells[1].Value != null)
+        private void NameTextChanged(object? sender, EventArgs e)
+        {
+            if (propertyGrid!.SelectedObject != null)
             {
-                propertyName = propertyList.Rows[index].Cells[0].Value.ToString();
-                propertyValue = propertyList.Rows[index].Cells[1].Value.ToString();
+                Control? ctrl = propertyGrid.SelectedObject as Control;
+                ctrl!.Name = propertyCtrlName!.Text;
+            }
+        }
 
-                if (formFlag)
+        private void PropertyValueChanged(object? s, PropertyValueChangedEventArgs e)
+        {
+            Control? ctrl = propertyGrid!.SelectedObject as Control;
+
+            if (ctrl!.Name == memForm.Name)
+            {
+                foreach (PropertyInfo item in memForm.GetType().GetProperties())
                 {
-                    SetFormProperty(propertyName, propertyValue);
+                    try
+                    {
+                        if (HideProperty(item.Name))
+                        {
+                            PropertyInfo? formItem = this.GetType().GetProperty(item.Name);
+                            formItem!.SetValue(this, item.GetValue(memForm));
+                        }
+                    }
+                    catch { }
                 }
-                else
+            }
+            else
+            {
+                for (int i = 0; i < CtrlItems.Count; i++)
                 {
-                    SetCtrlProperty(CtrlItems[i].ctrl, propertyName, propertyValue);
+                    if (CtrlItems[i].ctrl!.Name == ctrl!.Name)
+                    {
+                        CtrlItems[i].Selected = true;
+                    }
                 }
+            }
+        }
+        internal static bool HideProperty(string itemName)
+        {
+            if (itemName != "AccessibilityObject" &&
+                itemName != "AccessibleDefaultActionDescription" &&
+                itemName != "AutoScrollOffset" &&
+                itemName != "BindingContext" &&
+                itemName != "Bottom" &&
+                itemName != "Bounds" &&
+                itemName != "CanFocus" &&
+                itemName != "CanSelect" &&
+                itemName != "Capture" &&
+                itemName != "ClientRectangle" &&
+                itemName != "ClientSize" &&
+                itemName != "CompanyName" &&
+                itemName != "Container" &&
+                itemName != "ContainsFocus" &&
+                itemName != "Controls" &&
+                itemName != "Created" &&
+                itemName != "DataBindings" &&
+                itemName != "DeviceDpi" &&
+                itemName != "DisplayRectangle" &&
+                itemName != "Disposing" &&
+                itemName != "Focused" &&
+                itemName != "Handle" &&
+                itemName != "HasChildren" &&
+                itemName != "Height" &&
+                itemName != "ImeMode" &&
+                itemName != "InvokeRequired" &&
+                itemName != "IsAccessible" &&
+                itemName != "IsAncestorSiteInDesignMode" &&
+                itemName != "IsDisposed" &&
+                itemName != "IsHandleCreated" &&
+                itemName != "IsMirrored" &&
+                itemName != "LayoutEngine" &&
+                itemName != "Left" &&
+                itemName != "Parent" &&
+                itemName != "PreferredSize" &&
+                itemName != "ProductName" &&
+                itemName != "ProductVersion" &&
+                itemName != "RecreatingHandle" &&
+                itemName != "Region" &&
+                itemName != "Right" &&
+                itemName != "Site" &&
+                itemName != "Top" &&
+                itemName != "TopLevelControl" &&
+                itemName != "Width" &&
+                itemName != "WindowTarget" &&
+                itemName != "Visible" &&
+                itemName != "TextLength" &&
+                itemName != "RowCount" &&
+                itemName != "TabCount" &&
+                itemName != "PreferredWidth" &&
+                itemName != "PreferredHeight" &&
+                itemName != "SelectedIndex" &&
+                itemName != "SelectedItem" &&
+                itemName != "SelectedText" &&
+                itemName != "SelectedValue" &&
+                itemName != "SelectionLength" &&
+                itemName != "SelectionStart" &&
+                itemName != "CustomTabOffsets" &&
+                itemName != "FormatInfo" &&
+                itemName != "SelectedIndices" &&
+                itemName != "SelectedItems" &&
+                itemName != "SelectedTab" &&
+                itemName != "CanUndo" &&
+                itemName != "ParentForm" &&
+                itemName != "Item" &&
+                itemName != "AdjustedTopLeftHeaderBorderStyle" &&
+                itemName != "AdvancedCellBorderStyle" &&
+                itemName != "AdvancedColumnHeadersBorderStyle" &&
+                itemName != "AdvancedRowHeadersBorderStyle" &&
+                itemName != "AutoGenerateColumns" &&
+                itemName != "ColumnCount" &&
+                itemName != "CurrentCell" &&
+                itemName != "CurrentCellAddress" &&
+                itemName != "CurrentRow" &&
+                itemName != "EditingControl" &&
+                itemName != "EditingPanel" &&
+                itemName != "FirstDisplayedCell" &&
+                itemName != "FirstDisplayedScrollingColumnHiddenWidth" &&
+                itemName != "FirstDisplayedScrollingColumnIndex" &&
+                itemName != "FirstDisplayedScrollingRowIndex" &&
+                itemName != "HorizontalScrollingOffset" &&
+                itemName != "IsCurrentCellDirty" &&
+                itemName != "IsCurrentCellInEditMode" &&
+                itemName != "IsCurrentRowDirty" &&
+                itemName != "NewRowIndex" &&
+                itemName != "Rows" &&
+                itemName != "SelectedCells" &&
+                itemName != "SelectedRows" &&
+                itemName != "SortedColumn" &&
+                itemName != "SortOrder" &&
+                itemName != "TopLeftHeaderCell" &&
+                itemName != "VerticalScrollingOffset" &&
+                itemName != "VirtualMode" &&
+                itemName != "DataSource" &&
+                itemName != "TopItem" &&
+                itemName != "Rtf" &&
+                itemName != "CheckedIndices" &&
+                itemName != "CheckedItems" &&
+                itemName != "DisplayMember" &&
+                itemName != "IntegralHeight" &&
+                itemName != "TopIndex" &&
+                itemName != "UseCustomTabOffsets" &&
+                itemName != "ValueMember" &&
+                itemName != "Links" &&
+                itemName != "BackgroundImageLayout" &&
+                itemName != "CheckedIndices" &&
+                itemName != "CheckedItems" &&
+                itemName != "FocusedItem" &&
+                itemName != "InsertionMark" &&
+                itemName != "ListViewItemSorter" &&
+                itemName != "SelectionEnd" &&
+                itemName != "SingleMonthSize" &&
+                itemName != "TodayDateSet" &&
+                itemName != "UseVisualStyleBackColor" &&
+                itemName != "CanRedo" &&
+                itemName != "LanguageOption" &&
+                itemName != "RedoActionName" &&
+                itemName != "RichTextShortcutsEnabled" &&
+                itemName != "SelectedRtf" &&
+                itemName != "SelectionAlignment" &&
+                itemName != "SelectionBackColor" &&
+                itemName != "SelectionBullet" &&
+                itemName != "SelectionCharOffset" &&
+                itemName != "SelectionColor" &&
+                itemName != "SelectionFont" &&
+                itemName != "SelectionHangingIndent" &&
+                itemName != "SelectionIndent" &&
+                itemName != "SelectionProtected" &&
+                itemName != "SelectionRightIndent" &&
+                itemName != "SelectionTabs" &&
+                itemName != "SelectionType" &&
+                itemName != "UndoActionName" &&
+                itemName != "AutoScaleDimensions" &&
+                itemName != "AutoScaleMode" &&
+                itemName != "AutoScroll" &&
+                itemName != "AutoScrollMargin" &&
+                itemName != "AutoScrollMinSize" &&
+                itemName != "AutoScrollPosition" &&
+                itemName != "AutoValidate" &&
+                itemName != "CurrentAutoScaleDimensions" &&
+                itemName != "DockPadding" &&
+                itemName != "HorizontalScroll" &&
+                itemName != "SplitterRectangle" &&
+                itemName != "CanOverflow" &&
+                itemName != "DefaultDropDownDirection" &&
+                itemName != "GripDisplayStyle" &&
+                itemName != "GripRectangle" &&
+                itemName != "IsCurrentlyDragging" &&
+                itemName != "IsCurrentlyDragging" &&
+                itemName != "LayoutSettings" &&
+                itemName != "Orientation" &&
+                itemName != "OverflowButton" &&
+                itemName != "Renderer" &&
+                itemName != "SizeGripBounds" &&
+                itemName != "VisibleCount" &&
+                itemName != "SingleMonthSize" &&
+                itemName != "BackgroundImage" &&
+                itemName != "AccessibleDescription" &&
+                itemName != "AccessibleName" &&
+                itemName != "ContextMenuStrip" &&
+                itemName != "Image" &&
+                itemName != "ImageList" &&
+                itemName != "Tag" &&
+                itemName != "GroupImageList" &&
+                itemName != "LargeImageList" &&
+                itemName != "SmallImageList" &&
+                itemName != "StateImageList" &&
+                itemName != "ImageLocation" &&
+                itemName != "ActiveControl" &&
+                itemName != "SelectedNode" &&
+                itemName != "TopNode" &&
+                itemName != "TreeViewNodeSorter" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != "" &&
+                itemName != ""
+                )
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -199,35 +408,15 @@ namespace SWD4CS
 
         private void ShowProperty(bool flag)
         {
-            DataTable table = new DataTable();
-
-            propertyList!.Columns.Clear();
-            table.Columns.Add("Property");
-            table.Columns.Add("Value");
-
             if (flag)
             {
-                DataRow row = table.NewRow();
-                row[0] = "Name";
-                row[1] = "From1";
-                table.Rows.Add(row);
-
-                row = table.NewRow();
-                row[0] = "Size.Width";
-                row[1] = this.Size.Width;
-                table.Rows.Add(row);
-
-                row = table.NewRow();
-                row[0] = "Size.Height";
-                row[1] = this.Size.Height;
-                table.Rows.Add(row);
-
-                row = table.NewRow();
-                row[0] = "Text";
-                row[1] = this.Text;
-                table.Rows.Add(row);
+                propertyGrid!.SelectedObject = this.memForm;
+                propertyCtrlName!.Text = this.memForm.Name;
             }
-            propertyList.DataSource = table;
+            else
+            {
+                propertyGrid!.SelectedObject = null;
+            }
         }
 
         private void Form_Click(object? sender, EventArgs e)
@@ -255,7 +444,7 @@ namespace SWD4CS
 
                 int X = (int)(me.X / grid) * grid;
                 int Y = (int)(me.Y / grid) * grid;
-                _ = new cls_control(this, toolList!.Text, this, backPanel!, toolList, propertyList!, X, Y);
+                _ = new cls_control(this, toolList!.Text, this, backPanel!, toolList, propertyGrid!, propertyCtrlName!, X, Y);
                 toolList.SelectedIndex = -1;
             }
         }
@@ -357,7 +546,7 @@ namespace SWD4CS
 
             if (strParent == "")
             {
-                _ = new cls_control(this, ctrlClass, this, backPanel!, toolList, propertyList!, 0, 0);
+                _ = new cls_control(this, ctrlClass, this, backPanel!, toolList, propertyGrid!, propertyCtrlName!, 0, 0);
             }
             else
             {
@@ -392,7 +581,7 @@ namespace SWD4CS
             {
                 if (CtrlItems[k].ctrl!.Name == strParent)
                 {
-                    _ = new cls_control(this, ctrlClass, CtrlItems[k].ctrl!, backPanel!, toolList, propertyList!, 0, 0);
+                    _ = new cls_control(this, ctrlClass, CtrlItems[k].ctrl!, backPanel!, toolList, propertyGrid!, propertyCtrlName!, 0, 0);
                     break;
                 }
             }
@@ -412,13 +601,13 @@ namespace SWD4CS
                     {
                         splpanel = splcontainer!.Panel1;
                         splpanel.Name = splcontainer.Name + ".Panel1";
-                        _ = new cls_control(this, ctrlClass, splcontainer!.Panel1, backPanel!, toolList, propertyList!, 0, 0);
+                        _ = new cls_control(this, ctrlClass, splcontainer!.Panel1, backPanel!, toolList, propertyGrid!, propertyCtrlName!, 0, 0);
                     }
                     else
                     {
                         splpanel = splcontainer!.Panel2;
                         splpanel.Name = splcontainer.Name + ".Panel2";
-                        _ = new cls_control(this, ctrlClass, splcontainer!.Panel2, backPanel!, toolList, propertyList!, 0, 0);
+                        _ = new cls_control(this, ctrlClass, splcontainer!.Panel2, backPanel!, toolList, propertyGrid!, propertyCtrlName!, 0, 0);
                     }
                     break;
                 }
@@ -473,53 +662,6 @@ namespace SWD4CS
             }
             ctrl.Delete();
             CtrlItems.Remove(ctrl);
-        }
-
-        private void DataGridView1_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
-        {
-            int index = e.RowIndex;
-
-            if (this.selectFlag)
-            {
-                SetProperty(0, index, true);
-                SetSelect(true);
-            }
-            else
-            {
-                for (int i = 0; i < CtrlItems!.Count; i++)
-                {
-                    if (CtrlItems[i].Selected)
-                    {
-                        SetProperty(i, index, false);
-                        CtrlItems[i].Selected = true;
-                        break;
-                    }
-                }
-            }
-            propertyList!.Rows[0].Cells[0].Selected = false;
-            propertyList.Rows[index + 1].Cells[0].Selected = true;
-            propertyList.FirstDisplayedScrollingRowIndex = index;
-        }
-
-        private void SetFormProperty(string? propertyName, string? propertyValue)
-        {
-            try
-            {
-                if (propertyName == "Size.Width")
-                {
-                    this.Width = int.Parse(propertyValue!);
-                }
-                else if (propertyName == "Size.Height")
-                {
-                    this.Height = int.Parse(propertyValue!);
-                }
-                else if (propertyName == "Text")
-                {
-                    this.Text = propertyValue;
-                }
-            }
-            catch { }
-
         }
 
         private void Code2Property(List<string> strLine, bool formFlag)
@@ -651,9 +793,9 @@ namespace SWD4CS
 
             if (propertyValue.IndexOf("{X=") > -1)
             {
-                split = propertyValue!.Split(',');
-                split[0] = split[0].Replace("{X=", "");
-                split[1] = split[1].Replace("Y=", "").Replace("}", "");
+                //split = propertyValue!.Split(',');
+                //split[0] = split[0].Replace("{X=", "");
+                //split[1] = split[1].Replace("Y=", "").Replace("}", "");
             }
             else if (propertyValue.IndexOf("System.Drawing.Point") > 1)
             {
@@ -665,7 +807,7 @@ namespace SWD4CS
             }
             else
             {
-                split = propertyValue.Split(",");
+                //split = propertyValue.Split(",");
             }
 
             Point point = new(int.Parse(split[0]), int.Parse(split[1]));
