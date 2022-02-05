@@ -16,9 +16,7 @@ namespace SWD4CS
 
             source_base = ret[0];
             source_custom = ret[1];
-            cls_design_form1.Init(tabPage5, listBox1, dataGridView1);
-
-            dataGridView1.Init(cls_design_form1);
+            cls_design_form1.Init(tabPage5, listBox1, propertyGrid1, textBox3);
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
@@ -176,7 +174,7 @@ namespace SWD4CS
 
                             if (strProperty != "")
                             {
-                                source_custom.Insert(insertPos, str1 + Property2String(ctrl, item));
+                                source_custom.Insert(insertPos, str1 + strProperty);
                                 insertPos++;
                             }
                         }
@@ -271,5 +269,10 @@ namespace SWD4CS
             }
             return strProperty;
         }
+
+        //private void textBox3_TextChanged(object sender, EventArgs e)
+        //{
+        //    //MessageBox.Show("");
+        //}
     }
 }
