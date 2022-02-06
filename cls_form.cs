@@ -12,7 +12,7 @@ namespace SWD4CS
         private TextBox? propertyCtrlName;
         private bool selectFlag = false;
         private int grid = 8;
-        private Form memForm = new();
+        internal Form memForm = new();
 
         // ****************************************************************************************
         // コントロール追加時に下記を編集すること
@@ -174,18 +174,19 @@ namespace SWD4CS
 
             if (ctrl!.Name == memForm.Name)
             {
-                foreach (PropertyInfo item in memForm.GetType().GetProperties())
+                string[] split = e.ChangedItem!.ToString()!.Split(" ");
+
+                //Console.WriteLine(e.ChangedItem);
+                //Console.WriteLine(split[1]);
+
+                string? propertyName = split[1];
+                PropertyInfo? formItem = this.GetType().GetProperty(propertyName!);
+                PropertyInfo? item = memForm.GetType().GetProperty(propertyName!);
+
+                if (formItem != null)
                 {
-                    try
-                    {
-                        if (cls_control.HideProperty(item.Name))
-                        {
-                            PropertyInfo? formItem = this.GetType().GetProperty(item.Name);
-                            formItem!.SetValue(this, item.GetValue(memForm));
-                            SetSelect(true);
-                        }
-                    }
-                    catch { }
+                    formItem!.SetValue(this, item!.GetValue(memForm));
+                    SetSelect(true);
                 }
             }
             else
@@ -442,6 +443,7 @@ namespace SWD4CS
                     if (source_custom[i + 1].IndexOf("this.") == -1)
                     {
                         Code2Property(formProperty, true);
+                        this.Location = new Point(12, 12);
                         cnt = i + 1;
                         break;
                     }
@@ -484,10 +486,12 @@ namespace SWD4CS
             string propertyName;
             string propertyValue;
             Control ctrl;
+            Control form = new();
 
             if (formFlag)
             {
                 ctrl = this;
+                form = this.memForm;
             }
             else
             {
@@ -503,6 +507,11 @@ namespace SWD4CS
                 propertyName = split[split.Length - 1];
 
                 SetCtrlProperty(ctrl, propertyName, propertyValue);
+
+                if (formFlag)
+                {
+                    SetCtrlProperty(form, propertyName, propertyValue);
+                }
             }
         }
 
@@ -579,9 +588,9 @@ namespace SWD4CS
 
             if (propertyValue.IndexOf("{Width=") > -1)
             {
-                split = propertyValue!.Split(',');
-                split[0] = split[0].Replace("{Width=", "");
-                split[1] = split[1].Replace("Height=", "").Replace("}", "");
+                //split = propertyValue!.Split(',');
+                //split[0] = split[0].Replace("{Width=", "");
+                //split[1] = split[1].Replace("Height=", "").Replace("}", "");
             }
             else if (propertyValue.IndexOf("System.Drawing.Size") > -1)
             {
@@ -593,7 +602,7 @@ namespace SWD4CS
             }
             else
             {
-                split = propertyValue.Split(",");
+                //split = propertyValue.Split(",");
             }
 
             Size size = new(int.Parse(split[0]), int.Parse(split[1]));
@@ -732,14 +741,38 @@ namespace SWD4CS
             return style;
         }
 
+        private static Color? String2Color(string? propertyValue)
+        {
+            Color color = new();
+            string[] split;
+
+            if (propertyValue!.IndexOf("FromArgb") > -1)
+            {
+                split = propertyValue!.Split("(");
+                string strRGB = split[1].Trim().Replace(")", "");
+                split = strRGB.Split(",");
+
+                color = Color.FromArgb(int.Parse(split[0]), int.Parse(split[1]), int.Parse(split[2]));
+            }
+            else
+            {
+                split = propertyValue!.Split(".");
+                color = Color.FromName(split[3]);
+            }
+            return color;
+        }
+
         private static void SetCtrlProperty(Control? ctrl, string? propertyName, string? propertyValue)
         {
             Type type;
+
             PropertyInfo? property = ctrl!.GetType().GetProperty(propertyName!);
 
             if (property != null && property!.GetValue(ctrl) != null)
             {
                 type = property!.GetValue(ctrl)!.GetType();
+
+                //Console.WriteLine(type);
 
                 switch (type)
                 {
@@ -790,6 +823,10 @@ namespace SWD4CS
                     case Type t when t == typeof(System.Windows.Forms.HorizontalAlignment):
                         property.SetValue(ctrl, String2HorizontalAlignment(propertyValue));
                         break;
+                    case Type t when t == typeof(System.Drawing.Color):
+                        property.SetValue(ctrl, String2Color(propertyValue));
+                        break;
+
                 }
             }
         }
