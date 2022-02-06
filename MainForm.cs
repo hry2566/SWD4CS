@@ -112,17 +112,17 @@ namespace SWD4CS
 
         private string CreateSourcecCode()
         {
-            int w;
-            int h;
-            string text;
+            //int w;
+            //int h;
+            //string text;
             string source = "";
             int insertPos = 2;
             int insertPos2 = 0;
             int itemCount = cls_design_form1.CtrlItems!.Count;
 
-            w = cls_design_form1.Width;
-            h = cls_design_form1.Height;
-            text = cls_design_form1.Text;
+            //w = cls_design_form1.Width;
+            //h = cls_design_form1.Height;
+            //text = cls_design_form1.Text;
 
             source_custom.Insert(insertPos, "        //");
             insertPos++;
@@ -134,10 +134,41 @@ namespace SWD4CS
             insertPos++;
             source_custom.Insert(insertPos, "        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;");
             insertPos++;
-            source_custom.Insert(insertPos, "        this.ClientSize = new System.Drawing.Size(" + w + "," + h + ");");
-            insertPos++;
-            source_custom.Insert(insertPos, "        this.Text = \"" + text + "\";");
-            insertPos++;
+
+            foreach (PropertyInfo item in cls_design_form1!.memForm.GetType().GetProperties())
+            {
+                if (cls_control.HideProperty(item.Name))
+                {
+                    Control? baseForm = new Form();
+                    Control memForm = cls_design_form1.memForm as Control;
+
+                    if (item.GetValue(memForm) != null && item.GetValue(baseForm) != null)
+                    {
+                        if (item.GetValue(memForm)!.ToString() != item.GetValue(baseForm)!.ToString())
+                        {
+                            string str1 = "        this." + item.Name;
+                            string strProperty = Property2String(memForm, item);
+
+                            if (strProperty != "")
+                            {
+                                source_custom.Insert(insertPos, str1 + strProperty);
+                                insertPos++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //source_custom.Insert(insertPos, "        this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);");
+            //insertPos++;
+            //source_custom.Insert(insertPos, "        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;");
+            //insertPos++;
+            //source_custom.Insert(insertPos, "        this.ClientSize = new System.Drawing.Size(" + w + "," + h + ");");
+            //insertPos++;
+            //source_custom.Insert(insertPos, "        this.Text = \"" + text + "\";");
+            //insertPos++;
+
+
             source_custom.Insert(insertPos, "");
             insertPos++;
 
@@ -172,7 +203,7 @@ namespace SWD4CS
                             if (item.GetValue(ctrl.ctrl)!.ToString() != item.GetValue(baseCtrl)!.ToString())
                             {
                                 string str1 = "        this." + ctrl!.ctrl!.Name + "." + item.Name;
-                                string strProperty = Property2String(ctrl, item);
+                                string strProperty = Property2String(ctrl.ctrl, item);
 
                                 if (strProperty != "")
                                 {
@@ -234,20 +265,22 @@ namespace SWD4CS
             return strProperty;
         }
 
-        private string Property2String(cls_control ctrl, PropertyInfo item)
+        private string Property2String(Control ctrl, PropertyInfo item)
         {
             string strProperty = "";
-            Type type = item.GetValue(ctrl.ctrl)!.GetType();
-            string str2 = item.GetValue(ctrl.ctrl)!.ToString()!;
+            Type type = item.GetValue(ctrl)!.GetType();
+            string str2 = item.GetValue(ctrl)!.ToString()!;
+
+            //Console.WriteLine(item.Name);
 
             switch (type)
             {
                 case Type t when t == typeof(System.Drawing.Point):
-                    Point point = (Point)item.GetValue(ctrl.ctrl)!;
+                    Point point = (Point)item.GetValue(ctrl)!;
                     strProperty = " = new " + type.ToString() + "(" + point.X + "," + point.Y + ");";
                     break;
                 case Type t when t == typeof(System.Drawing.Size):
-                    Size size = (Size)item.GetValue(ctrl.ctrl)!;
+                    Size size = (Size)item.GetValue(ctrl)!;
                     strProperty = " = new " + type.ToString() + "(" + size.Width + "," + size.Height + ");";
                     break;
                 case Type t when t == typeof(System.String):
@@ -257,7 +290,7 @@ namespace SWD4CS
                     strProperty = " =  " + str2.ToLower() + ";";
                     break;
                 case Type t when t == typeof(System.Windows.Forms.AnchorStyles):
-                    strProperty = AnchorStyles2String(item.GetValue(ctrl.ctrl));
+                    strProperty = AnchorStyles2String(item.GetValue(ctrl));
                     break;
                 case Type t when t == typeof(System.Int32):
                     strProperty = " = " + int.Parse(str2) + ";";
@@ -269,13 +302,202 @@ namespace SWD4CS
 
                     strProperty = " = " + type.ToString() + "." + str2 + ";";
                     break;
+                case Type t when t == typeof(System.Drawing.Color):
+                    //Console.WriteLine(str2);
+                    strProperty = " = " + Property2Color(str2) + ";";
+                    break;
             }
             return strProperty;
         }
 
-        //private void textBox3_TextChanged(object sender, EventArgs e)
-        //{
-        //    //MessageBox.Show("");
-        //}
+        private string Property2Color(string color)
+        {
+            color = color.Replace("Color [", "").Replace("]", "");
+            string? strSystemColor = "System.Drawing.SystemColors.";
+            string? strColor = "System.Drawing.Color.";
+            string? strRGB = "System.Drawing.Color.FromArgb(";
+
+            switch (color)
+            {
+                case "ActiveBorder":
+                case "ActiveCaption":
+                case "ActiveCaptionText":
+                case "AppWorkspace":
+                case "ButtonFace":
+                case "ButtonHighlight":
+                case "ButtonShadow":
+                case "Control":
+                case "ControlDark":
+                case "ControlDarkDark":
+                case "ControlLight":
+                case "ControlLightLight":
+                case "ControlText":
+                case "Desktop":
+                case "GradientActiveCaption":
+                case "GradientInactiveCaption":
+                case "GrayText":
+                case "Highlight":
+                case "HighlightText":
+                case "HotTrack":
+                case "InactiveBorder":
+                case "InactiveCaption":
+                case "InactiveCaptionText":
+                case "Info":
+                case "InfoText":
+                case "Menu":
+                case "MenuBar":
+                case "MenuHighlight":
+                case "MenuText":
+                case "ScrollBar":
+                case "Window":
+                case "WindowFrame":
+                case "WindowText":
+                    return strSystemColor + color;
+                case "Black":
+                case "DimGray":
+                case "Gray":
+                case "DarkGray":
+                case "Silver":
+                case "LightGray":
+                case "Gainsboro":
+                case "WhiteSmoke":
+                case "White":
+                case "RosyBrown":
+                case "IndianRed":
+                case "Brown":
+                case "Firebrick":
+                case "LightCoral":
+                case "Maroon":
+                case "DarkRed":
+                case "Red":
+                case "Snow":
+                case "MistyRose":
+                case "Salmon":
+                case "Tomato":
+                case "DarkSalmon":
+                case "Coral":
+                case "OrangeRed":
+                case "LightSalmon":
+                case "Sienna":
+                case "SeaShell":
+                case "Chocolate":
+                case "SaddleBrown":
+                case "SandyBrown":
+                case "PeachPuff":
+                case "Peru":
+                case "Linen":
+                case "Bisque":
+                case "DarkOrange":
+                case "BurlyWood":
+                case "Tan":
+                case "AntiqueWhite":
+                case "NavajoWhite":
+                case "BlanchedAlmond":
+                case "PapayaWhip":
+                case "Moccasin":
+                case "Orange":
+                case "Wheat":
+                case "OldLace":
+                case "FloralWhite":
+                case "DarkGoldenrod":
+                case "Goldenrod":
+                case "Cornsilk":
+                case "Gold":
+                case "Khaki":
+                case "LemonChiffon":
+                case "PaleGoldenrod":
+                case "DarkKhaki":
+                case "Beige":
+                case "LightGoldenrodYellow":
+                case "Olive":
+                case "Yellow":
+                case "LightYellow":
+                case "Ivory":
+                case "OliveDrab":
+                case "YellowGreen":
+                case "DarkOliveGreen":
+                case "GreenYellow":
+                case "Chartreuse":
+                case "LawnGreen":
+                case "DarkSeaGreen":
+                case "ForestGreen":
+                case "LimeGreen":
+                case "LightGreen":
+                case "PaleGreen":
+                case "DarkGreen":
+                case "Green":
+                case "Lime":
+                case "Honeydew":
+                case "SeaGreen":
+                case "MediumSeaGreen":
+                case "SpringGreen":
+                case "MintCream":
+                case "MediumSpringGreen":
+                case "MediumAquamarine":
+                case "Aquamarine":
+                case "Turquoise":
+                case "LightSeaGreen":
+                case "MediumTurquoise":
+                case "DarkSlateGray":
+                case "PaleTurquoise":
+                case "Teal":
+                case "DarkCyan":
+                case "Cyan":
+                case "Aqua":
+                case "LightCyan":
+                case "Azure":
+                case "DarkTurquoise":
+                case "CadetBlue":
+                case "PowderBlue":
+                case "LightBlue":
+                case "DeepSkyBlue":
+                case "SkyBlue":
+                case "LightSkyBlue":
+                case "SteelBlue":
+                case "AliceBlue":
+                case "DodgerBlue":
+                case "SlateGray":
+                case "LightSlateGray":
+                case "LightSteelBlue":
+                case "CornflowerBlue":
+                case "RoyalBlue":
+                case "MidnightBlue":
+                case "Lavender":
+                case "Navy":
+                case "DarkBlue":
+                case "MediumBlue":
+                case "Blue":
+                case "GhostWhite":
+                case "SlateBlue":
+                case "DarkSlateBlue":
+                case "MediumSlateBlue":
+                case "MediumPurple":
+                case "BlueViolet":
+                case "Indigo":
+                case "DarkOrchid":
+                case "DarkViolet":
+                case "MediumOrchid":
+                case "Thistle":
+                case "Plum":
+                case "Violet":
+                case "Purple":
+                case "DarkMagenta":
+                case "Fuchsia":
+                case "Magenta":
+                case "Orchid":
+                case "MediumVioletRed":
+                case "DeepPink":
+                case "HotPink":
+                case "LavenderBlush":
+                case "PaleVioletRed":
+                case "Crimson":
+                    return strColor + color;
+                default:
+                    color = color.Replace("A", "").Replace("R", "").Replace("G", "").Replace("B", "").Replace("=", "");
+                    string[] split = color.Split(",");
+                    strRGB += split[1] + "," + split[2] + "," + split[3] + ")";
+                    return strRGB;
+            }
+        }
     }
 }
