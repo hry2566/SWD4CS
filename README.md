@@ -49,6 +49,19 @@
  ・Designer.csファイルのRead/Write（ただし、SWD4CS以外で編集したものは開けない）  
  ・他のコントローラー等は必要になったら追加する。
 
+## 対応プロパティ（Type）
+ ・System.Drawing.Point  
+ ・System.Drawing.Size  
+ ・System.String  
+ ・System.Boolean  
+ ・System.Int32  
+ ・System.Windows.Forms.AnchorStyles  
+ ・System.Windows.Forms.DockStyle  
+ ・System.Drawing.ContentAlignment  
+ ・System.Windows.Forms.ScrollBars  
+ ・System.Windows.Forms.HorizontalAlignment  
+ ・System.Drawing.Color  
+
 ## コントロール追加方法 
  * 「// コントロール追加時に下記を編集すること」に追記。  
 ・cls_form.cs  
