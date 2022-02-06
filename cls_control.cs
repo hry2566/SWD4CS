@@ -208,7 +208,6 @@ namespace SWD4CS
                 itemName != "Rtf" &&
                 itemName != "ParentForm" &&
                 itemName != "SelectedTab" &&
-                itemName != "" &&
                 itemName != "Top" &&
                 itemName != "Left" &&
                 itemName != "Right" &&
@@ -236,6 +235,11 @@ namespace SWD4CS
                 itemName != "SelectedIndex" &&
                 itemName != "TabCount" &&
                 itemName != "VisibleCount" &&
+                itemName != "DesktopLocation" &&
+                itemName != "AutoScale" &&
+                itemName != "CanFocus" &&
+                itemName != "IsMirrored" &&
+                itemName != "" &&
                 itemName != "" &&
                 itemName != "" &&
                 itemName != "" &&
