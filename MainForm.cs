@@ -76,6 +76,51 @@ namespace SWD4CS
             }
         }
 
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (tabControl1.SelectedIndex == 1)
+            {
+
+                treeView1.Nodes.Clear();
+                TreeNode NodeRoot = new("Form");
+                cls_treenode[] itemNode = Array.Empty<cls_treenode>();
+
+                for (int i = 0; i < cls_design_form1.CtrlItems.Count; i++)
+                {
+
+                    //Console.WriteLine(cls_design_form1.CtrlItems[i].className);
+                    //Console.WriteLine(cls_design_form1.CtrlItems[i].ctrl!.Name);
+                    //Console.WriteLine(cls_design_form1.CtrlItems[i].ctrl!.Parent.Name);
+
+                    if (cls_design_form1.CtrlItems[i].ctrl!.Parent == cls_design_form1)
+                    {
+                        Array.Resize(ref itemNode, itemNode.Count() + 1);
+                        itemNode[itemNode.Count() - 1] = new cls_treenode(cls_design_form1.CtrlItems[i].ctrl!.Name);
+                    }
+                    else
+                    {
+                        for (int j = 0; j < itemNode.Count(); j++)
+                        {
+                            cls_treenode? retNode = itemNode[j].Search(cls_design_form1.CtrlItems[i].ctrl!.Parent.Name);
+                            if (retNode != null)
+                            {
+                                retNode.Add(cls_design_form1.CtrlItems[i].ctrl!.Name);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (itemNode.Count() > 0)
+                {
+                    NodeRoot.Nodes.AddRange(itemNode);
+                }
+
+                treeView1.Nodes.Add(NodeRoot);
+                treeView1.TopNode.Expand();
+            }
+        }
+
         private void InitSourceCode()
         {
             bool flag = false;
@@ -112,17 +157,10 @@ namespace SWD4CS
 
         private string CreateSourcecCode()
         {
-            //int w;
-            //int h;
-            //string text;
             string source = "";
             int insertPos = 2;
             int insertPos2 = 0;
             int itemCount = cls_design_form1.CtrlItems!.Count;
-
-            //w = cls_design_form1.Width;
-            //h = cls_design_form1.Height;
-            //text = cls_design_form1.Text;
 
             source_custom.Insert(insertPos, "        //");
             insertPos++;
@@ -158,16 +196,6 @@ namespace SWD4CS
                     }
                 }
             }
-
-            //source_custom.Insert(insertPos, "        this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);");
-            //insertPos++;
-            //source_custom.Insert(insertPos, "        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;");
-            //insertPos++;
-            //source_custom.Insert(insertPos, "        this.ClientSize = new System.Drawing.Size(" + w + "," + h + ");");
-            //insertPos++;
-            //source_custom.Insert(insertPos, "        this.Text = \"" + text + "\";");
-            //insertPos++;
-
 
             source_custom.Insert(insertPos, "");
             insertPos++;
@@ -271,8 +299,6 @@ namespace SWD4CS
             Type type = item.GetValue(ctrl)!.GetType();
             string str2 = item.GetValue(ctrl)!.ToString()!;
 
-            //Console.WriteLine(item.Name);
-
             switch (type)
             {
                 case Type t when t == typeof(System.Drawing.Point):
@@ -303,7 +329,6 @@ namespace SWD4CS
                     strProperty = " = " + type.ToString() + "." + str2 + ";";
                     break;
                 case Type t when t == typeof(System.Drawing.Color):
-                    //Console.WriteLine(str2);
                     strProperty = " = " + Property2Color(str2) + ";";
                     break;
             }
