@@ -9,7 +9,8 @@
  * VisualStudio2022 C# → VSCode .net6.0
  
 ## スクリーンショット  
-![SWD4CS](https://user-images.githubusercontent.com/86605611/152626688-bb4cbfb6-a01c-47f9-9a0a-f4fd004d2ccf.png)
+![SWD4CS](https://user-images.githubusercontent.com/86605611/152679486-e8f7bbed-69b4-4186-b402-35d7bd2fec8f.png)
+
 
 ## 動画
  https://youtu.be/82qa0vOP_qk  
@@ -47,6 +48,19 @@
  ・VScrollBar  
  ・Designer.csファイルのRead/Write（ただし、SWD4CS以外で編集したものは開けない）  
  ・他のコントローラー等は必要になったら追加する。
+
+## 対応プロパティ（Type）
+ ・System.Drawing.Point  
+ ・System.Drawing.Size  
+ ・System.String  
+ ・System.Boolean  
+ ・System.Int32  
+ ・System.Windows.Forms.AnchorStyles  
+ ・System.Windows.Forms.DockStyle  
+ ・System.Drawing.ContentAlignment  
+ ・System.Windows.Forms.ScrollBars  
+ ・System.Windows.Forms.HorizontalAlignment  
+ ・System.Drawing.Color  
 
 ## コントロール追加方法 
  * 「// コントロール追加時に下記を編集すること」に追記。  
