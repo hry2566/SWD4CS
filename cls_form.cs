@@ -176,9 +176,6 @@ namespace SWD4CS
             {
                 string[] split = e.ChangedItem!.ToString()!.Split(" ");
 
-                //Console.WriteLine(e.ChangedItem);
-                //Console.WriteLine(split[1]);
-
                 string? propertyName = split[1];
                 PropertyInfo? formItem = this.GetType().GetProperty(propertyName!);
                 PropertyInfo? item = memForm.GetType().GetProperty(propertyName!);
@@ -586,25 +583,11 @@ namespace SWD4CS
             string[] split = new string[1];
             string dummy;
 
-            if (propertyValue.IndexOf("{Width=") > -1)
-            {
-                //split = propertyValue!.Split(',');
-                //split[0] = split[0].Replace("{Width=", "");
-                //split[1] = split[1].Replace("Height=", "").Replace("}", "");
-            }
-            else if (propertyValue.IndexOf("System.Drawing.Size") > -1)
-            {
-                split = propertyValue.Split("(");
-                dummy = split[1];
-                split = dummy.Split(")");
-                dummy = split[0];
-                split = dummy.Split(",");
-            }
-            else
-            {
-                //split = propertyValue.Split(",");
-            }
-
+            split = propertyValue.Split("(");
+            dummy = split[1];
+            split = dummy.Split(")");
+            dummy = split[0];
+            split = dummy.Split(",");
             Size size = new(int.Parse(split[0]), int.Parse(split[1]));
             return size;
         }
@@ -614,25 +597,11 @@ namespace SWD4CS
             string[] split = new string[1];
             string dummy;
 
-            if (propertyValue.IndexOf("{X=") > -1)
-            {
-                //split = propertyValue!.Split(',');
-                //split[0] = split[0].Replace("{X=", "");
-                //split[1] = split[1].Replace("Y=", "").Replace("}", "");
-            }
-            else if (propertyValue.IndexOf("System.Drawing.Point") > 1)
-            {
-                split = propertyValue.Split("(");
-                dummy = split[1];
-                split = dummy.Split(")");
-                dummy = split[0];
-                split = dummy.Split(",");
-            }
-            else
-            {
-                //split = propertyValue.Split(",");
-            }
-
+            split = propertyValue.Split("(");
+            dummy = split[1];
+            split = dummy.Split(")");
+            dummy = split[0];
+            split = dummy.Split(",");
             Point point = new(int.Parse(split[0]), int.Parse(split[1]));
             return point;
         }
@@ -771,8 +740,6 @@ namespace SWD4CS
             if (property != null && property!.GetValue(ctrl) != null)
             {
                 type = property!.GetValue(ctrl)!.GetType();
-
-                //Console.WriteLine(type);
 
                 switch (type)
                 {
