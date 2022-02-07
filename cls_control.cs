@@ -278,6 +278,18 @@ namespace SWD4CS
             }
         }
 
+        private void CreatePickBox(Control ctrl)
+        {
+            Button pickbox = new();
+            pickbox = new();
+            pickbox.Size = new System.Drawing.Size(24, 24);
+            pickbox.Text = "▼";
+            pickbox.Click += new System.EventHandler(Ctrl_Click);
+            pickbox.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
+            pickbox.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
+            ctrl.Controls.Add(pickbox);
+        }
+
         private bool Init(string className)
         {
             form.cnt_Control++;
@@ -470,18 +482,6 @@ namespace SWD4CS
             this.ctrl!.Text = this.ctrl!.Name;
             this.ctrl!.TabIndex = form.cnt_Control;
             return true;
-        }
-
-        private void CreatePickBox(Control ctrl)
-        {
-            Button pickbox = new();
-            pickbox = new();
-            pickbox.Size = new System.Drawing.Size(24, 24);
-            pickbox.Text = "▼";
-            pickbox.Click += new System.EventHandler(Ctrl_Click);
-            pickbox.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
-            pickbox.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
-            ctrl.Controls.Add(pickbox);
         }
     }
 }
