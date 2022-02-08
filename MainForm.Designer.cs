@@ -378,7 +378,7 @@
             this.closeCToolStripMenuItem.Name = "closeCToolStripMenuItem";
             this.closeCToolStripMenuItem.Size = new System.Drawing.Size(149, 26);
             this.closeCToolStripMenuItem.Text = "Quit(&Q)";
-            this.closeCToolStripMenuItem.Click += new System.EventHandler(this.closeCToolStripMenuItem_Click);
+            this.closeCToolStripMenuItem.Click += new System.EventHandler(this.CloseCToolStripMenuItem_Click);
             // 
             // controlsToolStripMenuItem
             // 
@@ -393,7 +393,7 @@
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             this.deleteToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
             this.deleteToolStripMenuItem.Text = "Delete (Alt + Dell)";
-            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
             // 
             // MainForm
             // 
