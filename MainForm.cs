@@ -27,7 +27,7 @@ namespace SWD4CS
             }
         }
 
-        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             KeyEventArgs keyevents = new(Keys.Alt | Keys.Delete);
             MainForm_KeyDown(sender, keyevents);
@@ -62,7 +62,7 @@ namespace SWD4CS
             }
         }
 
-        private void closeCToolStripMenuItem_Click(object sender, EventArgs e)
+        private void CloseCToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
         }
@@ -95,7 +95,16 @@ namespace SWD4CS
                     if (cls_design_form1.CtrlItems[i].ctrl!.Parent == cls_design_form1)
                     {
                         Array.Resize(ref itemNode, itemNode.Count() + 1);
-                        itemNode[itemNode.Count() - 1] = new cls_treenode(cls_design_form1.CtrlItems[i].ctrl!.Name);
+                        if (cls_design_form1.CtrlItems[i].className == "SplitContainer")
+                        {
+                            itemNode[itemNode.Count() - 1] = new cls_treenode(cls_design_form1.CtrlItems[i].ctrl!.Name + ".Panel1");
+                            Array.Resize(ref itemNode, itemNode.Count() + 1);
+                            itemNode[itemNode.Count() - 1] = new cls_treenode(cls_design_form1.CtrlItems[i].ctrl!.Name + ".Panel2");
+                        }
+                        else
+                        {
+                            itemNode[itemNode.Count() - 1] = new cls_treenode(cls_design_form1.CtrlItems[i].ctrl!.Name);
+                        }
                     }
                     else
                     {
@@ -104,7 +113,7 @@ namespace SWD4CS
                             cls_treenode? retNode = itemNode[j].Search(cls_design_form1.CtrlItems[i].ctrl!.Parent.Name);
                             if (retNode != null)
                             {
-                                retNode.Add(cls_design_form1.CtrlItems[i].ctrl!.Name);
+                                retNode.Add(cls_design_form1.CtrlItems[i].ctrl!.Name, cls_design_form1.CtrlItems[i].className);
                                 break;
                             }
                         }
