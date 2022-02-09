@@ -731,6 +731,62 @@ namespace SWD4CS
             return color;
         }
 
+        private static int? String2FormStartPosition(string? propertyValue)
+        {
+            int style = 0;
+
+            if (propertyValue!.IndexOf("System.Windows.Forms.FormStartPosition") > -1)
+            {
+                string[] split = propertyValue.Split(".");
+                propertyValue = split[split.Count() - 1];
+            }
+
+            switch (propertyValue)
+            {
+                case "CenterParent":
+                    style = 4;
+                    break;
+                case "CenterScreen":
+                    style = 1;
+                    break;
+                case "Manual":
+                    style = 0;
+                    break;
+                case "WindowsDefaultBounds":
+                    style = 3;
+                    break;
+                case "WindowsDefaultLocation":
+                    style = 2;
+                    break;
+            }
+            return style;
+        }
+
+        private static int? String2FormWindowState(string? propertyValue)
+        {
+            int style = 0;
+
+            if (propertyValue!.IndexOf("System.Windows.Forms.FormWindowState") > -1)
+            {
+                string[] split = propertyValue.Split(".");
+                propertyValue = split[split.Count() - 1];
+            }
+
+            switch (propertyValue)
+            {
+                case "Maximized":
+                    style = 2;
+                    break;
+                case "Minimized":
+                    style = 1;
+                    break;
+                case "Normal":
+                    style = 0;
+                    break;
+            }
+            return style;
+        }
+
         private static void SetCtrlProperty(Control? ctrl, string? propertyName, string? propertyValue)
         {
             Type type;
@@ -740,6 +796,8 @@ namespace SWD4CS
             if (property != null && property!.GetValue(ctrl) != null)
             {
                 type = property!.GetValue(ctrl)!.GetType();
+
+                Console.WriteLine(type);
 
                 switch (type)
                 {
@@ -770,7 +828,18 @@ namespace SWD4CS
                     case Type t when t == typeof(System.Drawing.Size):
                         try
                         {
-                            property.SetValue(ctrl, String2Size(propertyValue!));
+                            if (ctrl is cls_form || ctrl is Form)
+                            {
+                                Size size = String2Size(propertyValue!);
+                                size.Width -= 18;
+                                size.Height -= 47;
+
+                                property.SetValue(ctrl, size);
+                            }
+                            else
+                            {
+                                property.SetValue(ctrl, String2Size(propertyValue!));
+                            }
                         }
                         catch { }
                         break;
@@ -792,6 +861,12 @@ namespace SWD4CS
                         break;
                     case Type t when t == typeof(System.Drawing.Color):
                         property.SetValue(ctrl, String2Color(propertyValue));
+                        break;
+                    case Type t when t == typeof(System.Windows.Forms.FormStartPosition):
+                        property.SetValue(ctrl, String2FormStartPosition(propertyValue));
+                        break;
+                    case Type t when t == typeof(System.Windows.Forms.FormWindowState):
+                        property.SetValue(ctrl, String2FormWindowState(propertyValue));
                         break;
 
                 }
