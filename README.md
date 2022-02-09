@@ -12,7 +12,6 @@
 ![SWD4CS](https://user-images.githubusercontent.com/86605611/152679486-e8f7bbed-69b4-4186-b402-35d7bd2fec8f.png)
 ![SWD4CS](https://user-images.githubusercontent.com/86605611/152784518-c135ec3a-e156-4163-8f8d-90cc023d8448.png)
 ※ControlTreeは表示のみ  
-※SplitContainerに設置したコントロールはまだControlTreeに表示されません。
 
 
 ## 動画
