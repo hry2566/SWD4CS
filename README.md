@@ -63,6 +63,8 @@
  ・System.Windows.Forms.ScrollBars  
  ・System.Windows.Forms.HorizontalAlignment  
  ・System.Drawing.Color  
+ ・System.Windows.Forms.FormStartPosition  
+ ・System.Windows.Forms.FormWindowState  
 
 ## コントロール追加方法 
  * 「// コントロール追加時に下記を編集すること」に追記。  
