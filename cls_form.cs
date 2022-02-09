@@ -797,7 +797,7 @@ namespace SWD4CS
             {
                 type = property!.GetValue(ctrl)!.GetType();
 
-                Console.WriteLine(type);
+                //Console.WriteLine(type);
 
                 switch (type)
                 {
