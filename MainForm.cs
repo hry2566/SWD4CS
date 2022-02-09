@@ -229,6 +229,8 @@ namespace SWD4CS
                 source_custom.Insert(insertPos, "        this." + ctrl.ctrl.Name + " = new System.Windows.Forms." + ctrlClass + "();");
                 insertPos++;
 
+                string menStr1 = "";
+                string memProperty = "";
                 foreach (PropertyInfo item in ctrl.ctrl!.GetType().GetProperties())
                 {
                     if (cls_control.HideProperty(item.Name))
@@ -242,7 +244,13 @@ namespace SWD4CS
                                 string str1 = "        this." + ctrl!.ctrl!.Name + "." + item.Name;
                                 string strProperty = Property2String(ctrl.ctrl, item);
 
-                                if (strProperty != "")
+                                if (item.Name == "SplitterDistance")
+                                {
+                                    menStr1 = str1;
+                                    memProperty = strProperty;
+                                    strProperty = "";
+                                }
+                                else if (strProperty != "")
                                 {
                                     source_custom.Insert(insertPos, str1 + strProperty);
                                     insertPos++;
@@ -250,6 +258,12 @@ namespace SWD4CS
                             }
                         }
                     }
+                }
+
+                if (memProperty != "")
+                {
+                    source_custom.Insert(insertPos, menStr1 + memProperty);
+                    insertPos++;
                 }
 
                 source_custom.Insert(insertPos, "        this" + parentName + ".Controls.Add(this." + ctrl!.ctrl!.Name + ");\r\n");
@@ -308,6 +322,10 @@ namespace SWD4CS
             Type type = item.GetValue(ctrl)!.GetType();
             string str2 = item.GetValue(ctrl)!.ToString()!;
 
+            //Console.WriteLine(item.Name);
+            //Console.WriteLine(type);
+
+
             switch (type)
             {
                 case Type t when t == typeof(System.Drawing.Point):
@@ -316,7 +334,14 @@ namespace SWD4CS
                     break;
                 case Type t when t == typeof(System.Drawing.Size):
                     Size size = (Size)item.GetValue(ctrl)!;
-                    strProperty = " = new " + type.ToString() + "(" + size.Width + "," + size.Height + ");";
+                    if (ctrl is Form)
+                    {
+                        strProperty = " = new " + type.ToString() + "(" + (size.Width + 18) + "," + (size.Height + 47) + ");";
+                    }
+                    else
+                    {
+                        strProperty = " = new " + type.ToString() + "(" + size.Width + "," + size.Height + ");";
+                    }
                     break;
                 case Type t when t == typeof(System.String):
                     strProperty = " =  " + "\"" + str2 + "\";";
@@ -330,10 +355,12 @@ namespace SWD4CS
                 case Type t when t == typeof(System.Int32):
                     strProperty = " = " + int.Parse(str2) + ";";
                     break;
-                case Type t when t == typeof(System.Windows.Forms.DockStyle) |
-                                 t == typeof(System.Drawing.ContentAlignment) |
-                                 t == typeof(System.Windows.Forms.ScrollBars) |
-                                 t == typeof(System.Windows.Forms.HorizontalAlignment):
+                case Type t when t == typeof(System.Windows.Forms.DockStyle) ||
+                                 t == typeof(System.Drawing.ContentAlignment) ||
+                                 t == typeof(System.Windows.Forms.ScrollBars) ||
+                                 t == typeof(System.Windows.Forms.HorizontalAlignment) ||
+                                 t == typeof(System.Windows.Forms.FormWindowState) ||
+                                 t == typeof(System.Windows.Forms.FormStartPosition):
 
                     strProperty = " = " + type.ToString() + "." + str2 + ";";
                     break;
