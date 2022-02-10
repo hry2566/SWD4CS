@@ -854,6 +854,37 @@ namespace SWD4CS
             return style;
         }
 
+        private static int? String2PictureBoxSizeMode(string? propertyValue)
+        {
+            int style = 0;
+
+            if (propertyValue!.IndexOf("System.Windows.Forms.PictureBoxSizeMode") > -1)
+            {
+                string[] split = propertyValue.Split(".");
+                propertyValue = split[split.Count() - 1];
+            }
+
+            switch (propertyValue)
+            {
+                case "AutoSize":
+                    style = 2;
+                    break;
+                case "CenterImage":
+                    style = 3;
+                    break;
+                case "Normal":
+                    style = 0;
+                    break;
+                case "StretchImage":
+                    style = 1;
+                    break;
+                case "Zoom":
+                    style = 4;
+                    break;
+            }
+            return style;
+        }
+
 
         private static void SetCtrlProperty(Control? ctrl, string? propertyName, string? propertyValue)
         {
@@ -927,6 +958,9 @@ namespace SWD4CS
                         break;
                     case Type t when t == typeof(System.Windows.Forms.FixedPanel):
                         property.SetValue(ctrl, String2FixedPanel(propertyValue));
+                        break;
+                    case Type t when t == typeof(System.Windows.Forms.PictureBoxSizeMode):
+                        property.SetValue(ctrl, String2PictureBoxSizeMode(propertyValue));
                         break;
 
                 }
