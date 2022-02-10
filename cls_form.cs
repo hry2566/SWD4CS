@@ -216,7 +216,6 @@ namespace SWD4CS
                 }
 
                 PropertyInfo? formItem = this.GetType().GetProperty(propertyName!);
-                //PropertyInfo? item = memForm.GetType().GetProperty(propertyName!);
 
                 if (formItem != null)
                 {
@@ -904,12 +903,8 @@ namespace SWD4CS
                         property.SetValue(ctrl, propertyValue);
                         break;
                     case Type t when t == typeof(System.Boolean):
-                        try
-                        {
-                            bool b = System.Convert.ToBoolean(propertyValue);
-                            property.SetValue(ctrl, b);
-                        }
-                        catch { }
+                        bool b = System.Convert.ToBoolean(propertyValue);
+                        property.SetValue(ctrl, b);
                         break;
                     case Type t when t == typeof(System.Windows.Forms.DockStyle):
                         property.SetValue(ctrl, String2DockStyle(propertyValue));
@@ -918,25 +913,13 @@ namespace SWD4CS
                         property.SetValue(ctrl, String2AnchorStyles(propertyValue!));
                         break;
                     case Type t when t == typeof(System.Drawing.Point):
-                        try
-                        {
-                            property.SetValue(ctrl, String2Point(propertyValue!));
-                        }
-                        catch { }
+                        property.SetValue(ctrl, String2Point(propertyValue!));
                         break;
                     case Type t when t == typeof(System.Drawing.Size):
-                        try
-                        {
-                            property.SetValue(ctrl, String2Size(propertyValue!));
-                        }
-                        catch { }
+                        property.SetValue(ctrl, String2Size(propertyValue!));
                         break;
                     case Type t when t == typeof(System.Int32):
-                        try
-                        {
-                            property.SetValue(ctrl, int.Parse(propertyValue!));
-                        }
-                        catch { }
+                        property.SetValue(ctrl, int.Parse(propertyValue!));
                         break;
                     case Type t when t == typeof(System.Drawing.ContentAlignment):
                         property.SetValue(ctrl, String2ContentAlignment(propertyValue));
@@ -962,11 +945,8 @@ namespace SWD4CS
                     case Type t when t == typeof(System.Windows.Forms.PictureBoxSizeMode):
                         property.SetValue(ctrl, String2PictureBoxSizeMode(propertyValue));
                         break;
-
                 }
             }
         }
-
-
     }
 }
