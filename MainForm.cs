@@ -375,6 +375,9 @@ namespace SWD4CS
                 case Type t when t == typeof(System.Windows.Forms.FixedPanel):
                     strProperty = " = " + type.ToString() + "." + str2 + ";";
                     break;
+                case Type t when t == typeof(System.Windows.Forms.PictureBoxSizeMode):
+                    strProperty = " = " + type.ToString() + "." + str2 + ";";
+                    break;
 
             }
             return strProperty;
