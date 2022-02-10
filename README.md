@@ -65,6 +65,8 @@
  ・System.Drawing.Color  
  ・System.Windows.Forms.FormStartPosition  
  ・System.Windows.Forms.FormWindowState  
+ ・System.Windows.Forms.FixedPanel  
+ ・System.Windows.Forms.PictureBoxSizeMode  
 
 ## コントロール追加方法 
  * 「// コントロール追加時に下記を編集すること」に追記。  
