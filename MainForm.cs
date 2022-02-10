@@ -365,6 +365,8 @@ namespace SWD4CS
                                  t == typeof(System.Windows.Forms.ScrollBars) ||
                                  t == typeof(System.Windows.Forms.HorizontalAlignment) ||
                                  t == typeof(System.Windows.Forms.FormWindowState) ||
+                                 t == typeof(System.Windows.Forms.FixedPanel) ||
+                                 t == typeof(System.Windows.Forms.PictureBoxSizeMode) ||
                                  t == typeof(System.Windows.Forms.FormStartPosition):
 
                     strProperty = " = " + type.ToString() + "." + str2 + ";";
@@ -372,18 +374,11 @@ namespace SWD4CS
                 case Type t when t == typeof(System.Drawing.Color):
                     strProperty = " = " + Property2Color(str2) + ";";
                     break;
-                case Type t when t == typeof(System.Windows.Forms.FixedPanel):
-                    strProperty = " = " + type.ToString() + "." + str2 + ";";
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.PictureBoxSizeMode):
-                    strProperty = " = " + type.ToString() + "." + str2 + ";";
-                    break;
-
             }
             return strProperty;
         }
 
-        private string Property2Color(string color)
+        private static string Property2Color(string color)
         {
             color = color.Replace("Color [", "").Replace("]", "");
             string? strSystemColor = "System.Drawing.SystemColors.";
