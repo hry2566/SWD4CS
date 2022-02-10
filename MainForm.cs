@@ -191,17 +191,29 @@ namespace SWD4CS
 
                     if (item.GetValue(memForm) != null && item.GetValue(baseForm) != null)
                     {
-                        if (item.GetValue(memForm)!.ToString() != item.GetValue(baseForm)!.ToString())
+                        if (item.Name == "Size")
                         {
-                            string str1 = "        this." + item.Name;
-                            string strProperty = Property2String(memForm, item);
-
-                            if (strProperty != "")
+                            Type type = item.GetValue(memForm)!.GetType();
+                            Size size = memForm.ClientSize;
+                            string str1 = "        this.ClientSize = new " + type.ToString() + "(" + size.Width + "," + size.Height + ");";
+                            source_custom.Insert(insertPos, str1);
+                            insertPos++;
+                        }
+                        else
+                        {
+                            if (item.GetValue(memForm)!.ToString() != item.GetValue(baseForm)!.ToString())
                             {
-                                source_custom.Insert(insertPos, str1 + strProperty);
-                                insertPos++;
+                                string str1 = "        this." + item.Name;
+                                string strProperty = Property2String(memForm, item);
+
+                                if (strProperty != "")
+                                {
+                                    source_custom.Insert(insertPos, str1 + strProperty);
+                                    insertPos++;
+                                }
                             }
                         }
+
                     }
                 }
             }
@@ -334,14 +346,7 @@ namespace SWD4CS
                     break;
                 case Type t when t == typeof(System.Drawing.Size):
                     Size size = (Size)item.GetValue(ctrl)!;
-                    if (ctrl is Form)
-                    {
-                        strProperty = " = new " + type.ToString() + "(" + (size.Width + 18) + "," + (size.Height + 47) + ");";
-                    }
-                    else
-                    {
-                        strProperty = " = new " + type.ToString() + "(" + size.Width + "," + size.Height + ");";
-                    }
+                    strProperty = " = new " + type.ToString() + "(" + size.Width + "," + size.Height + ");";
                     break;
                 case Type t when t == typeof(System.String):
                     strProperty = " =  " + "\"" + str2 + "\";";
@@ -367,6 +372,10 @@ namespace SWD4CS
                 case Type t when t == typeof(System.Drawing.Color):
                     strProperty = " = " + Property2Color(str2) + ";";
                     break;
+                case Type t when t == typeof(System.Windows.Forms.FixedPanel):
+                    strProperty = " = " + type.ToString() + "." + str2 + ";";
+                    break;
+
             }
             return strProperty;
         }
