@@ -239,7 +239,7 @@ namespace SWD4CS
                 itemName != "AutoScale" &&
                 itemName != "CanFocus" &&
                 itemName != "IsMirrored" &&
-                itemName != "" &&
+                itemName != "SelectionStart" &&
                 itemName != "" &&
                 itemName != "" &&
                 itemName != "" &&
