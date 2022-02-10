@@ -125,6 +125,34 @@ namespace SWD4CS
             }
             return baseCtrl;
         }
+        private void CountInit()
+        {
+            cnt_Control = -1;
+            cnt_Button = 0;
+            cnt_Label = 0;
+            cnt_TextBox = 0;
+            cnt_ListBox = 0;
+            cnt_GroupBox = 0;
+            cnt_TabControl = 0;
+            cnt_TabPage = 0;
+            cnt_CheckBox = 0;
+            cnt_ComboBox = 0;
+            cnt_SplitContainer = 0;
+            cnt_DataGridView = 0;
+            cnt_Panel = 0;
+            cnt_CheckedListBox = 0;
+            cnt_LinkLabel = 0;
+            cnt_PictureBox = 0;
+            cnt_ProgressBar = 0;
+            cnt_RadioButton = 0;
+            cnt_RichTextBox = 0;
+            cnt_StatusStrip = 0;
+            cnt_ListView = 0;
+            cnt_TreeView = 0;
+            cnt_MonthCalendar = 0;
+            cnt_HScrollBar = 0;
+            cnt_VScrollBar = 0;
+        }
         // ****************************************************************************************
 
         public cls_form()
@@ -149,14 +177,14 @@ namespace SWD4CS
             selectBox = new cls_selectbox(this, backPanel);
 
             memForm.Location = this.Location;
-            memForm.Size = this.Size;
+            memForm.ClientSize = this.Size;
             memForm.Name = "Form1";
             SetSelect(true);
         }
 
         private void formResize(object? sender, EventArgs e)
         {
-            memForm.Size = this.Size;
+            memForm.ClientSize = this.Size;
         }
 
         private void NameTextChanged(object? sender, EventArgs e)
@@ -175,10 +203,20 @@ namespace SWD4CS
             if (ctrl!.Name == memForm.Name)
             {
                 string[] split = e.ChangedItem!.ToString()!.Split(" ");
+                PropertyInfo? item;
 
                 string? propertyName = split[1];
+                if (propertyName == "Size")
+                {
+                    item = memForm.GetType().GetProperty("ClientSize");
+                }
+                else
+                {
+                    item = memForm.GetType().GetProperty(propertyName!);
+                }
+
                 PropertyInfo? formItem = this.GetType().GetProperty(propertyName!);
-                PropertyInfo? item = memForm.GetType().GetProperty(propertyName!);
+                //PropertyInfo? item = memForm.GetType().GetProperty(propertyName!);
 
                 if (formItem != null)
                 {
@@ -261,8 +299,12 @@ namespace SWD4CS
             }
         }
 
+
+
         internal void CtrlAllClear()
         {
+            CountInit();
+
             for (int i = 0; i < CtrlItems!.Count; i++)
             {
                 CtrlItems[i].Selected = true;
@@ -787,6 +829,32 @@ namespace SWD4CS
             return style;
         }
 
+        private static int? String2FixedPanel(string? propertyValue)
+        {
+            int style = 0;
+
+            if (propertyValue!.IndexOf("System.Windows.Forms.FixedPanel") > -1)
+            {
+                string[] split = propertyValue.Split(".");
+                propertyValue = split[split.Count() - 1];
+            }
+
+            switch (propertyValue)
+            {
+                case "None":
+                    style = 0;
+                    break;
+                case "Panel1":
+                    style = 1;
+                    break;
+                case "Panel2":
+                    style = 2;
+                    break;
+            }
+            return style;
+        }
+
+
         private static void SetCtrlProperty(Control? ctrl, string? propertyName, string? propertyValue)
         {
             Type type;
@@ -828,18 +896,7 @@ namespace SWD4CS
                     case Type t when t == typeof(System.Drawing.Size):
                         try
                         {
-                            if (ctrl is cls_form || ctrl is Form)
-                            {
-                                Size size = String2Size(propertyValue!);
-                                size.Width -= 18;
-                                size.Height -= 47;
-
-                                property.SetValue(ctrl, size);
-                            }
-                            else
-                            {
-                                property.SetValue(ctrl, String2Size(propertyValue!));
-                            }
+                            property.SetValue(ctrl, String2Size(propertyValue!));
                         }
                         catch { }
                         break;
@@ -868,9 +925,14 @@ namespace SWD4CS
                     case Type t when t == typeof(System.Windows.Forms.FormWindowState):
                         property.SetValue(ctrl, String2FormWindowState(propertyValue));
                         break;
+                    case Type t when t == typeof(System.Windows.Forms.FixedPanel):
+                        property.SetValue(ctrl, String2FixedPanel(propertyValue));
+                        break;
 
                 }
             }
         }
+
+
     }
 }
