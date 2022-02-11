@@ -4,7 +4,7 @@ namespace SWD4CS
 {
     internal class cls_control
     {
-        private cls_form form;
+        private cls_user_form form;
         internal string className;
         internal Control? ctrl;
         internal Control parent;
@@ -18,7 +18,7 @@ namespace SWD4CS
         private Point memPos;
         private int grid = 8;
 
-        public cls_control(cls_form form, string className, Control parent, Control backPanel, ListBox? toolList, PropertyGrid propertyGrid, TextBox propertyCtrlName, int X, int Y)
+        public cls_control(cls_user_form form, string className, Control parent, Control backPanel, ListBox? toolList, PropertyGrid propertyGrid, TextBox propertyCtrlName, int X, int Y)
         {
             this.form = form;
             this.className = className;
@@ -192,6 +192,7 @@ namespace SWD4CS
             else
             {
                 propertyGrid!.SelectedObject = null;
+                propertyCtrlName!.Text = "";
             }
         }
 
@@ -289,6 +290,7 @@ namespace SWD4CS
             pickbox.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
             ctrl.Controls.Add(pickbox);
         }
+
 
         private bool Init(string className)
         {
