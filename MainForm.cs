@@ -80,53 +80,7 @@ namespace SWD4CS
         {
             if (tabControl1.SelectedIndex == 1)
             {
-
-                treeView1.Nodes.Clear();
-                TreeNode NodeRoot = new("Form");
-                cls_treenode[] itemNode = Array.Empty<cls_treenode>();
-
-                for (int i = 0; i < cls_design_form1.CtrlItems.Count; i++)
-                {
-
-                    //Console.WriteLine(cls_design_form1.CtrlItems[i].className);
-                    //Console.WriteLine(cls_design_form1.CtrlItems[i].ctrl!.Name);
-                    //Console.WriteLine(cls_design_form1.CtrlItems[i].ctrl!.Parent.Name);
-
-                    if (cls_design_form1.CtrlItems[i].ctrl!.Parent == cls_design_form1)
-                    {
-                        Array.Resize(ref itemNode, itemNode.Count() + 1);
-                        if (cls_design_form1.CtrlItems[i].className == "SplitContainer")
-                        {
-                            itemNode[itemNode.Count() - 1] = new cls_treenode(cls_design_form1.CtrlItems[i].ctrl!.Name + ".Panel1");
-                            Array.Resize(ref itemNode, itemNode.Count() + 1);
-                            itemNode[itemNode.Count() - 1] = new cls_treenode(cls_design_form1.CtrlItems[i].ctrl!.Name + ".Panel2");
-                        }
-                        else
-                        {
-                            itemNode[itemNode.Count() - 1] = new cls_treenode(cls_design_form1.CtrlItems[i].ctrl!.Name);
-                        }
-                    }
-                    else
-                    {
-                        for (int j = 0; j < itemNode.Count(); j++)
-                        {
-                            cls_treenode? retNode = itemNode[j].Search(cls_design_form1.CtrlItems[i].ctrl!.Parent.Name);
-                            if (retNode != null)
-                            {
-                                retNode.Add(cls_design_form1.CtrlItems[i].ctrl!.Name, cls_design_form1.CtrlItems[i].className);
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (itemNode.Count() > 0)
-                {
-                    NodeRoot.Nodes.AddRange(itemNode);
-                }
-
-                treeView1.Nodes.Add(NodeRoot);
-                treeView1.TopNode.Expand();
+                treeView1.ControlViewShow(cls_design_form1);
             }
         }
 
@@ -241,13 +195,13 @@ namespace SWD4CS
                 source_custom.Insert(insertPos, "        this." + ctrl.ctrl.Name + " = new System.Windows.Forms." + ctrlClass + "();");
                 insertPos++;
 
-                string menStr1 = "";
-                string memProperty = "";
+                List<string> menStr1 = new();
+                List<string> memProperty = new();
                 foreach (PropertyInfo item in ctrl.ctrl!.GetType().GetProperties())
                 {
                     if (cls_control.HideProperty(item.Name))
                     {
-                        Control? baseCtrl = cls_form.GetBaseCtrl(ctrl);
+                        Control? baseCtrl = cls_user_form.GetBaseCtrl(ctrl);
 
                         if (item.GetValue(ctrl.ctrl) != null && item.GetValue(baseCtrl) != null)
                         {
@@ -256,10 +210,10 @@ namespace SWD4CS
                                 string str1 = "        this." + ctrl!.ctrl!.Name + "." + item.Name;
                                 string strProperty = Property2String(ctrl.ctrl, item);
 
-                                if (item.Name == "SplitterDistance")
+                                if (item.Name == "SplitterDistance" || item.Name == "Anchor")
                                 {
-                                    menStr1 = str1;
-                                    memProperty = strProperty;
+                                    menStr1.Add(str1);
+                                    memProperty.Add(strProperty);
                                     strProperty = "";
                                 }
                                 else if (strProperty != "")
@@ -272,9 +226,9 @@ namespace SWD4CS
                     }
                 }
 
-                if (memProperty != "")
+                for (int j = 0; j < memProperty.Count; j++)
                 {
-                    source_custom.Insert(insertPos, menStr1 + memProperty);
+                    source_custom.Insert(insertPos, menStr1[j] + memProperty[j]);
                     insertPos++;
                 }
 
@@ -324,56 +278,6 @@ namespace SWD4CS
                 }
                 ancho = "(" + type.ToString() + ")" + ancho + ";";
                 strProperty = " = " + ancho;
-            }
-            return strProperty;
-        }
-
-        private string Property2String(Control ctrl, PropertyInfo item)
-        {
-            string strProperty = "";
-            Type type = item.GetValue(ctrl)!.GetType();
-            string str2 = item.GetValue(ctrl)!.ToString()!;
-
-            //Console.WriteLine(item.Name);
-            //Console.WriteLine(type);
-
-
-            switch (type)
-            {
-                case Type t when t == typeof(System.Drawing.Point):
-                    Point point = (Point)item.GetValue(ctrl)!;
-                    strProperty = " = new " + type.ToString() + "(" + point.X + "," + point.Y + ");";
-                    break;
-                case Type t when t == typeof(System.Drawing.Size):
-                    Size size = (Size)item.GetValue(ctrl)!;
-                    strProperty = " = new " + type.ToString() + "(" + size.Width + "," + size.Height + ");";
-                    break;
-                case Type t when t == typeof(System.String):
-                    strProperty = " =  " + "\"" + str2 + "\";";
-                    break;
-                case Type t when t == typeof(System.Boolean):
-                    strProperty = " =  " + str2.ToLower() + ";";
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.AnchorStyles):
-                    strProperty = AnchorStyles2String(item.GetValue(ctrl));
-                    break;
-                case Type t when t == typeof(System.Int32):
-                    strProperty = " = " + int.Parse(str2) + ";";
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.DockStyle) ||
-                                 t == typeof(System.Drawing.ContentAlignment) ||
-                                 t == typeof(System.Windows.Forms.ScrollBars) ||
-                                 t == typeof(System.Windows.Forms.HorizontalAlignment) ||
-                                 t == typeof(System.Windows.Forms.FormWindowState) ||
-                                 t == typeof(System.Windows.Forms.FixedPanel) ||
-                                 t == typeof(System.Windows.Forms.PictureBoxSizeMode) ||
-                                 t == typeof(System.Windows.Forms.FormStartPosition):
-
-                    strProperty = " = " + type.ToString() + "." + str2 + ";";
-                    break;
-                case Type t when t == typeof(System.Drawing.Color):
-                    strProperty = " = " + Property2Color(str2) + ";";
-                    break;
             }
             return strProperty;
         }
@@ -567,5 +471,57 @@ namespace SWD4CS
                     return strRGB;
             }
         }
+
+        private string Property2String(Control ctrl, PropertyInfo item)
+        {
+            string strProperty = "";
+            Type type = item.GetValue(ctrl)!.GetType();
+            string str2 = item.GetValue(ctrl)!.ToString()!;
+
+            //Console.WriteLine(item.Name);
+            //Console.WriteLine(type);
+
+
+            switch (type)
+            {
+                case Type t when t == typeof(System.Drawing.Point):
+                    Point point = (Point)item.GetValue(ctrl)!;
+                    strProperty = " = new " + type.ToString() + "(" + point.X + "," + point.Y + ");";
+                    break;
+                case Type t when t == typeof(System.Drawing.Size):
+                    Size size = (Size)item.GetValue(ctrl)!;
+                    strProperty = " = new " + type.ToString() + "(" + size.Width + "," + size.Height + ");";
+                    break;
+                case Type t when t == typeof(System.String):
+                    strProperty = " =  " + "\"" + str2 + "\";";
+                    break;
+                case Type t when t == typeof(System.Boolean):
+                    strProperty = " =  " + str2.ToLower() + ";";
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.AnchorStyles):
+                    strProperty = AnchorStyles2String(item.GetValue(ctrl));
+                    break;
+                case Type t when t == typeof(System.Int32):
+                    strProperty = " = " + int.Parse(str2) + ";";
+                    break;
+                case Type t when t == typeof(System.Windows.Forms.DockStyle) ||
+                                 t == typeof(System.Drawing.ContentAlignment) ||
+                                 t == typeof(System.Windows.Forms.ScrollBars) ||
+                                 t == typeof(System.Windows.Forms.HorizontalAlignment) ||
+                                 t == typeof(System.Windows.Forms.FormWindowState) ||
+                                 t == typeof(System.Windows.Forms.FixedPanel) ||
+                                 t == typeof(System.Windows.Forms.PictureBoxSizeMode) ||
+                                 t == typeof(System.Windows.Forms.FormStartPosition):
+
+                    strProperty = " = " + type.ToString() + "." + str2 + ";";
+                    break;
+                case Type t when t == typeof(System.Drawing.Color):
+                    strProperty = " = " + Property2Color(str2) + ";";
+                    break;
+            }
+            return strProperty;
+        }
+
+
     }
 }
