@@ -2,14 +2,14 @@
 {
     internal class cls_selectbox
     {
-        private cls_form? form;
+        private cls_user_form? form;
         private cls_control? ctrl;
         private Control parent;
         private Panel[] selectbox = new Panel[8];
         private Point memPos;
         private int grid = 8;
 
-        public cls_selectbox(cls_form ctrl, Control parent)
+        public cls_selectbox(cls_user_form ctrl, Control parent)
         {
             this.form = ctrl;
             this.parent = parent;
