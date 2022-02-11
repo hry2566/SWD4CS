@@ -34,11 +34,11 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.treeView1 = new SWD4CS.cls_user_treeview();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.tabControl3 = new System.Windows.Forms.TabControl();
             this.tabPage5 = new System.Windows.Forms.TabPage();
-            this.cls_design_form1 = new SWD4CS.cls_form();
+            this.cls_design_form1 = new SWD4CS.cls_user_form();
             this.tabPage6 = new System.Windows.Forms.TabPage();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.tabPage7 = new System.Windows.Forms.TabPage();
@@ -91,7 +91,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
             this.splitContainer1.Size = new System.Drawing.Size(1248, 918);
-            this.splitContainer1.SplitterDistance = 158;
+            this.splitContainer1.SplitterDistance = 288;
             this.splitContainer1.TabIndex = 0;
             // 
             // tabControl1
@@ -102,7 +102,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(158, 918);
+            this.tabControl1.Size = new System.Drawing.Size(288, 918);
             this.tabControl1.TabIndex = 0;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
@@ -112,7 +112,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 29);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(150, 885);
+            this.tabPage1.Size = new System.Drawing.Size(280, 885);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "ToolBox";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -150,7 +150,7 @@
             "VScrollBar"});
             this.listBox1.Location = new System.Drawing.Point(3, 3);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(144, 879);
+            this.listBox1.Size = new System.Drawing.Size(274, 879);
             this.listBox1.Sorted = true;
             this.listBox1.TabIndex = 0;
             // 
@@ -160,7 +160,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 29);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(150, 885);
+            this.tabPage2.Size = new System.Drawing.Size(232, 885);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "ControlTree";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -174,7 +174,7 @@
             treeNode1.Text = "Form";
             this.treeView1.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1});
-            this.treeView1.Size = new System.Drawing.Size(144, 879);
+            this.treeView1.Size = new System.Drawing.Size(226, 879);
             this.treeView1.TabIndex = 0;
             // 
             // splitContainer2
@@ -191,8 +191,8 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.tabControl2);
-            this.splitContainer2.Size = new System.Drawing.Size(1086, 918);
-            this.splitContainer2.SplitterDistance = 726;
+            this.splitContainer2.Size = new System.Drawing.Size(956, 918);
+            this.splitContainer2.SplitterDistance = 596;
             this.splitContainer2.TabIndex = 0;
             // 
             // tabControl3
@@ -205,7 +205,7 @@
             this.tabControl3.Location = new System.Drawing.Point(0, 0);
             this.tabControl3.Name = "tabControl3";
             this.tabControl3.SelectedIndex = 0;
-            this.tabControl3.Size = new System.Drawing.Size(726, 918);
+            this.tabControl3.Size = new System.Drawing.Size(596, 918);
             this.tabControl3.TabIndex = 0;
             this.tabControl3.SelectedIndexChanged += new System.EventHandler(this.TabControl3_SelectedIndexChanged);
             // 
@@ -218,7 +218,7 @@
             this.tabPage5.Location = new System.Drawing.Point(4, 29);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(718, 885);
+            this.tabPage5.Size = new System.Drawing.Size(588, 885);
             this.tabPage5.TabIndex = 0;
             this.tabPage5.Text = "Design";
             // 
@@ -237,7 +237,7 @@
             this.tabPage6.Location = new System.Drawing.Point(4, 29);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(718, 885);
+            this.tabPage6.Size = new System.Drawing.Size(636, 885);
             this.tabPage6.TabIndex = 1;
             this.tabPage6.Text = "Source";
             this.tabPage6.UseVisualStyleBackColor = true;
@@ -249,7 +249,7 @@
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(712, 879);
+            this.textBox1.Size = new System.Drawing.Size(630, 879);
             this.textBox1.TabIndex = 0;
             this.textBox1.WordWrap = false;
             // 
@@ -258,7 +258,7 @@
             this.tabPage7.Controls.Add(this.textBox2);
             this.tabPage7.Location = new System.Drawing.Point(4, 29);
             this.tabPage7.Name = "tabPage7";
-            this.tabPage7.Size = new System.Drawing.Size(718, 885);
+            this.tabPage7.Size = new System.Drawing.Size(636, 885);
             this.tabPage7.TabIndex = 2;
             this.tabPage7.Text = "Event";
             this.tabPage7.UseVisualStyleBackColor = true;
@@ -270,7 +270,7 @@
             this.textBox2.Multiline = true;
             this.textBox2.Name = "textBox2";
             this.textBox2.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox2.Size = new System.Drawing.Size(718, 885);
+            this.textBox2.Size = new System.Drawing.Size(636, 885);
             this.textBox2.TabIndex = 0;
             this.textBox2.WordWrap = false;
             // 
@@ -449,7 +449,7 @@
         private TabPage tabPage5;
         private TabPage tabPage6;
         private ListBox listBox1;
-        private cls_form cls_design_form1;
+        private cls_user_form cls_design_form1;
         private TextBox textBox1;
         private TabPage tabPage7;
         private TextBox textBox2;
@@ -463,6 +463,6 @@
         private PropertyGrid propertyGrid1;
         private TextBox textBox3;
         private Label label1;
-        private TreeView treeView1;
+        private cls_user_treeview treeView1;
     }
 }
