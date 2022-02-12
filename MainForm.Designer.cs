@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Form");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Form");
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
@@ -160,7 +160,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 29);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(232, 885);
+            this.tabPage2.Size = new System.Drawing.Size(280, 885);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "ControlTree";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -170,11 +170,11 @@
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.Location = new System.Drawing.Point(3, 3);
             this.treeView1.Name = "treeView1";
-            treeNode1.Name = "Form";
-            treeNode1.Text = "Form";
+            treeNode2.Name = "Form";
+            treeNode2.Text = "Form";
             this.treeView1.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1});
-            this.treeView1.Size = new System.Drawing.Size(226, 879);
+            treeNode2});
+            this.treeView1.Size = new System.Drawing.Size(274, 879);
             this.treeView1.TabIndex = 0;
             // 
             // splitContainer2
@@ -237,19 +237,21 @@
             this.tabPage6.Location = new System.Drawing.Point(4, 29);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(636, 885);
+            this.tabPage6.Size = new System.Drawing.Size(588, 885);
             this.tabPage6.TabIndex = 1;
             this.tabPage6.Text = "Source";
             this.tabPage6.UseVisualStyleBackColor = true;
             // 
             // textBox1
             // 
+            this.textBox1.BackColor = System.Drawing.Color.White;
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox1.Location = new System.Drawing.Point(3, 3);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(630, 879);
+            this.textBox1.Size = new System.Drawing.Size(582, 879);
             this.textBox1.TabIndex = 0;
             this.textBox1.WordWrap = false;
             // 
@@ -258,7 +260,7 @@
             this.tabPage7.Controls.Add(this.textBox2);
             this.tabPage7.Location = new System.Drawing.Point(4, 29);
             this.tabPage7.Name = "tabPage7";
-            this.tabPage7.Size = new System.Drawing.Size(636, 885);
+            this.tabPage7.Size = new System.Drawing.Size(588, 885);
             this.tabPage7.TabIndex = 2;
             this.tabPage7.Text = "Event";
             this.tabPage7.UseVisualStyleBackColor = true;
@@ -270,7 +272,7 @@
             this.textBox2.Multiline = true;
             this.textBox2.Name = "textBox2";
             this.textBox2.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox2.Size = new System.Drawing.Size(636, 885);
+            this.textBox2.Size = new System.Drawing.Size(588, 885);
             this.textBox2.TabIndex = 0;
             this.textBox2.WordWrap = false;
             // 
