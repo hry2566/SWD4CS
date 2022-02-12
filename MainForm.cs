@@ -281,7 +281,6 @@ namespace SWD4CS
             }
             return strProperty;
         }
-
         private static string Property2Color(string color)
         {
             color = color.Replace("Color [", "").Replace("]", "");
@@ -511,6 +510,7 @@ namespace SWD4CS
                                  t == typeof(System.Windows.Forms.FormWindowState) ||
                                  t == typeof(System.Windows.Forms.FixedPanel) ||
                                  t == typeof(System.Windows.Forms.PictureBoxSizeMode) ||
+                                 t == typeof(System.Windows.Forms.View) ||
                                  t == typeof(System.Windows.Forms.FormStartPosition):
 
                     strProperty = " = " + type.ToString() + "." + str2 + ";";
