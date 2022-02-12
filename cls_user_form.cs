@@ -885,6 +885,37 @@ namespace SWD4CS
             return style;
         }
 
+        private static int? String2View(string? propertyValue)
+        {
+            int style = 0;
+
+            if (propertyValue!.IndexOf("System.Windows.Forms.View") > -1)
+            {
+                string[] split = propertyValue.Split(".");
+                propertyValue = split[split.Count() - 1];
+            }
+
+            switch (propertyValue)
+            {
+                case "Details":
+                    style = 1;
+                    break;
+                case "LargeIcon":
+                    style = 0;
+                    break;
+                case "List":
+                    style = 3;
+                    break;
+                case "SmallIcon":
+                    style = 2;
+                    break;
+                case "Tile":
+                    style = 4;
+                    break;
+            }
+            return style;
+        }
+
 
         private static void SetCtrlProperty(Control? ctrl, string? propertyName, string? propertyValue)
         {
@@ -945,6 +976,9 @@ namespace SWD4CS
                         break;
                     case Type t when t == typeof(System.Windows.Forms.PictureBoxSizeMode):
                         property.SetValue(ctrl, String2PictureBoxSizeMode(propertyValue));
+                        break;
+                    case Type t when t == typeof(System.Windows.Forms.View):
+                        property.SetValue(ctrl, String2View(propertyValue));
                         break;
                 }
             }
