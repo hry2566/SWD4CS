@@ -144,8 +144,6 @@
                 {
                     SetControlSize(newPos, move_selectbox.TabIndex);
                 }
-
-                //System.Windows.Forms.Application.DoEvents();
             }
         }
 
