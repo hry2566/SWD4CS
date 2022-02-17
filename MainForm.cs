@@ -17,6 +17,24 @@ namespace SWD4CS
             source_base = ret[0];
             source_custom = ret[1];
             cls_design_form1.Init(tabPage5, listBox1, propertyGrid1, textBox3);
+            RunCommandLine();
+        }
+
+        private void RunCommandLine()
+        {
+            string[] cmds = System.Environment.GetCommandLineArgs();
+            if (cmds.Length < 2) { return; }
+
+            List<string>[] ret = cls_file.CommandLine(cmds[1]);
+
+            if (ret[2] != null)
+            {
+                source_base = ret[0];
+                source_custom = ret[1];
+                sourceFileName = ret[2][0];
+                cls_design_form1.CtrlAllClear();
+                cls_design_form1.CreateControl(source_custom);
+            }
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
@@ -60,6 +78,8 @@ namespace SWD4CS
             {
                 cls_file.Save(textBox1.Text);
             }
+
+            Close();
         }
 
         private void CloseCToolStripMenuItem_Click(object sender, EventArgs e)
