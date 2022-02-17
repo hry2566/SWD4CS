@@ -57,6 +57,39 @@
 
             return ret;
         }
+        internal static List<string>[] CommandLine(string fName)
+        {
+            List<string> source_base = new List<string>();
+            List<string> source_custom = new List<string>();
+            List<string> fileName = new List<string>();
+            List<string>[] ret = new List<string>[3];
+            bool flag = true;
+
+            if (fName.IndexOf(".Designer.cs") == -1) { return ret; }
+
+            foreach (string line in System.IO.File.ReadLines(fName))
+            {
+                if (line.IndexOf("private void InitializeComponent()") > 1)
+                {
+                    flag = false;
+                }
+
+                if (flag)
+                {
+                    source_base.Add(line);
+                }
+                else
+                {
+                    source_custom.Add(line);
+                }
+            }
+
+            fileName.Add(fName);
+            ret[0] = source_base;
+            ret[1] = source_custom;
+            ret[2] = fileName;
+            return ret;
+        }
         internal static List<string>[] OpenFile()
         {
             List<string> source_base = new List<string>();
