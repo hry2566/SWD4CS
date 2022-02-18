@@ -1,4 +1,5 @@
-﻿namespace SWD4CS
+﻿
+namespace SWD4CS
 {
     internal class cls_file
     {
@@ -57,17 +58,93 @@
 
             return ret;
         }
+
+        internal static void WriteIni(MainForm form, string fileName, SplitContainer splitContainer1, SplitContainer splitContainer2)
+        {
+            string[] split = Application.ExecutablePath.Split("/");
+            if (split.Length == 1)
+            {
+                split = Application.ExecutablePath.Split("\\");
+            }
+            string filePath = Application.ExecutablePath.Replace(split[split.Length - 1], "") + fileName;
+            string line = "";
+            line += "WndPos.X:" + form.Left.ToString() + "\n";
+            line += "WndPos.Y:" + form.Top.ToString() + "\n";
+            line += "WndSize.Width:" + form.Width.ToString() + "\n";
+            line += "WndSize.Height:" + form.Height.ToString() + "\n";
+            line += "SplitContainer1.SplitDistance:" + splitContainer1.SplitterDistance.ToString() + "\n";
+            line += "SplitContainer2.SplitDistance:" + splitContainer2.SplitterDistance.ToString() + "\n";
+
+            File.WriteAllText(filePath, line);
+        }
+
+        internal static void ReadIni(MainForm form, string fileName, SplitContainer splitContainer1, SplitContainer splitContainer2)
+        {
+            string[] split = Application.ExecutablePath.Split("/");
+            if (split.Length == 1)
+            {
+                split = Application.ExecutablePath.Split("\\");
+            }
+
+            string filePath = Application.ExecutablePath.Replace(split[split.Length - 1], "") + fileName;
+            if (!System.IO.File.Exists(filePath)) { return; }
+            form.StartPosition = FormStartPosition.Manual;
+
+            foreach (string line in System.IO.File.ReadLines(filePath))
+            {
+                split = line.Split(":");
+                switch (split[0])
+                {
+                    case "WndPos.X":
+                        form.Left = int.Parse(split[1]);
+                        break;
+                    case "WndPos.Y":
+                        form.Top = int.Parse(split[1]);
+                        break;
+                    case "WndSize.Width":
+                        form.Width = int.Parse(split[1]);
+                        break;
+                    case "WndSize.Height":
+                        form.Height = int.Parse(split[1]);
+                        break;
+                    case "SplitContainer1.SplitDistance":
+                        splitContainer1.SplitterDistance = int.Parse(split[1]);
+                        break;
+                    case "SplitContainer2.SplitDistance":
+                        splitContainer2.SplitterDistance = int.Parse(split[1]);
+                        break;
+                }
+            }
+        }
         internal static List<string>[] CommandLine(string fName)
+        {
+            if (fName.IndexOf(".Designer.cs") == -1) { return new List<string>[3]; }
+            return ReadCode(fName);
+        }
+        internal static List<string>[] OpenFile()
+        {
+            OpenFileDialog dlg = new()
+            {
+                InitialDirectory = @"C:\",
+                Filter = "Designer.csファイル(*.Designer.cs;*.Designer.cs)|*.Designer.cs;*.Designer.cs",
+                FilterIndex = 1,
+                Title = "開くファイルを選択してください",
+                RestoreDirectory = true
+            };
+            if (dlg.ShowDialog() != DialogResult.OK) { return new List<string>[3]; }
+            return ReadCode(dlg.FileName);
+        }
+
+        private static List<string>[] ReadCode(string filePath)
         {
             List<string> source_base = new List<string>();
             List<string> source_custom = new List<string>();
             List<string> fileName = new List<string>();
             List<string>[] ret = new List<string>[3];
+
             bool flag = true;
 
-            if (fName.IndexOf(".Designer.cs") == -1) { return ret; }
-
-            foreach (string line in System.IO.File.ReadLines(fName))
+            foreach (string line in System.IO.File.ReadLines(filePath))
             {
                 if (line.IndexOf("private void InitializeComponent()") > 1)
                 {
@@ -84,57 +161,11 @@
                 }
             }
 
-            fileName.Add(fName);
+            fileName.Add(filePath);
+
             ret[0] = source_base;
             ret[1] = source_custom;
             ret[2] = fileName;
-            return ret;
-        }
-        internal static List<string>[] OpenFile()
-        {
-            List<string> source_base = new List<string>();
-            List<string> source_custom = new List<string>();
-            List<string> fileName = new List<string>();
-            List<string>[] ret = new List<string>[3];
-
-            OpenFileDialog dlg = new()
-            {
-                InitialDirectory = @"C:\",
-                Filter = "Designer.csファイル(*.Designer.cs;*.Designer.cs)|*.Designer.cs;*.Designer.cs",
-                FilterIndex = 1,
-                Title = "開くファイルを選択してください",
-                RestoreDirectory = true
-            };
-
-
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                bool flag = true;
-
-                foreach (string line in System.IO.File.ReadLines(dlg.FileName))
-                {
-                    if (line.IndexOf("private void InitializeComponent()") > 1)
-                    {
-                        flag = false;
-                    }
-
-                    if (flag)
-                    {
-                        source_base.Add(line);
-                    }
-                    else
-                    {
-                        source_custom.Add(line);
-                    }
-                }
-
-                fileName.Add(dlg.FileName);
-
-                ret[0] = source_base;
-                ret[1] = source_custom;
-                ret[2] = fileName;
-            }
-
             return ret;
         }
 
