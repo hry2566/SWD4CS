@@ -17,16 +17,27 @@ namespace SWD4CS
             source_base = ret[0];
             source_custom = ret[1];
             cls_design_form1.Init(tabPage5, listBox1, propertyGrid1, textBox3);
+
+            cls_file.ReadIni(this, "SWD4CS.ini", splitContainer1, splitContainer2);
             RunCommandLine();
+
+            Application.ApplicationExit += new EventHandler(AppExit);
+        }
+
+        private void AppExit(object? sender, EventArgs e)
+        {
+            cls_file.WriteIni(this, "SWD4CS.ini", splitContainer1, splitContainer2);
         }
 
         private void RunCommandLine()
         {
             string[] cmds = System.Environment.GetCommandLineArgs();
             if (cmds.Length < 2) { return; }
+            GetCode(cls_file.CommandLine(cmds[1]));
+        }
 
-            List<string>[] ret = cls_file.CommandLine(cmds[1]);
-
+        private void GetCode(List<string>[] ret)
+        {
             if (ret[2] != null)
             {
                 source_base = ret[0];
@@ -53,16 +64,7 @@ namespace SWD4CS
 
         private void ReadrToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            List<string>[] ret = cls_file.OpenFile();
-
-            if (ret[2] != null)
-            {
-                source_base = ret[0];
-                source_custom = ret[1];
-                sourceFileName = ret[2][0];
-                cls_design_form1.CtrlAllClear();
-                cls_design_form1.CreateControl(source_custom);
-            }
+            GetCode(cls_file.OpenFile());
         }
 
         private void SaveSToolStripMenuItem_Click(object sender, EventArgs e)
