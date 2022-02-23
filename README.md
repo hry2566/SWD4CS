@@ -19,7 +19,7 @@
  https://youtu.be/FkDaMW4hGyk
  
 ## ブログ
- https://danpapa-hry.hateblo.jp/entry/2022/01/01/211917
+ https://danpapa-hry.hateblo.jp/entry/2022/02/23/210416
  
 ## 実装
  ・ポトペタ  
