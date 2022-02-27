@@ -13,12 +13,15 @@ namespace SWD4CS
         private ListBox? toolList;
         private PropertyGrid propertyGrid;
         private TextBox? propertyCtrlName;
+        private cls_user_datagridview? eventView;
         private bool selectFlag;
         private bool changeFlag;
         private Point memPos;
         private int grid = 8;
+        internal List<string> decHandler = new();
+        internal List<string> decFunc = new();
 
-        public cls_control(cls_user_form form, string className, Control parent, Control backPanel, ListBox? toolList, PropertyGrid propertyGrid, TextBox propertyCtrlName, int X, int Y)
+        public cls_control(cls_user_form form, string className, Control parent, Control backPanel, ListBox? toolList, PropertyGrid propertyGrid, TextBox propertyCtrlName, cls_user_datagridview eventView, int X, int Y)
         {
             this.form = form;
             this.className = className;
@@ -27,6 +30,7 @@ namespace SWD4CS
             this.toolList = toolList;
             this.propertyGrid = propertyGrid;
             this.propertyCtrlName = propertyCtrlName;
+            this.eventView = eventView;
 
             if (Init(className))
             {
@@ -41,8 +45,8 @@ namespace SWD4CS
 
                 if (this.ctrl is TabControl)
                 {
-                    _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyGrid!, propertyCtrlName, X, Y);
-                    _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyGrid!, propertyCtrlName, X, Y);
+                    _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyGrid!, propertyCtrlName, eventView, X, Y);
+                    _ = new cls_control(form, "TabPage", this.ctrl!, backPanel!, toolList, propertyGrid!, propertyCtrlName, eventView, X, Y);
                 }
 
                 if (this.ctrl is TabPage)
@@ -130,11 +134,11 @@ namespace SWD4CS
             {
                 if (splitpanel == null)
                 {
-                    _ = new cls_control(form, toolList!.Text, this.ctrl!, backPanel!, toolList, propertyGrid!, propertyCtrlName!, X, Y);
+                    _ = new cls_control(form, toolList!.Text, this.ctrl!, backPanel!, toolList, propertyGrid!, propertyCtrlName!, eventView!, X, Y);
                 }
                 else
                 {
-                    _ = new cls_control(form, toolList!.Text, splitpanel!, backPanel!, toolList, propertyGrid!, propertyCtrlName!, X, Y);
+                    _ = new cls_control(form, toolList!.Text, splitpanel!, backPanel!, toolList, propertyGrid!, propertyCtrlName!, eventView!, X, Y);
                 }
             }
             toolList!.SelectedIndex = -1;
@@ -175,6 +179,7 @@ namespace SWD4CS
                     selectBox!.SetSelectBoxPos(value);
                 }
                 ShowProperty(value);
+                eventView!.ShowEventList(value, this);
             }
             get
             {
