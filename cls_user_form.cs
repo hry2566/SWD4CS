@@ -13,6 +13,9 @@ namespace SWD4CS
         private bool selectFlag = false;
         private int grid = 8;
         internal Form memForm = new();
+        private cls_user_datagridview? eventView;
+        internal List<string> decHandler = new();
+        internal List<string> decFunc = new();
 
         // ****************************************************************************************
         // コントロール追加時に下記を編集すること
@@ -160,12 +163,13 @@ namespace SWD4CS
             InitializeComponent();
         }
 
-        internal void Init(Control backPanel, ListBox toolList, PropertyGrid propertyGrid, TextBox propertyCtrlName)
+        internal void Init(Control backPanel, ListBox toolList, PropertyGrid propertyGrid, TextBox propertyCtrlName, cls_user_datagridview eventView)
         {
             this.backPanel = backPanel;
             this.toolList = toolList;
             this.propertyGrid = propertyGrid;
             this.propertyCtrlName = propertyCtrlName;
+            this.eventView = eventView;
             this.Click += new System.EventHandler(Form_Click);
 
             backPanel.Click += new System.EventHandler(Backpanel_Click);
@@ -253,6 +257,7 @@ namespace SWD4CS
             selectFlag = flag;
             selectBox!.SetSelectBoxPos(selectFlag);
             ShowProperty(flag);
+            eventView!.ShowEventList(flag, this);
         }
 
         private void ShowProperty(bool flag)
@@ -294,7 +299,7 @@ namespace SWD4CS
 
                 int X = (int)(me.X / grid) * grid;
                 int Y = (int)(me.Y / grid) * grid;
-                _ = new cls_control(this, toolList!.Text, this, backPanel!, toolList, propertyGrid!, propertyCtrlName!, X, Y);
+                _ = new cls_control(this, toolList!.Text, this, backPanel!, toolList, propertyGrid!, propertyCtrlName!, eventView!, X, Y);
                 toolList.SelectedIndex = -1;
             }
         }
@@ -400,7 +405,7 @@ namespace SWD4CS
 
             if (strParent == "")
             {
-                _ = new cls_control(this, ctrlClass, this, backPanel!, toolList, propertyGrid!, propertyCtrlName!, 0, 0);
+                _ = new cls_control(this, ctrlClass, this, backPanel!, toolList, propertyGrid!, propertyCtrlName!, eventView!, 0, 0);
             }
             else
             {
@@ -435,7 +440,7 @@ namespace SWD4CS
             {
                 if (CtrlItems[k].ctrl!.Name == strParent)
                 {
-                    _ = new cls_control(this, ctrlClass, CtrlItems[k].ctrl!, backPanel!, toolList, propertyGrid!, propertyCtrlName!, 0, 0);
+                    _ = new cls_control(this, ctrlClass, CtrlItems[k].ctrl!, backPanel!, toolList, propertyGrid!, propertyCtrlName!, eventView!, 0, 0);
                     break;
                 }
             }
@@ -455,13 +460,13 @@ namespace SWD4CS
                     {
                         splpanel = splcontainer!.Panel1;
                         splpanel.Name = splcontainer.Name + ".Panel1";
-                        _ = new cls_control(this, ctrlClass, splcontainer!.Panel1, backPanel!, toolList, propertyGrid!, propertyCtrlName!, 0, 0);
+                        _ = new cls_control(this, ctrlClass, splcontainer!.Panel1, backPanel!, toolList, propertyGrid!, propertyCtrlName!, eventView!, 0, 0);
                     }
                     else
                     {
                         splpanel = splcontainer!.Panel2;
                         splpanel.Name = splcontainer.Name + ".Panel2";
-                        _ = new cls_control(this, ctrlClass, splcontainer!.Panel2, backPanel!, toolList, propertyGrid!, propertyCtrlName!, 0, 0);
+                        _ = new cls_control(this, ctrlClass, splcontainer!.Panel2, backPanel!, toolList, propertyGrid!, propertyCtrlName!, eventView!, 0, 0);
                     }
                     break;
                 }
