@@ -1,3 +1,4 @@
+
 using System.Reflection;
 
 namespace SWD4CS
@@ -16,7 +17,7 @@ namespace SWD4CS
 
             source_base = ret[0];
             source_custom = ret[1];
-            cls_design_form1.Init(tabPage5, listBox1, propertyGrid1, textBox3);
+            cls_design_form1.Init(tabPage5, listBox1, propertyGrid1, textBox3, cls_user_datagridview1);
 
             cls_file.ReadIni(this, "SWD4CS.ini", splitContainer1, splitContainer2);
             RunCommandLine();
@@ -43,6 +44,8 @@ namespace SWD4CS
                 source_base = ret[0];
                 source_custom = ret[1];
                 sourceFileName = ret[2][0];
+                cls_design_form1.decHandler = new();
+                cls_design_form1.decFunc = new();
                 cls_design_form1.CtrlAllClear();
                 cls_design_form1.CreateControl(source_custom);
             }
@@ -91,10 +94,15 @@ namespace SWD4CS
 
         private void TabControl3_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (tabControl3.SelectedIndex == 1)
+            switch (tabControl3.SelectedIndex)
             {
-                InitSourceCode();
-                textBox1.Text = CreateSourcecCode();
+                case 1:
+                    InitSourceCode();
+                    textBox1.Text = CreateSourcecCode();
+                    break;
+                case 2:
+                    textBox2.Text = CreateEventCode();
+                    break;
             }
         }
 
@@ -502,7 +510,6 @@ namespace SWD4CS
             //Console.WriteLine(item.Name);
             //Console.WriteLine(type);
 
-
             switch (type)
             {
                 case Type t when t == typeof(System.Drawing.Point):
@@ -543,7 +550,68 @@ namespace SWD4CS
             }
             return strProperty;
         }
+        private string CreateEventCode()
+        {
+            List<string> decHandler = new();
+            List<string> decFunc = new();
+
+            for (int i = 0; i < cls_design_form1.decHandler.Count; i++)
+            {
+                decHandler.Add(cls_design_form1.decHandler[i]);
+                decFunc.Add(cls_design_form1.decFunc[i]);
+            }
+
+            for (int j = 0; j < cls_design_form1.CtrlItems.Count; j++)
+            {
+                for (int i = 0; i < cls_design_form1.CtrlItems[j].decHandler.Count; i++)
+                {
+                    decHandler.Add(cls_design_form1.CtrlItems[j].decHandler[i]);
+                    decFunc.Add(cls_design_form1.CtrlItems[j].decFunc[i]);
+                }
+            }
+
+            if (decHandler.Count == 0) { return ""; }
+
+            string[] split = CreateSourcecCode().Split(Environment.NewLine);
+            string eventSource = "";
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (eventSource == "")
+                {
+                    eventSource = split[i];
+                }
+                else
+                {
+                    eventSource += Environment.NewLine + split[i];
+                }
+            }
+
+            eventSource += Environment.NewLine;
+            eventSource += "    private void InitializeEvents()" + Environment.NewLine;
+            eventSource += "    {" + Environment.NewLine;
 
 
+            for (int i = 0; i < decHandler.Count; i++)
+            {
+                eventSource += "        " + decHandler[i] + Environment.NewLine;
+            }
+
+            eventSource += "    }" + Environment.NewLine;
+            eventSource += Environment.NewLine;
+
+            for (int i = 0; i < decFunc.Count; i++)
+            {
+                eventSource += "    " + decFunc[i] + Environment.NewLine;
+                eventSource += "    {" + Environment.NewLine;
+                eventSource += Environment.NewLine;
+                eventSource += "    }" + Environment.NewLine;
+                eventSource += Environment.NewLine;
+            }
+
+            eventSource += "}" + Environment.NewLine;
+
+            return eventSource;
+        }
     }
 }
