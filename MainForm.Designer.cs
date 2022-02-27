@@ -49,6 +49,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.cls_user_datagridview1 = new SWD4CS.cls_user_datagridview();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.readrToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -73,6 +74,8 @@
             this.tabPage7.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            this.tabPage4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.cls_user_datagridview1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -226,7 +229,7 @@
             // 
             this.cls_design_form1.BackColor = System.Drawing.Color.WhiteSmoke;
             this.cls_design_form1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.cls_design_form1.Location = new System.Drawing.Point(12, 12);
+            this.cls_design_form1.Location = new System.Drawing.Point(6, 6);
             this.cls_design_form1.Name = "cls_design_form1";
             this.cls_design_form1.Size = new System.Drawing.Size(480, 400);
             this.cls_design_form1.TabIndex = 0;
@@ -331,13 +334,26 @@
             // 
             // tabPage4
             // 
+            this.tabPage4.Controls.Add(this.cls_user_datagridview1);
             this.tabPage4.Location = new System.Drawing.Point(4, 29);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage4.Size = new System.Drawing.Size(348, 885);
             this.tabPage4.TabIndex = 1;
-            this.tabPage4.Text = "Action";
+            this.tabPage4.Text = "Events";
             this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // cls_user_datagridview1
+            // 
+            this.cls_user_datagridview1.AllowUserToAddRows = false;
+            this.cls_user_datagridview1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.cls_user_datagridview1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cls_user_datagridview1.Location = new System.Drawing.Point(3, 3);
+            this.cls_user_datagridview1.Name = "cls_user_datagridview1";
+            this.cls_user_datagridview1.RowHeadersWidth = 51;
+            this.cls_user_datagridview1.RowTemplate.Height = 29;
+            this.cls_user_datagridview1.Size = new System.Drawing.Size(342, 879);
+            this.cls_user_datagridview1.TabIndex = 0;
             // 
             // menuStrip1
             // 
@@ -430,6 +446,8 @@
             this.tabControl2.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
+            this.tabPage4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.cls_user_datagridview1)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -466,5 +484,6 @@
         private TextBox textBox3;
         private Label label1;
         private cls_user_treeview treeView1;
+        private cls_user_datagridview cls_user_datagridview1;
     }
 }
