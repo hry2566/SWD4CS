@@ -1,617 +1,432 @@
-
 using System.Reflection;
 
 namespace SWD4CS
 {
     public partial class MainForm : Form
     {
-        private List<string> source_base = new();
-        private List<string> source_custom = new();
+        private FILE_INFO fileInfo;
+        internal PropertyGrid propertyGrid;
+        internal TextBox propertyCtrlName;
+        internal ListBox toolLstBox;
+        internal TreeView ctrlTree;
         private string sourceFileName = "";
+
 
         public MainForm()
         {
             InitializeComponent();
+            cls_controls.AddToolList(ctrlLstBox);
 
-            List<string>[] ret = cls_file.NewFile();
+            propertyGrid = propertyBox;
+            propertyCtrlName = nameTxtBox;
+            toolLstBox = ctrlLstBox;
+            this.ctrlTree = ctrlTreeView;
+            userForm.Init(this, designePage);
 
-            source_base = ret[0];
-            source_custom = ret[1];
-            cls_design_form1.Init(tabPage5, listBox1, propertyGrid1, textBox3, cls_user_datagridview1);
-
-            cls_file.ReadIni(this, "SWD4CS.ini", splitContainer1, splitContainer2);
+            cls_file.ReadIni(this, "SWD4CS.ini", mainWndSplitContainer, subWndSplitContainer);
             RunCommandLine();
 
             Application.ApplicationExit += new EventHandler(AppExit);
         }
-
         private void AppExit(object? sender, EventArgs e)
         {
-            cls_file.WriteIni(this, "SWD4CS.ini", splitContainer1, splitContainer2);
+            cls_file.WriteIni(this, "SWD4CS.ini", mainWndSplitContainer, subWndSplitContainer);
         }
-
         private void RunCommandLine()
         {
             string[] cmds = System.Environment.GetCommandLineArgs();
             if (cmds.Length < 2) { return; }
-            GetCode(cls_file.CommandLine(cmds[1]));
+            fileInfo = cls_file.CommandLine(cmds[1]);
+            sourceFileName = fileInfo.source_FileName;
+            logTxtBox.Text = "";
+            userForm.AddControl(fileInfo.ctrlInfo);
         }
-
-        private void GetCode(List<string>[] ret)
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (ret[2] != null)
+            fileInfo = cls_file.OpenFile();
+            sourceFileName = fileInfo.source_FileName;
+            logTxtBox.Text = "";
+            userForm.AddControl(fileInfo.ctrlInfo);
+        }
+        internal void AddLog(string log)
+        {
+            if (logTxtBox.Text == "")
             {
-                source_base = ret[0];
-                source_custom = ret[1];
-                sourceFileName = ret[2][0];
-                cls_design_form1.decHandler = new();
-                cls_design_form1.decFunc = new();
-                cls_design_form1.CtrlAllClear();
-                cls_design_form1.CreateControl(source_custom);
+                logTxtBox.Text = log;
+            }
+            else
+            {
+                logTxtBox.Text += "\r\n" + log;
             }
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Alt && e.KeyCode == Keys.Delete && tabControl3.SelectedIndex == 0)
+            if (e.Alt && e.KeyCode == Keys.Delete && designeTab.SelectedIndex == 0)
             {
-                cls_design_form1.RemoveSelectedItem();
+                userForm.RemoveSelectedItem();
             }
         }
 
-        private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            KeyEventArgs keyevents = new(Keys.Alt | Keys.Delete);
-            MainForm_KeyDown(sender, keyevents);
-        }
-
-        private void ReadrToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            GetCode(cls_file.OpenFile());
-        }
-
-        private void SaveSToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            tabControl3.SelectedIndex = 1;
-            tabControl3.SelectedIndex = 0;
+            designeTab.SelectedIndex = 1;
+            designeTab.SelectedIndex = 0;
 
             if (sourceFileName != "")
             {
-                cls_file.SaveAs(sourceFileName, textBox1.Text);
+                cls_file.SaveAs(sourceFileName, sourceTxtBox.Text);
             }
             else
             {
-                cls_file.Save(textBox1.Text);
+                cls_file.Save(sourceTxtBox.Text);
             }
 
             Close();
         }
 
-        private void CloseCToolStripMenuItem_Click(object sender, EventArgs e)
+        private void designeTab_SelectedIndexChanged(object sender, EventArgs e)
         {
-            this.Close();
-        }
-
-        private void TabControl3_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            switch (tabControl3.SelectedIndex)
+            switch (designeTab.SelectedIndex)
             {
                 case 1:
-                    InitSourceCode();
-                    textBox1.Text = CreateSourcecCode();
+                    if (fileInfo.source_base == null)
+                    {
+                        fileInfo.source_base = cls_file.NewFile();
+                    }
+                    sourceTxtBox.Text = CreateSourcecCode();
                     break;
                 case 2:
-                    textBox2.Text = CreateEventCode();
+                    //textBox2.Text = CreateEventCode();
                     break;
             }
         }
-
-        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (tabControl1.SelectedIndex == 1)
-            {
-                treeView1.ControlViewShow(cls_design_form1);
-            }
-        }
-
-        private void InitSourceCode()
-        {
-            bool flag = false;
-
-            for (int i = 2; i < source_custom.Count; i++)
-            {
-                source_custom.RemoveAt(i);
-                if (source_custom[i] == "    }")
-                {
-                    break;
-                }
-                i--;
-            }
-
-            for (int i = 0; i < source_custom.Count; i++)
-            {
-                if (source_custom[i] == "}" && flag)
-                {
-                    flag = false;
-                }
-
-                if (flag)
-                {
-                    source_custom.RemoveAt(i);
-                    i--;
-                }
-
-                if (source_custom[i] == "    #endregion")
-                {
-                    flag = true;
-                }
-            }
-        }
-
         private string CreateSourcecCode()
         {
             string source = "";
-            int insertPos = 2;
-            int insertPos2 = 0;
-            int itemCount = cls_design_form1.CtrlItems!.Count;
+            List<string> lstSuspend = new();
+            List<string> lstResume = new();
+            string space = "";
 
-            source_custom.Insert(insertPos, "        //");
-            insertPos++;
-            source_custom.Insert(insertPos, "        // Form1");
-            insertPos++;
-            source_custom.Insert(insertPos, "        //");
-            insertPos++;
-            source_custom.Insert(insertPos, "        this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);");
-            insertPos++;
-            source_custom.Insert(insertPos, "        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;");
-            insertPos++;
-
-            foreach (PropertyInfo item in cls_design_form1!.memForm.GetType().GetProperties())
+            if (fileInfo.source_base[0].IndexOf(";") == -1)
             {
-                if (cls_control.HideProperty(item.Name))
-                {
-                    Control? baseForm = new Form();
-                    Control memForm = cls_design_form1.memForm as Control;
-
-                    if (item.GetValue(memForm) != null && item.GetValue(baseForm) != null)
-                    {
-                        if (item.Name == "Size")
-                        {
-                            Type type = item.GetValue(memForm)!.GetType();
-                            Size size = memForm.ClientSize;
-                            string str1 = "        this.ClientSize = new " + type.ToString() + "(" + size.Width + "," + size.Height + ");";
-                            source_custom.Insert(insertPos, str1);
-                            insertPos++;
-                        }
-                        else
-                        {
-                            if (item.GetValue(memForm)!.ToString() != item.GetValue(baseForm)!.ToString())
-                            {
-                                string str1 = "        this." + item.Name;
-                                string strProperty = Property2String(memForm, item);
-
-                                if (strProperty != "")
-                                {
-                                    source_custom.Insert(insertPos, str1 + strProperty);
-                                    insertPos++;
-                                }
-                            }
-                        }
-
-                    }
-                }
+                space = space.PadLeft(8);
+            }
+            else
+            {
+                space = space.PadLeft(4);
             }
 
-            source_custom.Insert(insertPos, "");
-            insertPos++;
+            source = CreateCode_Instance(source, space);
+            source = CreateCode_Suspend_Resume(source, lstSuspend, lstResume, space);
 
-            for (int i = 0; i < itemCount; i++)
+            // suspend
+            for (int i = 0; i < lstSuspend.Count; i++)
             {
-                cls_control ctrl = cls_design_form1.CtrlItems[i];
-                string ctrlClass = ctrl.className;
-                string parentName = "." + ctrl.parent!.Name;
-
-                if (parentName == ".cls_design_form1")
-                {
-                    parentName = "";
-                }
-
-                source_custom.Insert(insertPos, "        //");
-                insertPos++;
-                source_custom.Insert(insertPos, "        // " + ctrl!.ctrl!.Name);
-                insertPos++;
-                source_custom.Insert(insertPos, "        //");
-                insertPos++;
-                source_custom.Insert(insertPos, "        this." + ctrl.ctrl.Name + " = new System.Windows.Forms." + ctrlClass + "();");
-                insertPos++;
-
-                List<string> menStr1 = new();
-                List<string> memProperty = new();
-                foreach (PropertyInfo item in ctrl.ctrl!.GetType().GetProperties())
-                {
-                    if (cls_control.HideProperty(item.Name))
-                    {
-                        Control? baseCtrl = cls_user_form.GetBaseCtrl(ctrl);
-
-                        if (item.GetValue(ctrl.ctrl) != null && item.GetValue(baseCtrl) != null)
-                        {
-                            if (item.GetValue(ctrl.ctrl)!.ToString() != item.GetValue(baseCtrl)!.ToString())
-                            {
-                                string str1 = "        this." + ctrl!.ctrl!.Name + "." + item.Name;
-                                string strProperty = Property2String(ctrl.ctrl, item);
-
-                                if (item.Name == "SplitterDistance" || item.Name == "Anchor")
-                                {
-                                    menStr1.Add(str1);
-                                    memProperty.Add(strProperty);
-                                    strProperty = "";
-                                }
-                                else if (strProperty != "")
-                                {
-                                    source_custom.Insert(insertPos, str1 + strProperty);
-                                    insertPos++;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                for (int j = 0; j < memProperty.Count; j++)
-                {
-                    source_custom.Insert(insertPos, menStr1[j] + memProperty[j]);
-                    insertPos++;
-                }
-
-                source_custom.Insert(insertPos, "        this" + parentName + ".Controls.Add(this." + ctrl!.ctrl!.Name + ");\r\n");
-                insertPos++;
-                source_custom.Insert(3 + insertPos + insertPos2, "    private " + ctrlClass + " " + ctrl!.ctrl!.Name + ";");
-                insertPos2++;
+                source += lstSuspend[i];
             }
 
-            for (int i = 0; i < source_base.Count; i++)
+            source = CreateCode_Property(source, space);
+            source = CreateCode_FormProperty(source, space);
+            source = CreateCode_FormAddControl(source, space);
+
+            // resume
+            for (int i = 0; i < lstResume.Count; i++)
             {
-                source += source_base[i] + "\r\n";
+                source += lstResume[i];
             }
-            for (int i = 0; i < source_custom.Count; i++)
+
+            source = CreateCode_Declaration(source, space);
+
+            if (fileInfo.source_base[0].IndexOf(";") == -1)
             {
-                source += source_custom[i] + "\r\n"; ;
+                source += "    }\r\n";
             }
+            source += "}\r\n";
+            source += "\r\n";
 
             return source;
         }
 
-        private string AnchorStyles2String(object? propertyinfo)
+        private string CreateCode_Declaration(string source, string space)
         {
-            string strProperty;
-            string[] split = propertyinfo!.ToString()!.Split(',');
-            Type type = propertyinfo.GetType();
-            string str2 = propertyinfo.ToString()!;
+            source += space + "}\r\n";
+            source += "\r\n";
+            source += space + "#endregion\r\n";
+            source += "\r\n";
 
-            if (split.Length == 1)
+            // declaration
+            for (int i = 0; i < userForm.CtrlItems.Count; i++)
             {
-                strProperty = " = " + type.ToString() + "." + str2 + ";";
+                string[] split = userForm.CtrlItems[i].ctrl!.GetType().ToString().Split(".");
+                string dec = split[split.Length - 1];
+                source += space + "private " + dec + " " + userForm.CtrlItems[i].ctrl!.Name + ";\r\n";
+
             }
-            else
-            {
-                string ancho = "";
+            return source;
+        }
 
-                for (int j = 0; j < split.Length; j++)
+        private string CreateCode_FormAddControl(string source, string space)
+        {
+            // AddControl
+            for (int i = 0; i < userForm.CtrlItems.Count; i++)
+            {
+                if (userForm.CtrlItems[i].ctrl!.Parent == userForm)
                 {
-                    if (j == 0)
+                    source += space + "    this.Controls.Add(this." + userForm.CtrlItems[i].ctrl!.Name + ");\r\n";
+                }
+            }
+            return source;
+        }
+
+        private string CreateCode_FormProperty(string source, string space)
+        {
+            // form-property
+            source += space + "    //\r\n";
+            source += space + "    // form\r\n";
+            source += space + "    //\r\n";
+
+
+            foreach (PropertyInfo item in userForm!.memForm.GetType().GetProperties())
+            {
+                if (cls_controls.HideProperty(item.Name))
+                {
+                    Control? baseForm = new Form();
+                    Control memForm = userForm.memForm as Control;
+
+                    if (item.GetValue(memForm) != null && item.GetValue(baseForm) != null)
                     {
-                        ancho = type.ToString() + "." + split[j].Trim();
+                        if (item.GetValue(memForm)!.ToString() != item.GetValue(baseForm)!.ToString())
+                        {
+                            string str1 = space + "    this." + item.Name;
+                            string strProperty = cls_controls.Property2String(memForm, item);
+
+                            if (strProperty != "")
+                            {
+                                source += str1 + strProperty + "\r\n";
+                            }
+                        }
+                    }
+                }
+            }
+            return source;
+        }
+
+        private string CreateCode_Property(string source, string space)
+        {
+            // Property
+            for (int i = 0; i < userForm.CtrlItems.Count; i++)
+            {
+                string memCode = "";
+                source += space + "    //\r\n";
+                source += space + "    // " + userForm.CtrlItems[i].ctrl!.Name + "\r\n";
+                source += space + "    //\r\n";
+
+                source = CreateCode_AddControl(source, space, i);
+
+                // Property
+                foreach (PropertyInfo item in userForm.CtrlItems[i].ctrl!.GetType().GetProperties())
+                {
+                    if (cls_controls.HideProperty(item.Name))
+                    {
+                        Control? baseCtrl = userForm.CtrlItems[i].GetBaseCtrl();
+                        if (item.GetValue(userForm.CtrlItems[i].ctrl) != null && item.GetValue(baseCtrl) != null)
+                        {
+                            if (item.GetValue(userForm.CtrlItems[i].ctrl)!.ToString() != item.GetValue(baseCtrl)!.ToString())
+                            {
+                                string str1 = space + "    this." + userForm.CtrlItems[i]!.ctrl!.Name + "." + item.Name;
+                                string strProperty = cls_controls.Property2String(userForm.CtrlItems[i].ctrl!, item);
+                                if (strProperty != "")
+                                {
+                                    if (item.Name != "SplitterDistance" && item.Name != "Anchor")
+                                    {
+                                        source += str1 + strProperty + "\r\n";
+                                    }
+                                    else
+                                    {
+                                        memCode += str1 + strProperty + "\r\n";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (memCode != "")
+                {
+                    source += memCode;
+                }
+            }
+            return source;
+        }
+
+        private string CreateCode_AddControl(string source, string space, int i)
+        {
+            // AddControl
+            for (int j = 0; j < userForm.CtrlItems.Count; j++)
+            {
+                if (userForm.CtrlItems[i].ctrl!.Name == userForm.CtrlItems[j].ctrl!.Parent.Name)
+                {
+                    source += space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".Controls.Add(this." + userForm.CtrlItems[j].ctrl!.Name + ");\r\n";
+                }
+                else if (userForm.CtrlItems[i].ctrl!.Name == userForm.CtrlItems[j].ctrl!.Parent.Parent.Name)
+                {
+                    if (userForm.CtrlItems[j].ctrl!.Parent.Name.IndexOf("Panel1") > -1)
+                    {
+                        source += space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".Panel1.Controls.Add(this." + userForm.CtrlItems[j].ctrl!.Name + ");\r\n";
+                    }
+                    else if (userForm.CtrlItems[j].ctrl!.Parent.Name.IndexOf("Panel2") > -1)
+                    {
+                        source += space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".Panel2.Controls.Add(this." + userForm.CtrlItems[j].ctrl!.Name + ");\r\n";
+                    }
+                }
+            }
+            return source;
+        }
+
+        private string CreateCode_Suspend_Resume(string source, List<string> lstSuspend, List<string> lstResume, string space)
+        {
+            // Suspend & resume
+            for (int i = 0; i < userForm.CtrlItems.Count; i++)
+            {
+                source += space + "    this." + userForm.CtrlItems[i].ctrl!.Name + " = new System.Windows.Forms." + userForm.CtrlItems[i].className + "();\r\n";
+                if (userForm.CtrlItems[i].className == "DataGridView" ||
+                    userForm.CtrlItems[i].className == "PictureBox" ||
+                    userForm.CtrlItems[i].className == "SplitContainer")
+                {
+                    lstSuspend.Add(space + "    ((System.ComponentModel.ISupportInitialize)(this." + userForm.CtrlItems[i].ctrl!.Name + ")).BeginInit();\r\n");
+                    lstResume.Add(space + "    ((System.ComponentModel.ISupportInitialize)(this." + userForm.CtrlItems[i].ctrl!.Name + ")).EndInit();\r\n");
+                }
+                if (userForm.CtrlItems[i].className == "GroupBox" ||
+                         userForm.CtrlItems[i].className == "Panel" ||
+                         userForm.CtrlItems[i].className == "StatusStrip" ||
+                         userForm.CtrlItems[i].className == "TabControl" ||
+                         userForm.CtrlItems[i].className == "TabPage")
+                {
+                    lstSuspend.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".SuspendLayout();\r\n");
+                    lstResume.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".ResumeLayout(false);\r\n");
+                }
+                if (userForm.CtrlItems[i].className == "SplitContainer")
+                {
+                    lstSuspend.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".Panel1.SuspendLayout();\r\n");
+                    lstSuspend.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".Panel2.SuspendLayout();\r\n");
+                    lstSuspend.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".SuspendLayout();\r\n");
+                    lstResume.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".Panel1.ResumeLayout(false);\r\n");
+                    lstResume.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".Panel2.ResumeLayout(false);\r\n");
+                    lstResume.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".ResumeLayout(false);\r\n");
+                }
+            }
+            lstSuspend.Add(space + "    this.SuspendLayout();\r\n");
+            lstResume.Add(space + "    this.ResumeLayout(false);\r\n");
+
+            return source;
+        }
+
+        private string CreateCode_Instance(string source, string space)
+        {
+            // Instance
+            for (int i = 0; i < fileInfo.source_base.Count; i++)
+            {
+                source += fileInfo.source_base[i] + "\r\n";
+            }
+            source += space + "{\r\n";
+
+            return source;
+        }
+
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            userForm.RemoveSelectedItem();
+        }
+
+        private void nameTxtBox_TextChanged(object sender, EventArgs e)
+        {
+            if (propertyGrid!.SelectedObject != null && propertyGrid.SelectedObject is Form == false)
+            {
+                Control? ctrl = propertyGrid.SelectedObject as Control;
+                ctrl!.Name = propertyCtrlName!.Text;
+            }
+        }
+
+        private void ctrlsTab_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (ctrlsTab.SelectedIndex == 1)
+            {
+                ControlViewShow(userForm);
+            }
+        }
+        private void ControlViewShow(cls_userform form)
+        {
+            ctrlTreeView.Nodes.Clear();
+            TreeNode NodeRoot = new("Form");
+            cls_treenode[] itemNode = Array.Empty<cls_treenode>();
+
+            for (int i = 0; i < form.CtrlItems.Count; i++)
+            {
+                if (form.CtrlItems[i].ctrl!.Parent == form)
+                {
+                    Array.Resize(ref itemNode, itemNode.Length + 1);
+                    if (form.CtrlItems[i].className == "SplitContainer")
+                    {
+                        itemNode[itemNode.Length - 1] = new cls_treenode(form.CtrlItems[i].ctrl!.Name + ".Panel1");
+                        Array.Resize(ref itemNode, itemNode.Length + 1);
+                        itemNode[itemNode.Length - 1] = new cls_treenode(form.CtrlItems[i].ctrl!.Name + ".Panel2");
                     }
                     else
                     {
-                        ancho = "(" + ancho + " | " + type.ToString() + "." + split[j].Trim() + ")";
+                        itemNode[itemNode.Length - 1] = new cls_treenode(form.CtrlItems[i].ctrl!.Name);
                     }
-                }
-                ancho = "(" + type.ToString() + ")" + ancho + ";";
-                strProperty = " = " + ancho;
-            }
-            return strProperty;
-        }
-        private static string Property2Color(string color)
-        {
-            color = color.Replace("Color [", "").Replace("]", "");
-            string? strSystemColor = "System.Drawing.SystemColors.";
-            string? strColor = "System.Drawing.Color.";
-            string? strRGB = "System.Drawing.Color.FromArgb(";
-
-            switch (color)
-            {
-                case "ActiveBorder":
-                case "ActiveCaption":
-                case "ActiveCaptionText":
-                case "AppWorkspace":
-                case "ButtonFace":
-                case "ButtonHighlight":
-                case "ButtonShadow":
-                case "Control":
-                case "ControlDark":
-                case "ControlDarkDark":
-                case "ControlLight":
-                case "ControlLightLight":
-                case "ControlText":
-                case "Desktop":
-                case "GradientActiveCaption":
-                case "GradientInactiveCaption":
-                case "GrayText":
-                case "Highlight":
-                case "HighlightText":
-                case "HotTrack":
-                case "InactiveBorder":
-                case "InactiveCaption":
-                case "InactiveCaptionText":
-                case "Info":
-                case "InfoText":
-                case "Menu":
-                case "MenuBar":
-                case "MenuHighlight":
-                case "MenuText":
-                case "ScrollBar":
-                case "Window":
-                case "WindowFrame":
-                case "WindowText":
-                    return strSystemColor + color;
-                case "Black":
-                case "DimGray":
-                case "Gray":
-                case "DarkGray":
-                case "Silver":
-                case "LightGray":
-                case "Gainsboro":
-                case "WhiteSmoke":
-                case "White":
-                case "RosyBrown":
-                case "IndianRed":
-                case "Brown":
-                case "Firebrick":
-                case "LightCoral":
-                case "Maroon":
-                case "DarkRed":
-                case "Red":
-                case "Snow":
-                case "MistyRose":
-                case "Salmon":
-                case "Tomato":
-                case "DarkSalmon":
-                case "Coral":
-                case "OrangeRed":
-                case "LightSalmon":
-                case "Sienna":
-                case "SeaShell":
-                case "Chocolate":
-                case "SaddleBrown":
-                case "SandyBrown":
-                case "PeachPuff":
-                case "Peru":
-                case "Linen":
-                case "Bisque":
-                case "DarkOrange":
-                case "BurlyWood":
-                case "Tan":
-                case "AntiqueWhite":
-                case "NavajoWhite":
-                case "BlanchedAlmond":
-                case "PapayaWhip":
-                case "Moccasin":
-                case "Orange":
-                case "Wheat":
-                case "OldLace":
-                case "FloralWhite":
-                case "DarkGoldenrod":
-                case "Goldenrod":
-                case "Cornsilk":
-                case "Gold":
-                case "Khaki":
-                case "LemonChiffon":
-                case "PaleGoldenrod":
-                case "DarkKhaki":
-                case "Beige":
-                case "LightGoldenrodYellow":
-                case "Olive":
-                case "Yellow":
-                case "LightYellow":
-                case "Ivory":
-                case "OliveDrab":
-                case "YellowGreen":
-                case "DarkOliveGreen":
-                case "GreenYellow":
-                case "Chartreuse":
-                case "LawnGreen":
-                case "DarkSeaGreen":
-                case "ForestGreen":
-                case "LimeGreen":
-                case "LightGreen":
-                case "PaleGreen":
-                case "DarkGreen":
-                case "Green":
-                case "Lime":
-                case "Honeydew":
-                case "SeaGreen":
-                case "MediumSeaGreen":
-                case "SpringGreen":
-                case "MintCream":
-                case "MediumSpringGreen":
-                case "MediumAquamarine":
-                case "Aquamarine":
-                case "Turquoise":
-                case "LightSeaGreen":
-                case "MediumTurquoise":
-                case "DarkSlateGray":
-                case "PaleTurquoise":
-                case "Teal":
-                case "DarkCyan":
-                case "Cyan":
-                case "Aqua":
-                case "LightCyan":
-                case "Azure":
-                case "DarkTurquoise":
-                case "CadetBlue":
-                case "PowderBlue":
-                case "LightBlue":
-                case "DeepSkyBlue":
-                case "SkyBlue":
-                case "LightSkyBlue":
-                case "SteelBlue":
-                case "AliceBlue":
-                case "DodgerBlue":
-                case "SlateGray":
-                case "LightSlateGray":
-                case "LightSteelBlue":
-                case "CornflowerBlue":
-                case "RoyalBlue":
-                case "MidnightBlue":
-                case "Lavender":
-                case "Navy":
-                case "DarkBlue":
-                case "MediumBlue":
-                case "Blue":
-                case "GhostWhite":
-                case "SlateBlue":
-                case "DarkSlateBlue":
-                case "MediumSlateBlue":
-                case "MediumPurple":
-                case "BlueViolet":
-                case "Indigo":
-                case "DarkOrchid":
-                case "DarkViolet":
-                case "MediumOrchid":
-                case "Thistle":
-                case "Plum":
-                case "Violet":
-                case "Purple":
-                case "DarkMagenta":
-                case "Fuchsia":
-                case "Magenta":
-                case "Orchid":
-                case "MediumVioletRed":
-                case "DeepPink":
-                case "HotPink":
-                case "LavenderBlush":
-                case "PaleVioletRed":
-                case "Crimson":
-                    return strColor + color;
-                default:
-                    color = color.Replace("A", "").Replace("R", "").Replace("G", "").Replace("B", "").Replace("=", "");
-                    string[] split = color.Split(",");
-                    strRGB += split[1] + "," + split[2] + "," + split[3] + ")";
-                    return strRGB;
-            }
-        }
-
-        private string Property2String(Control ctrl, PropertyInfo item)
-        {
-            string strProperty = "";
-            Type type = item.GetValue(ctrl)!.GetType();
-            string str2 = item.GetValue(ctrl)!.ToString()!;
-
-            //Console.WriteLine(item.Name);
-            //Console.WriteLine(type);
-
-            switch (type)
-            {
-                case Type t when t == typeof(System.Drawing.Point):
-                    Point point = (Point)item.GetValue(ctrl)!;
-                    strProperty = " = new " + type.ToString() + "(" + point.X + "," + point.Y + ");";
-                    break;
-                case Type t when t == typeof(System.Drawing.Size):
-                    Size size = (Size)item.GetValue(ctrl)!;
-                    strProperty = " = new " + type.ToString() + "(" + size.Width + "," + size.Height + ");";
-                    break;
-                case Type t when t == typeof(System.String):
-                    strProperty = " =  " + "\"" + str2 + "\";";
-                    break;
-                case Type t when t == typeof(System.Boolean):
-                    strProperty = " =  " + str2.ToLower() + ";";
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.AnchorStyles):
-                    strProperty = AnchorStyles2String(item.GetValue(ctrl));
-                    break;
-                case Type t when t == typeof(System.Int32):
-                    strProperty = " = " + int.Parse(str2) + ";";
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.DockStyle) ||
-                                 t == typeof(System.Drawing.ContentAlignment) ||
-                                 t == typeof(System.Windows.Forms.ScrollBars) ||
-                                 t == typeof(System.Windows.Forms.HorizontalAlignment) ||
-                                 t == typeof(System.Windows.Forms.FormWindowState) ||
-                                 t == typeof(System.Windows.Forms.FixedPanel) ||
-                                 t == typeof(System.Windows.Forms.PictureBoxSizeMode) ||
-                                 t == typeof(System.Windows.Forms.View) ||
-                                 t == typeof(System.Windows.Forms.FormStartPosition):
-
-                    strProperty = " = " + type.ToString() + "." + str2 + ";";
-                    break;
-                case Type t when t == typeof(System.Drawing.Color):
-                    strProperty = " = " + Property2Color(str2) + ";";
-                    break;
-            }
-            return strProperty;
-        }
-        private string CreateEventCode()
-        {
-            List<string> decHandler = new();
-            List<string> decFunc = new();
-
-            for (int i = 0; i < cls_design_form1.decHandler.Count; i++)
-            {
-                decHandler.Add(cls_design_form1.decHandler[i]);
-                decFunc.Add(cls_design_form1.decFunc[i]);
-            }
-
-            for (int j = 0; j < cls_design_form1.CtrlItems.Count; j++)
-            {
-                for (int i = 0; i < cls_design_form1.CtrlItems[j].decHandler.Count; i++)
-                {
-                    decHandler.Add(cls_design_form1.CtrlItems[j].decHandler[i]);
-                    decFunc.Add(cls_design_form1.CtrlItems[j].decFunc[i]);
-                }
-            }
-
-            if (decHandler.Count == 0) { return ""; }
-
-            string[] split = CreateSourcecCode().Split(Environment.NewLine);
-            string eventSource = "";
-
-            for (int i = 0; i < 4; i++)
-            {
-                if (eventSource == "")
-                {
-                    eventSource = split[i];
                 }
                 else
                 {
-                    eventSource += Environment.NewLine + split[i];
+                    for (int j = 0; j < itemNode.Length; j++)
+                    {
+                        cls_treenode? retNode = itemNode[j].Search(form.CtrlItems[i].ctrl!.Parent.Name);
+                        if (retNode != null)
+                        {
+                            retNode.Add(form.CtrlItems[i].ctrl!.Name, form.CtrlItems[i].className!);
+                            break;
+                        }
+                    }
                 }
             }
 
-            eventSource += Environment.NewLine;
-            eventSource += "    private void InitializeEvents()" + Environment.NewLine;
-            eventSource += "    {" + Environment.NewLine;
-
-
-            for (int i = 0; i < decHandler.Count; i++)
+            if (itemNode.Length > 0)
             {
-                eventSource += "        " + decHandler[i] + Environment.NewLine;
+                NodeRoot.Nodes.AddRange(itemNode);
             }
 
-            eventSource += "    }" + Environment.NewLine;
-            eventSource += Environment.NewLine;
+            ctrlTreeView.Nodes.Add(NodeRoot);
+            ctrlTreeView.TopNode.Expand();
+        }
 
-            for (int i = 0; i < decFunc.Count; i++)
+        private void ctrlTreeView_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if (ctrlTree.SelectedNode == null) { return; }
+            string ctrlName = ctrlTree.SelectedNode.Text;
+
+            if (ctrlName == "Form")
             {
-                eventSource += "    " + decFunc[i] + Environment.NewLine;
-                eventSource += "    {" + Environment.NewLine;
-                eventSource += Environment.NewLine;
-                eventSource += "    }" + Environment.NewLine;
-                eventSource += Environment.NewLine;
+                userForm.SelectAllClear();
+                userForm.SetSelect(true);
             }
-
-            eventSource += "}" + Environment.NewLine;
-
-            return eventSource;
+            else
+            {
+                for (int i = 0; i < userForm.CtrlItems.Count; i++)
+                {
+                    if (userForm.CtrlItems[i].ctrl!.Name == ctrlName && !userForm.CtrlItems[i].Selected)
+                    {
+                        userForm.SelectAllClear();
+                        userForm.CtrlItems[i].Selected = true;
+                        break;
+                    }
+                }
+            }
+            ctrlTree.Focus();
         }
     }
 }
