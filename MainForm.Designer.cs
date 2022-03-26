@@ -41,6 +41,7 @@
             this.sourcePage = new System.Windows.Forms.TabPage();
             this.sourceTxtBox = new System.Windows.Forms.TextBox();
             this.eventsPage = new System.Windows.Forms.TabPage();
+            this.eventTxtBox = new System.Windows.Forms.TextBox();
             this.logPage = new System.Windows.Forms.TabPage();
             this.logTxtBox = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
@@ -58,7 +59,6 @@
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.eventTxtBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.mainWndSplitContainer)).BeginInit();
             this.mainWndSplitContainer.Panel1.SuspendLayout();
             this.mainWndSplitContainer.Panel2.SuspendLayout();
@@ -248,6 +248,19 @@
             this.eventsPage.Text = "Events";
             this.eventsPage.UseVisualStyleBackColor = true;
             // 
+            // eventTxtBox
+            // 
+            this.eventTxtBox.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.eventTxtBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.eventTxtBox.Location = new System.Drawing.Point(3, 3);
+            this.eventTxtBox.Multiline = true;
+            this.eventTxtBox.Name = "eventTxtBox";
+            this.eventTxtBox.ReadOnly = true;
+            this.eventTxtBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.eventTxtBox.Size = new System.Drawing.Size(507, 565);
+            this.eventTxtBox.TabIndex = 0;
+            this.eventTxtBox.WordWrap = false;
+            // 
             // logPage
             // 
             this.logPage.Controls.Add(this.logTxtBox);
@@ -331,7 +344,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 29);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(259, 571);
+            this.tabPage4.Size = new System.Drawing.Size(259, 567);
             this.tabPage4.TabIndex = 1;
             this.tabPage4.Text = "Events";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -345,7 +358,7 @@
             this.evtGridView.Name = "evtGridView";
             this.evtGridView.RowHeadersWidth = 51;
             this.evtGridView.RowTemplate.Height = 29;
-            this.evtGridView.Size = new System.Drawing.Size(253, 565);
+            this.evtGridView.Size = new System.Drawing.Size(253, 561);
             this.evtGridView.TabIndex = 0;
             // 
             // statusStrip1
@@ -410,21 +423,9 @@
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(136, 26);
-            this.deleteToolStripMenuItem.Text = "Delete";
-            // 
-            // eventTxtBox
-            // 
-            this.eventTxtBox.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.eventTxtBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.eventTxtBox.Location = new System.Drawing.Point(3, 3);
-            this.eventTxtBox.Multiline = true;
-            this.eventTxtBox.Name = "eventTxtBox";
-            this.eventTxtBox.ReadOnly = true;
-            this.eventTxtBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.eventTxtBox.Size = new System.Drawing.Size(507, 565);
-            this.eventTxtBox.TabIndex = 0;
-            this.eventTxtBox.WordWrap = false;
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.deleteToolStripMenuItem.Text = "Delete (Alt + Del)";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click_1);
             // 
             // MainForm
             // 
