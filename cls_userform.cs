@@ -11,6 +11,8 @@ namespace SWD4CS
         internal Form memForm = new();
         internal TabPage? backPanel;
         private int grid = 8;
+        internal List<string> decHandler = new();
+        internal List<string> decFunc = new();
 
         // ****************************************************************************************
         // コントロール追加時に下記を編集すること
@@ -280,7 +282,7 @@ namespace SWD4CS
             {
                 mainForm!.ctrlTree.SelectedNode = mainForm.ctrlTree.TopNode;
             }
-            //eventView!.ShowEventList(flag, this);
+            mainForm!.eventView!.ShowEventList(flag, this);
         }
         internal void SelectAllClear()
         {
