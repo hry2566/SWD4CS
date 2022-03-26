@@ -11,6 +11,7 @@
         public List<string> subAdd_childCtrlName = new();
         public List<string> subAddRange_CtrlName = new();
         public List<string> subAddRange_childCtrlName = new();
+        public List<string> decHandler = new();
 
         public CONTROL_INFO() { }
     }
@@ -123,7 +124,7 @@
             string[] split1;
             string[] split2;
 
-            if (line.IndexOf("=") > -1 && line.IndexOf("new") > -1 && line.IndexOf("System.Windows.Forms.") > -1)
+            if (line.IndexOf("=") > -1 && line.IndexOf("new") > -1 && line.IndexOf("System.Windows.Forms.") > -1 && line.IndexOf("+=") == -1)
             {
                 //string ctrlName, ctrlClassName, propertyName, strProperty, addCtrlName, subAdd_CtrlName, subAdd_childCtrlName, subAddRange_CtrlName, subAddRange_childCtrlName;
 
@@ -135,7 +136,7 @@
                     string ctrlName, ctrlClassName;
                     ctrlName = GetCtrlName(line, 0);
                     ctrlClassName = GetClassName(line);
-                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, ctrlClassName, null, null, null, null, null, null, null);
+                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, ctrlClassName, null, null, null, null, null, null, null, null);
                     //Console.WriteLine(line);
                     //Console.WriteLine("{0} : {1}", ctrlName, ctrlClassName);
                 }
@@ -145,7 +146,7 @@
                     //Console.WriteLine(line);
                 }
             }
-            else if (line.IndexOf("=") > -1)
+            else if (line.IndexOf("=") > -1 && line.IndexOf("+=") == -1)
             {
                 split1 = line.Split('=');
                 split2 = split1[0].Split('.');
@@ -156,7 +157,7 @@
                     ctrlName = GetCtrlName(line, 0);
                     propertyName = GetPropertyName(line);
                     strProperty = GetProperty(line);
-                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, propertyName, strProperty, null, null, null, null, null);
+                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, propertyName, strProperty, null, null, null, null, null, null);
                     //Console.WriteLine(line);
                     //Console.WriteLine("{0} : {1} : {2}", ctrlName, propertyName, strProperty);
                 }
@@ -173,7 +174,7 @@
                     ctrlClassName = "Form";
                     propertyName = GetPropertyName(line);
                     strProperty = GetProperty(line);
-                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, ctrlClassName, propertyName, strProperty, null, null, null, null, null);
+                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, ctrlClassName, propertyName, strProperty, null, null, null, null, null, null);
                     //Console.WriteLine(line);
                     //Console.WriteLine("{0} : {1} : {2} : {3}", ctrlName, ctrlClassName, propertyName, strProperty);
                 }
@@ -191,7 +192,7 @@
                     ctrlName = "this";
                     addCtrlName = GetCtrlName(line, 1);
 
-                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, addCtrlName, null, null, null, null);
+                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, addCtrlName, null, null, null, null, null);
                     //Console.WriteLine(line);
                     //Console.WriteLine(addCtrlName);
                 }
@@ -199,7 +200,7 @@
                 {
                     ctrlName = GetCtrlName(line, 0);
                     addCtrlName = GetCtrlName(line, 1);
-                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, addCtrlName, null, null, null, null);
+                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, addCtrlName, null, null, null, null, null);
                     //Console.WriteLine(line);
                     //Console.WriteLine("{0} : {1}", ctrlName, addCtrlName);
                 }
@@ -208,7 +209,7 @@
                     ctrlName = GetCtrlName(line, 0);
                     subAdd_CtrlName = GetCtrlName(line, 2);
                     subAdd_childCtrlName = GetCtrlName(line, 1);
-                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, null, subAdd_CtrlName, subAdd_childCtrlName, null, null);
+                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, null, subAdd_CtrlName, subAdd_childCtrlName, null, null, null);
                     //Console.WriteLine(line);
                     //Console.WriteLine("{0} : {1} : {2}", ctrlName, subAdd_CtrlName, subAdd_childCtrlName);
                 }
@@ -222,18 +223,35 @@
                 // 特殊Parent
                 string ctrlName, subAddRange_CtrlName, subAddRange_childCtrlName;
                 string[] lineArray = splitAddRange(line);
-                string[] split;
 
                 for (int i = 0; i < lineArray.Length; i++)
                 {
-                    split = lineArray[i].Split(",");
-                    ctrlName = split[0];
-                    subAddRange_CtrlName = split[1];
-                    subAddRange_childCtrlName = split[2];
-                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, null, null, null, subAddRange_CtrlName, subAddRange_childCtrlName);
+                    split1 = lineArray[i].Split(",");
+                    ctrlName = split1[0];
+                    subAddRange_CtrlName = split1[1];
+                    subAddRange_childCtrlName = split1[2];
+                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, null, null, null, subAddRange_CtrlName, subAddRange_childCtrlName, null);
                 }
                 //Console.WriteLine(lineArray[0]);
                 //Console.WriteLine(lineArray[1]);
+            }
+            else if (line.IndexOf("+=") > -1)
+            {
+                // events
+                string ctrlName, decHandler;
+                decHandler = line;
+                split1 = line.Split("+=")[0].Split(".");
+                if (split1.Length == 2)
+                {
+                    ctrlName = split1[0];
+                }
+                else
+                {
+                    ctrlName = split1[1];
+                }
+                lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, null, null, null, null, null, decHandler);
+                //Console.WriteLine(eventName);
+                //Console.WriteLine(decHandler);
             }
             else
             {
@@ -263,12 +281,12 @@
             return split2;
         }
 
-        private static List<CONTROL_INFO> AddInfo(List<CONTROL_INFO> lstCtrlInfo, string? ctrlName, string? ctrlClassName, string? propertyName, string? strProperty, string? addCtrlName, string? subAdd_CtrlName, string? subAdd_childCtrlName, string? subAddRange_CtrlName, string? subAddRange_childCtrlName)
+        private static List<CONTROL_INFO> AddInfo(List<CONTROL_INFO> lstCtrlInfo, string? ctrlName, string? ctrlClassName, string? propertyName, string? strProperty, string? addCtrlName, string? subAdd_CtrlName, string? subAdd_childCtrlName, string? subAddRange_CtrlName, string? subAddRange_childCtrlName, string? decHandler)
         {
             if (lstCtrlInfo.Count == 0)
             {
                 CONTROL_INFO info = new();
-                info = WriteInfo(info, ctrlName, ctrlClassName, propertyName, strProperty, addCtrlName, subAdd_CtrlName, subAdd_childCtrlName, subAddRange_CtrlName, subAddRange_childCtrlName);
+                info = WriteInfo(info, ctrlName, ctrlClassName, propertyName, strProperty, addCtrlName, subAdd_CtrlName, subAdd_childCtrlName, subAddRange_CtrlName, subAddRange_childCtrlName, decHandler);
                 lstCtrlInfo.Add(info);
             }
             else
@@ -279,7 +297,7 @@
                     if (lstCtrlInfo[i].ctrlName == ctrlName)
                     {
                         CONTROL_INFO info = lstCtrlInfo[i];
-                        info = WriteInfo(info, ctrlName, ctrlClassName, propertyName, strProperty, addCtrlName, subAdd_CtrlName, subAdd_childCtrlName, subAddRange_CtrlName, subAddRange_childCtrlName);
+                        info = WriteInfo(info, ctrlName, ctrlClassName, propertyName, strProperty, addCtrlName, subAdd_CtrlName, subAdd_childCtrlName, subAddRange_CtrlName, subAddRange_childCtrlName, decHandler);
                         lstCtrlInfo[i] = info;
                         flag = true;
                         break;
@@ -288,14 +306,14 @@
                 if (!flag)
                 {
                     CONTROL_INFO info = new();
-                    info = WriteInfo(info, ctrlName, ctrlClassName, propertyName, strProperty, addCtrlName, subAdd_CtrlName, subAdd_childCtrlName, subAddRange_CtrlName, subAddRange_childCtrlName);
+                    info = WriteInfo(info, ctrlName, ctrlClassName, propertyName, strProperty, addCtrlName, subAdd_CtrlName, subAdd_childCtrlName, subAddRange_CtrlName, subAddRange_childCtrlName, decHandler);
                     lstCtrlInfo.Add(info);
                 }
             }
             return lstCtrlInfo;
         }
 
-        private static CONTROL_INFO WriteInfo(CONTROL_INFO info, string? ctrlName, string? ctrlClassName, string? propertyName, string? strProperty, string? addCtrlName, string? subAdd_CtrlName, string? subAdd_childCtrlName, string? subAddRange_CtrlName, string? subAddRange_childCtrlName)
+        private static CONTROL_INFO WriteInfo(CONTROL_INFO info, string? ctrlName, string? ctrlClassName, string? propertyName, string? strProperty, string? addCtrlName, string? subAdd_CtrlName, string? subAdd_childCtrlName, string? subAddRange_CtrlName, string? subAddRange_childCtrlName, string? decHandler)
         {
             info.ctrlName = ctrlName;
             if (ctrlClassName != null) { info.ctrlClassName = ctrlClassName; }
@@ -306,6 +324,7 @@
             if (subAdd_childCtrlName != null) { info.subAdd_childCtrlName.Add(subAdd_childCtrlName); }
             if (subAddRange_CtrlName != null) { info.subAddRange_CtrlName.Add(subAddRange_CtrlName); }
             if (subAddRange_childCtrlName != null) { info.subAddRange_childCtrlName.Add(subAddRange_childCtrlName); }
+            if (decHandler != null) { info.decHandler.Add(decHandler); }
             return info;
         }
 
