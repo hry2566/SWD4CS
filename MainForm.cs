@@ -9,6 +9,7 @@ namespace SWD4CS
         internal TextBox propertyCtrlName;
         internal ListBox toolLstBox;
         internal TreeView ctrlTree;
+        internal cls_user_datagridview? eventView;
         private string sourceFileName = "";
 
 
@@ -17,10 +18,11 @@ namespace SWD4CS
             InitializeComponent();
             cls_controls.AddToolList(ctrlLstBox);
 
-            propertyGrid = propertyBox;
-            propertyCtrlName = nameTxtBox;
-            toolLstBox = ctrlLstBox;
+            this.propertyGrid = propertyBox;
+            this.propertyCtrlName = nameTxtBox;
+            this.toolLstBox = ctrlLstBox;
             this.ctrlTree = ctrlTreeView;
+            this.eventView = evtGridView;
             userForm.Init(this, designePage);
 
             cls_file.ReadIni(this, "SWD4CS.ini", mainWndSplitContainer, subWndSplitContainer);
@@ -94,14 +96,81 @@ namespace SWD4CS
                     {
                         fileInfo.source_base = cls_file.NewFile();
                     }
-                    sourceTxtBox.Text = CreateSourcecCode();
+                    sourceTxtBox.Text = CreateSourceCode();
                     break;
                 case 2:
-                    //textBox2.Text = CreateEventCode();
+                    eventTxtBox.Text = CreateEventCode();
                     break;
             }
         }
-        private string CreateSourcecCode()
+        private string CreateEventCode()
+        {
+            List<string> decHandler = new();
+            List<string> decFunc = new();
+
+            for (int i = 0; i < userForm.decHandler.Count; i++)
+            {
+                decHandler.Add(userForm.decHandler[i]);
+                decFunc.Add(userForm.decFunc[i]);
+            }
+
+            for (int j = 0; j < userForm.CtrlItems.Count; j++)
+            {
+                for (int i = 0; i < userForm.CtrlItems[j].decHandler.Count; i++)
+                {
+                    decHandler.Add(userForm.CtrlItems[j].decHandler[i]);
+                    decFunc.Add(userForm.CtrlItems[j].decFunc[i]);
+                }
+            }
+
+            if (decHandler.Count == 0) { return ""; }
+            if (fileInfo.source_base == null)
+            {
+                fileInfo.source_base = cls_file.NewFile();
+            }
+            string[] split = CreateSourceCode().Split(Environment.NewLine);
+            string eventSource = "";
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (eventSource == "")
+                {
+                    eventSource = split[i];
+                }
+                else
+                {
+                    eventSource += Environment.NewLine + split[i];
+                }
+            }
+
+            eventSource += Environment.NewLine;
+            eventSource += "    private void InitializeEvents()" + Environment.NewLine;
+            eventSource += "    {" + Environment.NewLine;
+
+
+            for (int i = 0; i < decHandler.Count; i++)
+            {
+                eventSource += "        " + decHandler[i] + Environment.NewLine;
+            }
+
+            eventSource += "    }" + Environment.NewLine;
+            eventSource += Environment.NewLine;
+
+            for (int i = 0; i < decFunc.Count; i++)
+            {
+                eventSource += "    " + decFunc[i] + Environment.NewLine;
+                eventSource += "    {" + Environment.NewLine;
+                eventSource += Environment.NewLine;
+                eventSource += "    }" + Environment.NewLine;
+                eventSource += Environment.NewLine;
+            }
+
+            eventSource += "}" + Environment.NewLine;
+
+            return eventSource;
+        }
+
+        private string CreateSourceCode()
         {
             string source = "";
             List<string> lstSuspend = new();
@@ -144,6 +213,36 @@ namespace SWD4CS
             }
             source += "}\r\n";
             source += "\r\n";
+
+            // events function
+            source = CreateCode_FuncDec(source, space);
+            return source;
+        }
+
+        private string CreateCode_FuncDec(string source, string space)
+        {
+            // control
+            for (int i = 0; i < userForm.CtrlItems.Count; i++)
+            {
+                for (int j = 0; j < userForm.CtrlItems[i].decFunc.Count; j++)
+                {
+                    source += "//" + userForm.CtrlItems[i].decFunc[j] + "\r\n";
+                    source += "//" + "{\r\n";
+                    source += "//" + "\r\n";
+                    source += "//" + "}\r\n";
+                    source += "\r\n";
+                }
+            }
+
+            // form
+            for (int i = 0; i < userForm.decFunc.Count; i++)
+            {
+                source += "//" + userForm.decFunc[i] + "\r\n";
+                source += "//" + "{\r\n";
+                source += "//" + "\r\n";
+                source += "//" + "}\r\n";
+                source += "\r\n";
+            }
 
             return source;
         }
@@ -209,6 +308,7 @@ namespace SWD4CS
                     }
                 }
             }
+            source = CreateCode_FormEventsDec(source, space, userForm);
             return source;
         }
 
@@ -255,6 +355,24 @@ namespace SWD4CS
                 {
                     source += memCode;
                 }
+
+                source = CreateCode_EventsDec(source, space, userForm.CtrlItems[i]);
+            }
+            return source;
+        }
+        private string CreateCode_EventsDec(string source, string space, cls_controls cls_ctrl)
+        {
+            for (int i = 0; i < cls_ctrl.decHandler.Count; i++)
+            {
+                source += space + "    " + cls_ctrl.decHandler[i] + "\r\n";
+            }
+            return source;
+        }
+        private string CreateCode_FormEventsDec(string source, string space, cls_userform userForm)
+        {
+            for (int i = 0; i < userForm.decHandler.Count; i++)
+            {
+                source += space + "    " + userForm.decHandler[i] + "\r\n";
             }
             return source;
         }
