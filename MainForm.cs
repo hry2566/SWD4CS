@@ -546,5 +546,10 @@ namespace SWD4CS
             }
             ctrlTree.Focus();
         }
+
+        private void deleteToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            userForm.RemoveSelectedItem();
+        }
     }
 }
