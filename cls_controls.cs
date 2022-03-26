@@ -14,6 +14,8 @@ namespace SWD4CS
         private bool changeFlag;
         private Point memPos;
         private int grid = 8;
+        internal List<string> decHandler = new();
+        internal List<string> decFunc = new();
         public cls_controls(cls_userform form, string className, Control parent, int X, int Y)
         {
             if ((className == "TabPage" && parent == form) || (parent is StatusStrip)) { return; }
@@ -66,6 +68,50 @@ namespace SWD4CS
                 {
                     log = SetCtrlProperty(this.ctrl, ctrlInfo.propertyName[i], ctrlInfo.strProperty[i]);
                 }
+
+                // events
+                for (int i = 0; i < ctrlInfo.decHandler.Count; i++)
+                {
+                    string[] split = ctrlInfo.decHandler[i].Split("+=")[0].Split(".");
+                    string eventName = split[split.Length - 1].Trim();
+                    split = ctrlInfo.decHandler[i].Split("+=")[1].Split("(");
+                    string funcName = split[split.Length - 1].Replace(");", "");
+
+                    Type? delegateType = this.ctrl.GetType().GetEvent(eventName!)!.EventHandlerType;
+                    MethodInfo? invoke = delegateType!.GetMethod("Invoke");
+                    ParameterInfo[] pars = invoke!.GetParameters();
+                    split = delegateType.AssemblyQualifiedName!.Split(",");
+                    string newHandler = "new " + split[0];
+                    string funcParam = "";
+
+                    foreach (ParameterInfo p in pars)
+                    {
+                        string param = p.ParameterType.ToString();
+
+                        if (param == "System.Object")
+                        {
+                            param += "? sender";
+                        }
+                        else
+                        {
+                            param += " e";
+                        }
+
+                        if (funcParam == "")
+                        {
+                            funcParam = param;
+                        }
+                        else
+                        {
+                            funcParam += ", " + param;
+                        }
+                    }
+                    string decFunc = "private void " + funcName + "(" + funcParam + ")";
+                    this!.decHandler.Add(ctrlInfo.decHandler[i]);
+                    this.decFunc.Add(decFunc);
+
+                    //Console.WriteLine("{0}", decFunc);
+                }
             }
             else if (ctrlInfo.ctrlName == "this")
             {
@@ -82,6 +128,50 @@ namespace SWD4CS
                     {
                         form.Size = memForm.ClientSize;
                     }
+                }
+
+                // events
+                for (int i = 0; i < ctrlInfo.decHandler.Count; i++)
+                {
+                    string[] split = ctrlInfo.decHandler[i].Split("+=")[0].Split(".");
+                    string eventName = split[split.Length - 1].Trim();
+                    split = ctrlInfo.decHandler[i].Split("+=")[1].Split("(");
+                    string funcName = split[split.Length - 1].Replace(");", "");
+
+                    Type? delegateType = memForm.GetType().GetEvent(eventName!)!.EventHandlerType;
+                    MethodInfo? invoke = delegateType!.GetMethod("Invoke");
+                    ParameterInfo[] pars = invoke!.GetParameters();
+                    split = delegateType.AssemblyQualifiedName!.Split(",");
+                    string newHandler = "new " + split[0];
+                    string funcParam = "";
+
+                    foreach (ParameterInfo p in pars)
+                    {
+                        string param = p.ParameterType.ToString();
+
+                        if (param == "System.Object")
+                        {
+                            param += "? sender";
+                        }
+                        else
+                        {
+                            param += " e";
+                        }
+
+                        if (funcParam == "")
+                        {
+                            funcParam = param;
+                        }
+                        else
+                        {
+                            funcParam += ", " + param;
+                        }
+                    }
+                    string decFunc = "private void " + funcName + "(" + funcParam + ")";
+                    this.form!.decHandler.Add(ctrlInfo.decHandler[i]);
+                    this.form.decFunc.Add(decFunc);
+
+                    //Console.WriteLine("{0}", decFunc);
                 }
             }
             else
@@ -673,7 +763,7 @@ namespace SWD4CS
                     selectBox!.SetSelectBoxPos(value);
                 }
                 ShowProperty(value);
-                //eventView!.ShowEventList(value, this);
+                form!.mainForm!.eventView!.ShowEventList(value, this);
             }
             get
             {
