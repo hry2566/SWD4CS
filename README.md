@@ -29,16 +29,20 @@
  ・CheckedListBox  
  ・ComboBox  
  ・DataGridView  
+ ・DateTimePicker  
+ ・DomainUpDown  
  ・GroupBox  
  ・HScrollBar  
  ・Label  
  ・LinkLabel  
  ・ListBox  
  ・ListView  
+ ・MaskedTextBox  
  ・MonthCalender  
  ・Panel  
  ・PictureBox  
  ・ProgressBar  
+ ・PropertyGrid  
  ・RadioButton  
  ・RichText  
  ・SplitContainer  
@@ -48,7 +52,7 @@
  ・TextBox  
  ・TreeView  
  ・VScrollBar  
- ・Designer.csファイルのRead/Write（ただし、SWD4CS以外で編集したものは開けない）  
+ ・Designer.csファイルのRead/Write　~~（ただし、SWD4CS以外で編集したものは開けない）~~  
  ・他のコントローラー等は必要になったら追加する。
 
 ## 対応プロパティ（Type）
