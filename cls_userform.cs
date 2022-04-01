@@ -88,7 +88,7 @@ namespace SWD4CS
             this.Resize += new System.EventHandler(formResize);
             backPanel.Click += new System.EventHandler(Backpanel_Click);
 
-            mainForm.propertyGrid.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(PropertyValueChanged);
+            mainForm.propertyGrid!.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(PropertyValueChanged);
             memForm.Location = this.Location;
             memForm.ClientSize = this.Size;
             memForm.Name = "Form1";
@@ -238,7 +238,7 @@ namespace SWD4CS
             }
             RemoveSelectedItem();
         }
-        internal void AddControl(List<CONTROL_INFO> ctrlInfo)
+        internal void Add_Controls(List<CONTROL_INFO> ctrlInfo)
         {
             // コントロール全削除
             CtrlAllClear();
@@ -280,7 +280,7 @@ namespace SWD4CS
             ShowProperty(flag);
             if (flag)
             {
-                mainForm!.ctrlTree.SelectedNode = mainForm.ctrlTree.TopNode;
+                mainForm!.ctrlTree!.SelectedNode = mainForm.ctrlTree.TopNode;
             }
             mainForm!.eventView!.ShowEventList(flag, this);
         }
