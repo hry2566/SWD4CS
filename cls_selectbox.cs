@@ -55,8 +55,6 @@
 
                 this.selectbox[i].MouseDown += new MouseEventHandler(SelectboxMouseDown!);
                 this.selectbox[i].MouseMove += new MouseEventHandler(SelectboxMouseMove!);
-
-                //cls_form.EnableDoubleBuffering(this.selectbox[i]);
             }
             parent.Controls.AddRange(this.selectbox);
         }
@@ -65,12 +63,7 @@
         {
             if (flag)
             {
-                int x1;
-                int x2;
-                int x3;
-                int y1;
-                int y2;
-                int y3;
+                int x1, x2, x3, y1, y2, y3;
 
                 if (ctrl != null)
                 {
