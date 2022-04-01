@@ -16,10 +16,10 @@ namespace SWD4CS
         {
             InitializeComponent();
             Private2Internal_Controls();
-            Run_CommandLine();
             userForm.Init(this, designePage);
             cls_controls.AddToolList(ctrlLstBox);
             cls_file.ReadIni(this, "SWD4CS.ini", mainWndSplitContainer, subWndSplitContainer);
+            Run_CommandLine();
             Application.ApplicationExit += new EventHandler(AppExit);
         }
         private void Private2Internal_Controls()
