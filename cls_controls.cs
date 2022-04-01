@@ -24,11 +24,11 @@ namespace SWD4CS
             if (Init(className))
             {
                 this.className = className;
-                this.ctrl!.Location = new System.Drawing.Point(X, Y);
+                ctrl!.Location = new System.Drawing.Point(X, Y);
                 this.form.CtrlItems!.Add(this);
                 parent.Controls.Add(this.form.CtrlItems[this.form.CtrlItems.Count - 1].ctrl);
 
-                if (this.ctrl is TabControl)
+                if (ctrl is TabControl)
                 {
                     _ = new cls_controls(form, "TabPage", this.ctrl!, X, Y);
                     _ = new cls_controls(form, "TabPage", this.ctrl!, X, Y);
@@ -43,9 +43,9 @@ namespace SWD4CS
                     selectBox = new cls_selectbox(this, parent);
                     Selected = true;
                 }
-                this.ctrl!.Click += new System.EventHandler(Ctrl_Click);
-                this.ctrl.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
-                this.ctrl.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
+                ctrl!.Click += new System.EventHandler(Ctrl_Click);
+                ctrl.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
+                ctrl.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
             }
         }
         public cls_controls(cls_userform form, Form memForm, CONTROL_INFO ctrlInfo)
@@ -55,124 +55,11 @@ namespace SWD4CS
 
             if (Init(ctrlInfo.ctrlClassName!))
             {
-                this.className = ctrlInfo.ctrlClassName!;
-                this.ctrl!.Name = ctrlInfo.ctrlName;
-                this.ctrl!.Click += new System.EventHandler(Ctrl_Click);
-                this.ctrl.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
-                this.ctrl.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
-
-                form.CtrlItems.Add(this);
-
-                // Property設定
-                for (int i = 0; i < ctrlInfo.propertyName.Count; i++)
-                {
-                    log = SetCtrlProperty(this.ctrl, ctrlInfo.propertyName[i], ctrlInfo.strProperty[i]);
-                }
-
-                // events
-                for (int i = 0; i < ctrlInfo.decHandler.Count; i++)
-                {
-                    string[] split = ctrlInfo.decHandler[i].Split("+=")[0].Split(".");
-                    string eventName = split[split.Length - 1].Trim();
-                    split = ctrlInfo.decHandler[i].Split("+=")[1].Split("(");
-                    string funcName = split[split.Length - 1].Replace(");", "");
-
-                    Type? delegateType = this.ctrl.GetType().GetEvent(eventName!)!.EventHandlerType;
-                    MethodInfo? invoke = delegateType!.GetMethod("Invoke");
-                    ParameterInfo[] pars = invoke!.GetParameters();
-                    split = delegateType.AssemblyQualifiedName!.Split(",");
-                    string newHandler = "new " + split[0];
-                    string funcParam = "";
-
-                    foreach (ParameterInfo p in pars)
-                    {
-                        string param = p.ParameterType.ToString();
-
-                        if (param == "System.Object")
-                        {
-                            param += "? sender";
-                        }
-                        else
-                        {
-                            param += " e";
-                        }
-
-                        if (funcParam == "")
-                        {
-                            funcParam = param;
-                        }
-                        else
-                        {
-                            funcParam += ", " + param;
-                        }
-                    }
-                    string decFunc = "private void " + funcName + "(" + funcParam + ")";
-                    this!.decHandler.Add(ctrlInfo.decHandler[i]);
-                    this.decFunc.Add(decFunc);
-
-                    //Console.WriteLine("{0}", decFunc);
-                }
+                log += Set_Ini_Controls(ctrlInfo);
             }
             else if (ctrlInfo.ctrlName == "this")
             {
-                // form_property
-                for (int i = 0; i < ctrlInfo.propertyName.Count; i++)
-                {
-                    log = SetCtrlProperty(memForm, ctrlInfo.propertyName[i], ctrlInfo.strProperty[i]);
-
-                    if (ctrlInfo.propertyName[i] != "Size")
-                    {
-                        log = SetCtrlProperty(form, ctrlInfo.propertyName[i], ctrlInfo.strProperty[i]);
-                    }
-                    else
-                    {
-                        form.Size = memForm.ClientSize;
-                    }
-                }
-
-                // events
-                for (int i = 0; i < ctrlInfo.decHandler.Count; i++)
-                {
-                    string[] split = ctrlInfo.decHandler[i].Split("+=")[0].Split(".");
-                    string eventName = split[split.Length - 1].Trim();
-                    split = ctrlInfo.decHandler[i].Split("+=")[1].Split("(");
-                    string funcName = split[split.Length - 1].Replace(");", "");
-
-                    Type? delegateType = memForm.GetType().GetEvent(eventName!)!.EventHandlerType;
-                    MethodInfo? invoke = delegateType!.GetMethod("Invoke");
-                    ParameterInfo[] pars = invoke!.GetParameters();
-                    split = delegateType.AssemblyQualifiedName!.Split(",");
-                    string newHandler = "new " + split[0];
-                    string funcParam = "";
-
-                    foreach (ParameterInfo p in pars)
-                    {
-                        string param = p.ParameterType.ToString();
-
-                        if (param == "System.Object")
-                        {
-                            param += "? sender";
-                        }
-                        else
-                        {
-                            param += " e";
-                        }
-
-                        if (funcParam == "")
-                        {
-                            funcParam = param;
-                        }
-                        else
-                        {
-                            funcParam += ", " + param;
-                        }
-                    }
-                    string decFunc = "private void " + funcName + "(" + funcParam + ")";
-                    this.form!.decHandler.Add(ctrlInfo.decHandler[i]);
-                    this.form.decFunc.Add(decFunc);
-
-                    //Console.WriteLine("{0}", decFunc);
-                }
+                log += Set_Ini_Form(ctrlInfo, memForm);
             }
             else
             {
@@ -190,75 +77,205 @@ namespace SWD4CS
                 //else
                 //{
                 //未対応
-                form.mainForm!.AddLog("Unimplemented Control : " + ctrlInfo.ctrlClassName);
+                form.mainForm!.Add_Log("Unimplemented Control : " + ctrlInfo.ctrlClassName);
                 //Console.WriteLine("Unimplemented Control : " + ctrlInfo.ctrlClassName);
                 //}
 
             }
             if (log != "")
             {
-                form.mainForm!.AddLog(log);
+                form.mainForm!.Add_Log(log);
             }
+        }
+
+        private string Set_Ini_Form(CONTROL_INFO ctrlInfo, Form memForm)
+        {
+            string log = "";
+            // form_property
+            for (int i = 0; i < ctrlInfo.propertyName.Count; i++)
+            {
+                log += SetCtrlProperty(memForm, ctrlInfo.propertyName[i], ctrlInfo.strProperty[i]);
+
+                if (ctrlInfo.propertyName[i] != "Size")
+                {
+                    log += SetCtrlProperty(form, ctrlInfo.propertyName[i], ctrlInfo.strProperty[i]);
+                }
+                else
+                {
+                    form!.Size = memForm.ClientSize;
+                }
+            }
+
+            // events
+            for (int i = 0; i < ctrlInfo.decHandler.Count; i++)
+            {
+                string[] split = ctrlInfo.decHandler[i].Split("+=")[0].Split(".");
+                string eventName = split[split.Length - 1].Trim();
+                split = ctrlInfo.decHandler[i].Split("+=")[1].Split("(");
+                string funcName = split[split.Length - 1].Replace(");", "");
+
+                Type? delegateType = memForm.GetType().GetEvent(eventName!)!.EventHandlerType;
+                MethodInfo? invoke = delegateType!.GetMethod("Invoke");
+                ParameterInfo[] pars = invoke!.GetParameters();
+                split = delegateType.AssemblyQualifiedName!.Split(",");
+                string newHandler = "new " + split[0];
+                string funcParam = "";
+
+                foreach (ParameterInfo p in pars)
+                {
+                    string param = p.ParameterType.ToString();
+
+                    if (param == "System.Object")
+                    {
+                        param += "? sender";
+                    }
+                    else
+                    {
+                        param += " e";
+                    }
+
+                    if (funcParam == "")
+                    {
+                        funcParam = param;
+                    }
+                    else
+                    {
+                        funcParam += ", " + param;
+                    }
+                }
+                string decFunc = "private void " + funcName + "(" + funcParam + ")";
+                this.form!.decHandler.Add(ctrlInfo.decHandler[i]);
+                this.form.decFunc.Add(decFunc);
+
+                //Console.WriteLine("{0}", decFunc);
+            }
+            return log;
+        }
+
+        private string Set_Ini_Controls(CONTROL_INFO ctrlInfo)
+        {
+            string log = "";
+            this.className = ctrlInfo.ctrlClassName!;
+            this.ctrl!.Name = ctrlInfo.ctrlName;
+            this.ctrl!.Click += new System.EventHandler(Ctrl_Click);
+            this.ctrl.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
+            this.ctrl.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
+
+            form!.CtrlItems.Add(this);
+
+            // Property設定
+            for (int i = 0; i < ctrlInfo.propertyName.Count; i++)
+            {
+                log += SetCtrlProperty(this.ctrl, ctrlInfo.propertyName[i], ctrlInfo.strProperty[i]);
+            }
+
+            // events
+            for (int i = 0; i < ctrlInfo.decHandler.Count; i++)
+            {
+                string[] split = ctrlInfo.decHandler[i].Split("+=")[0].Split(".");
+                string eventName = split[split.Length - 1].Trim();
+                split = ctrlInfo.decHandler[i].Split("+=")[1].Split("(");
+                string funcName = split[split.Length - 1].Replace(");", "");
+
+                Type? delegateType = this.ctrl.GetType().GetEvent(eventName!)!.EventHandlerType;
+                MethodInfo? invoke = delegateType!.GetMethod("Invoke");
+                ParameterInfo[] pars = invoke!.GetParameters();
+                split = delegateType.AssemblyQualifiedName!.Split(",");
+                string newHandler = "new " + split[0];
+                string funcParam = "";
+
+                foreach (ParameterInfo p in pars)
+                {
+                    string param = p.ParameterType.ToString();
+
+                    if (param == "System.Object")
+                    {
+                        param += "? sender";
+                    }
+                    else
+                    {
+                        param += " e";
+                    }
+
+                    if (funcParam == "")
+                    {
+                        funcParam = param;
+                    }
+                    else
+                    {
+                        funcParam += ", " + param;
+                    }
+                }
+                string decFunc = "private void " + funcName + "(" + funcParam + ")";
+                this!.decHandler.Add(ctrlInfo.decHandler[i]);
+                this.decFunc.Add(decFunc);
+
+                //Console.WriteLine("{0}", decFunc);
+            }
+            return log;
         }
 
         internal static bool HideProperty(string itemName)
         {
-            if (itemName != "AccessibilityObject" &&
-                itemName != "BindingContext" &&
-                itemName != "Parent" &&
-                itemName != "TopLevelControl" &&
-                itemName != "DataSource" &&
-                itemName != "FirstDisplayedCell" &&
-                itemName != "Item" &&
-                itemName != "TopItem" &&
-                itemName != "Rtf" &&
-                itemName != "ParentForm" &&
-                itemName != "SelectedTab" &&
-                itemName != "Top" &&
-                itemName != "Left" &&
-                itemName != "Right" &&
-                itemName != "Bottom" &&
-                itemName != "Width" &&
-                itemName != "Height" &&
-                itemName != "CanSelect" &&
-                itemName != "Created" &&
-                itemName != "IsHandleCreated" &&
-                itemName != "PreferredSize" &&
-                itemName != "Visible" &&
-                itemName != "Enable" &&
-                itemName != "ClientSize" &&
-                itemName != "UseVisualStyleBackColor" &&
-                itemName != "PreferredHeight" &&
-                itemName != "ColumnCount" &&
-                itemName != "FirstDisplayedScrollingColumnIndex" &&
-                itemName != "FirstDisplayedScrollingRowIndex" &&
-                itemName != "NewRowIndex" &&
-                itemName != "RowCount" &&
-                itemName != "HasChildren" &&
-                itemName != "PreferredWidth" &&
-                itemName != "SingleMonthSize" &&
-                itemName != "TextLength" &&
-                itemName != "SelectedIndex" &&
-                itemName != "TabCount" &&
-                itemName != "VisibleCount" &&
-                itemName != "DesktopLocation" &&
-                itemName != "AutoScale" &&
-                itemName != "CanFocus" &&
-                itemName != "IsMirrored" &&
-                itemName != "SelectionStart" &&
-                itemName != "ContextMenuDefaultLocation" &&
-                itemName != "" &&
-                itemName != "" &&
-                itemName != "" &&
-                itemName != ""
-                )
+            List<string> propertyName = new()
             {
-                return true;
-            }
-            else
+                "AccessibilityObject",
+                "BindingContext",
+                "Parent",
+                "TopLevelControl",
+                "DataSource",
+                "FirstDisplayedCell",
+                "Item",
+                "TopItem",
+                "Rtf",
+                "ParentForm",
+                "SelectedTab",
+                "Top",
+                "Left",
+                "Right",
+                "Bottom",
+                "Width",
+                "Height",
+                "CanSelect",
+                "Created",
+                "IsHandleCreated",
+                "PreferredSize",
+                "Visible",
+                "Enable",
+                "ClientSize",
+                "UseVisualStyleBackColor",
+                "PreferredHeight",
+                "ColumnCount",
+                "FirstDisplayedScrollingColumnIndex",
+                "FirstDisplayedScrollingRowIndex",
+                "NewRowIndex",
+                "RowCount",
+                "HasChildren",
+                "PreferredWidth",
+                "SingleMonthSize",
+                "TextLength",
+                "SelectedIndex",
+                "TabCount",
+                "VisibleCount",
+                "DesktopLocation",
+                "AutoScale",
+                "CanFocus",
+                "IsMirrored",
+                "SelectionStart",
+                "ContextMenuDefaultLocation",
+                "",
+                "",
+                "",
+            };
+
+            for (int i = 0; i < propertyName.Count; i++)
             {
-                return false;
+                if (propertyName[i] == itemName)
+                {
+                    return false;
+                }
             }
+            return true;
         }
         internal static string Property2String(Control ctrl, PropertyInfo item)
         {
@@ -345,287 +362,221 @@ namespace SWD4CS
         }
         private static string Property2Color(string color)
         {
+            List<string> systemColorName = new()
+            {
+                "ActiveBorder",
+                "ActiveCaption",
+                "ActiveCaptionText",
+                "AppWorkspace",
+                "ButtonFace",
+                "ButtonHighlight",
+                "ButtonShadow",
+                "Control",
+                "ControlDark",
+                "ControlDarkDark",
+                "ControlLight",
+                "ControlLightLight",
+                "ControlText",
+                "Desktop",
+                "GradientActiveCaption",
+                "GradientInactiveCaption",
+                "GrayText",
+                "Highlight",
+                "HighlightText",
+                "HotTrack",
+                "InactiveBorder",
+                "InactiveCaption",
+                "InactiveCaptionText",
+                "Info",
+                "InfoText",
+                "Menu",
+                "MenuBar",
+                "MenuHighlight",
+                "MenuText",
+                "ScrollBar",
+                "Window",
+                "WindowFrame",
+                "WindowText",
+            };
+
+            List<string> colorName = new()
+            {
+                "Black",
+                "DimGray",
+                "Gray",
+                "DarkGray",
+                "Silver",
+                "LightGray",
+                "Gainsboro",
+                "WhiteSmoke",
+                "White",
+                "RosyBrown",
+                "IndianRed",
+                "Brown",
+                "Firebrick",
+                "LightCoral",
+                "Maroon",
+                "DarkRed",
+                "Red",
+                "Snow",
+                "MistyRose",
+                "Salmon",
+                "Tomato",
+                "DarkSalmon",
+                "Coral",
+                "OrangeRed",
+                "LightSalmon",
+                "Sienna",
+                "SeaShell",
+                "Chocolate",
+                "SaddleBrown",
+                "SandyBrown",
+                "PeachPuff",
+                "Peru",
+                "Linen",
+                "Bisque",
+                "DarkOrange",
+                "BurlyWood",
+                "Tan",
+                "AntiqueWhite",
+                "NavajoWhite",
+                "BlanchedAlmond",
+                "PapayaWhip",
+                "Moccasin",
+                "Orange",
+                "Wheat",
+                "OldLace",
+                "FloralWhite",
+                "DarkGoldenrod",
+                "Goldenrod",
+                "Cornsilk",
+                "Gold",
+                "Khaki",
+                "LemonChiffon",
+                "PaleGoldenrod",
+                "DarkKhaki",
+                "Beige",
+                "LightGoldenrodYellow",
+                "Olive",
+                "Yellow",
+                "LightYellow",
+                "Ivory",
+                "OliveDrab",
+                "YellowGreen",
+                "DarkOliveGreen",
+                "GreenYellow",
+                "Chartreuse",
+                "LawnGreen",
+                "DarkSeaGreen",
+                "ForestGreen",
+                "LimeGreen",
+                "LightGreen",
+                "PaleGreen",
+                "DarkGreen",
+                "Green",
+                "Lime",
+                "Honeydew",
+                "SeaGreen",
+                "MediumSeaGreen",
+                "SpringGreen",
+                "MintCream",
+                "MediumSpringGreen",
+                "MediumAquamarine",
+                "Aquamarine",
+                "Turquoise",
+                "LightSeaGreen",
+                "MediumTurquoise",
+                "DarkSlateGray",
+                "PaleTurquoise",
+                "Teal",
+                "DarkCyan",
+                "Cyan",
+                "Aqua",
+                "LightCyan",
+                "Azure",
+                "DarkTurquoise",
+                "CadetBlue",
+                "PowderBlue",
+                "LightBlue",
+                "DeepSkyBlue",
+                "SkyBlue",
+                "LightSkyBlue",
+                "SteelBlue",
+                "AliceBlue",
+                "DodgerBlue",
+                "SlateGray",
+                "LightSlateGray",
+                "LightSteelBlue",
+                "CornflowerBlue",
+                "RoyalBlue",
+                "MidnightBlue",
+                "Lavender",
+                "Navy",
+                "DarkBlue",
+                "MediumBlue",
+                "Blue",
+                "GhostWhite",
+                "SlateBlue",
+                "DarkSlateBlue",
+                "MediumSlateBlue",
+                "MediumPurple",
+                "BlueViolet",
+                "Indigo",
+                "DarkOrchid",
+                "DarkViolet",
+                "MediumOrchid",
+                "Thistle",
+                "Plum",
+                "Violet",
+                "Purple",
+                "DarkMagenta",
+                "Fuchsia",
+                "Magenta",
+                "Orchid",
+                "MediumVioletRed",
+                "DeepPink",
+                "HotPink",
+                "LavenderBlush",
+                "PaleVioletRed",
+                "Crimson",
+            };
+
             color = color.Replace("Color [", "").Replace("]", "");
             string? strSystemColor = "System.Drawing.SystemColors.";
             string? strColor = "System.Drawing.Color.";
             string? strRGB = "System.Drawing.Color.FromArgb(";
 
-            switch (color)
+            if (color == "Transparent")
             {
-                case "Transparent":
-                    return "Color.Transparent";
-                case "ActiveBorder":
-                case "ActiveCaption":
-                case "ActiveCaptionText":
-                case "AppWorkspace":
-                case "ButtonFace":
-                case "ButtonHighlight":
-                case "ButtonShadow":
-                case "Control":
-                case "ControlDark":
-                case "ControlDarkDark":
-                case "ControlLight":
-                case "ControlLightLight":
-                case "ControlText":
-                case "Desktop":
-                case "GradientActiveCaption":
-                case "GradientInactiveCaption":
-                case "GrayText":
-                case "Highlight":
-                case "HighlightText":
-                case "HotTrack":
-                case "InactiveBorder":
-                case "InactiveCaption":
-                case "InactiveCaptionText":
-                case "Info":
-                case "InfoText":
-                case "Menu":
-                case "MenuBar":
-                case "MenuHighlight":
-                case "MenuText":
-                case "ScrollBar":
-                case "Window":
-                case "WindowFrame":
-                case "WindowText":
-                    return strSystemColor + color;
-                case "Black":
-                case "DimGray":
-                case "Gray":
-                case "DarkGray":
-                case "Silver":
-                case "LightGray":
-                case "Gainsboro":
-                case "WhiteSmoke":
-                case "White":
-                case "RosyBrown":
-                case "IndianRed":
-                case "Brown":
-                case "Firebrick":
-                case "LightCoral":
-                case "Maroon":
-                case "DarkRed":
-                case "Red":
-                case "Snow":
-                case "MistyRose":
-                case "Salmon":
-                case "Tomato":
-                case "DarkSalmon":
-                case "Coral":
-                case "OrangeRed":
-                case "LightSalmon":
-                case "Sienna":
-                case "SeaShell":
-                case "Chocolate":
-                case "SaddleBrown":
-                case "SandyBrown":
-                case "PeachPuff":
-                case "Peru":
-                case "Linen":
-                case "Bisque":
-                case "DarkOrange":
-                case "BurlyWood":
-                case "Tan":
-                case "AntiqueWhite":
-                case "NavajoWhite":
-                case "BlanchedAlmond":
-                case "PapayaWhip":
-                case "Moccasin":
-                case "Orange":
-                case "Wheat":
-                case "OldLace":
-                case "FloralWhite":
-                case "DarkGoldenrod":
-                case "Goldenrod":
-                case "Cornsilk":
-                case "Gold":
-                case "Khaki":
-                case "LemonChiffon":
-                case "PaleGoldenrod":
-                case "DarkKhaki":
-                case "Beige":
-                case "LightGoldenrodYellow":
-                case "Olive":
-                case "Yellow":
-                case "LightYellow":
-                case "Ivory":
-                case "OliveDrab":
-                case "YellowGreen":
-                case "DarkOliveGreen":
-                case "GreenYellow":
-                case "Chartreuse":
-                case "LawnGreen":
-                case "DarkSeaGreen":
-                case "ForestGreen":
-                case "LimeGreen":
-                case "LightGreen":
-                case "PaleGreen":
-                case "DarkGreen":
-                case "Green":
-                case "Lime":
-                case "Honeydew":
-                case "SeaGreen":
-                case "MediumSeaGreen":
-                case "SpringGreen":
-                case "MintCream":
-                case "MediumSpringGreen":
-                case "MediumAquamarine":
-                case "Aquamarine":
-                case "Turquoise":
-                case "LightSeaGreen":
-                case "MediumTurquoise":
-                case "DarkSlateGray":
-                case "PaleTurquoise":
-                case "Teal":
-                case "DarkCyan":
-                case "Cyan":
-                case "Aqua":
-                case "LightCyan":
-                case "Azure":
-                case "DarkTurquoise":
-                case "CadetBlue":
-                case "PowderBlue":
-                case "LightBlue":
-                case "DeepSkyBlue":
-                case "SkyBlue":
-                case "LightSkyBlue":
-                case "SteelBlue":
-                case "AliceBlue":
-                case "DodgerBlue":
-                case "SlateGray":
-                case "LightSlateGray":
-                case "LightSteelBlue":
-                case "CornflowerBlue":
-                case "RoyalBlue":
-                case "MidnightBlue":
-                case "Lavender":
-                case "Navy":
-                case "DarkBlue":
-                case "MediumBlue":
-                case "Blue":
-                case "GhostWhite":
-                case "SlateBlue":
-                case "DarkSlateBlue":
-                case "MediumSlateBlue":
-                case "MediumPurple":
-                case "BlueViolet":
-                case "Indigo":
-                case "DarkOrchid":
-                case "DarkViolet":
-                case "MediumOrchid":
-                case "Thistle":
-                case "Plum":
-                case "Violet":
-                case "Purple":
-                case "DarkMagenta":
-                case "Fuchsia":
-                case "Magenta":
-                case "Orchid":
-                case "MediumVioletRed":
-                case "DeepPink":
-                case "HotPink":
-                case "LavenderBlush":
-                case "PaleVioletRed":
-                case "Crimson":
-                    return strColor + color;
-                default:
-                    color = color.Replace("A", "").Replace("R", "").Replace("G", "").Replace("B", "").Replace("=", "");
-                    string[] split = color.Split(",");
-                    strRGB += split[1] + "," + split[2] + "," + split[3] + ")";
-                    return strRGB;
+                return "Color.Transparent";
             }
+
+            for (int i = 0; i < systemColorName.Count; i++)
+            {
+                if (systemColorName[i] == color)
+                {
+                    return strSystemColor + color;
+                }
+            }
+
+            for (int i = 0; i < colorName.Count; i++)
+            {
+                if (colorName[i] == color)
+                {
+                    return strColor + color;
+                }
+            }
+
+            color = color.Replace("A", "").Replace("R", "").Replace("G", "").Replace("B", "").Replace("=", "");
+            string[] split = color.Split(",");
+            strRGB += split[1] + "," + split[2] + "," + split[3] + ")";
+            return strRGB;
+
         }
         internal Control? GetBaseCtrl()
         {
-            Control? baseCtrl = new();
             Type type = this.ctrl!.GetType();
-
-            switch (type)
-            {
-                case Type t when t == typeof(System.Windows.Forms.Button):
-                    baseCtrl = new Button();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.Label):
-                    baseCtrl = new Label();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.GroupBox):
-                    baseCtrl = new GroupBox();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.TextBox):
-                    baseCtrl = new TextBox();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.ListBox):
-                    baseCtrl = new ListBox();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.TabControl):
-                    baseCtrl = new TabControl();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.TabPage):
-                    baseCtrl = new TabPage();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.CheckBox):
-                    baseCtrl = new CheckBox();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.ComboBox):
-                    baseCtrl = new ComboBox();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.SplitContainer):
-                    baseCtrl = new SplitContainer();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.DataGridView):
-                    baseCtrl = new DataGridView();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.Panel):
-                    baseCtrl = new Panel();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.CheckedListBox):
-                    baseCtrl = new CheckedListBox();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.LinkLabel):
-                    baseCtrl = new LinkLabel();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.PictureBox):
-                    baseCtrl = new PictureBox();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.ProgressBar):
-                    baseCtrl = new ProgressBar();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.RadioButton):
-                    baseCtrl = new RadioButton();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.RichTextBox):
-                    baseCtrl = new RichTextBox();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.StatusStrip):
-                    baseCtrl = new StatusStrip();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.ListView):
-                    baseCtrl = new ListView();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.TreeView):
-                    baseCtrl = new TreeView();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.MonthCalendar):
-                    baseCtrl = new MonthCalendar();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.HScrollBar):
-                    baseCtrl = new HScrollBar();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.VScrollBar):
-                    baseCtrl = new VScrollBar();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.MaskedTextBox):
-                    baseCtrl = new MaskedTextBox();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.PropertyGrid):
-                    baseCtrl = new PropertyGrid();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.DateTimePicker):
-                    baseCtrl = new DateTimePicker();
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.DomainUpDown):
-                    baseCtrl = new DomainUpDown();
-                    break;
-            }
+            Control? baseCtrl = (Control)Activator.CreateInstance(type)!;
             return baseCtrl;
         }
         internal void Delete()
@@ -685,7 +636,7 @@ namespace SWD4CS
                 if (form!.mainForm!.toolLstBox!.Text == "")
                 {
                     SetSelected(me);
-                    foreach (TreeNode n in form!.mainForm.ctrlTree.Nodes)
+                    foreach (TreeNode n in form.mainForm.ctrlTree!.Nodes)
                     {
                         TreeNode ret = FindNode(n, this.ctrl!.Name);
                         if (ret != null)
@@ -744,8 +695,8 @@ namespace SWD4CS
         {
             if (flag)
             {
-                form!.mainForm!.propertyGrid.SelectedObject = this.ctrl;
-                form.mainForm!.propertyCtrlName!.Text = this.ctrl!.Name;
+                form!.mainForm!.propertyGrid!.SelectedObject = this.ctrl;
+                form.mainForm.propertyCtrlName!.Text = this.ctrl!.Name;
             }
             else
             {
