@@ -121,140 +121,166 @@
 
         private static List<CONTROL_INFO> AnalysisCode(string line, List<CONTROL_INFO> lstCtrlInfo)
         {
-            string[] split1;
-            string[] split2;
-
-            if (line.IndexOf("=") > -1 && line.IndexOf("new") > -1 && line.IndexOf("System.Windows.Forms.") > -1 && line.IndexOf("+=") == -1)
+            if (line.IndexOf("=") > -1 && line.IndexOf("new") > -1 &&
+                line.IndexOf("System.Windows.Forms.") > -1 && line.IndexOf("+=") == -1)
             {
-                //string ctrlName, ctrlClassName, propertyName, strProperty, addCtrlName, subAdd_CtrlName, subAdd_childCtrlName, subAddRange_CtrlName, subAddRange_childCtrlName;
-
-                split1 = line.Split('=');
-                split2 = split1[0].Split('.');
-                if (split2.Length == 2)
-                {
-                    // Control宣言 ctrlName, ctrlClassName
-                    string ctrlName, ctrlClassName;
-                    ctrlName = GetCtrlName(line, 0);
-                    ctrlClassName = GetClassName(line);
-                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, ctrlClassName, null, null, null, null, null, null, null, null);
-                    //Console.WriteLine(line);
-                    //Console.WriteLine("{0} : {1}", ctrlName, ctrlClassName);
-                }
-                else
-                {
-                    // 特殊Property
-                    //Console.WriteLine(line);
-                }
+                lstCtrlInfo = AnalysisCode_Control_Declaration(line, lstCtrlInfo);
             }
             else if (line.IndexOf("=") > -1 && line.IndexOf("+=") == -1)
             {
-                split1 = line.Split('=');
-                split2 = split1[0].Split('.');
-                if (split2.Length == 3)
-                {
-                    // Property ctrlName, propertyName, strProperty
-                    string ctrlName, propertyName, strProperty;
-                    ctrlName = GetCtrlName(line, 0);
-                    propertyName = GetPropertyName(line);
-                    strProperty = GetProperty(line);
-                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, propertyName, strProperty, null, null, null, null, null, null);
-                    //Console.WriteLine(line);
-                    //Console.WriteLine("{0} : {1} : {2}", ctrlName, propertyName, strProperty);
-                }
-                else if (split2.Length == 4)
-                {
-                    // 特殊Property
-                    //Console.WriteLine(line);
-                }
-                else
-                {
-                    // this
-                    string ctrlName, ctrlClassName, propertyName, strProperty;
-                    ctrlName = "this";
-                    ctrlClassName = "Form";
-                    propertyName = GetPropertyName(line);
-                    strProperty = GetProperty(line);
-                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, ctrlClassName, propertyName, strProperty, null, null, null, null, null, null);
-                    //Console.WriteLine(line);
-                    //Console.WriteLine("{0} : {1} : {2} : {3}", ctrlName, ctrlClassName, propertyName, strProperty);
-                }
+                lstCtrlInfo = AnalysisCode_Control_Property(line, lstCtrlInfo);
             }
             else if (line.IndexOf("Add") > -1 && line.IndexOf("AddRange") == -1)
             {
-                // Parent
-                split1 = line.Split("Controls.Add");
-                split2 = split1[0].Split(".");
-
-                string ctrlName, addCtrlName, subAdd_CtrlName, subAdd_childCtrlName;
-
-                if (split2.Length == 2)
-                {
-                    ctrlName = "this";
-                    addCtrlName = GetCtrlName(line, 1);
-
-                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, addCtrlName, null, null, null, null, null);
-                    //Console.WriteLine(line);
-                    //Console.WriteLine(addCtrlName);
-                }
-                else if (split2.Length == 3)
-                {
-                    ctrlName = GetCtrlName(line, 0);
-                    addCtrlName = GetCtrlName(line, 1);
-                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, addCtrlName, null, null, null, null, null);
-                    //Console.WriteLine(line);
-                    //Console.WriteLine("{0} : {1}", ctrlName, addCtrlName);
-                }
-                else if (split2.Length == 4)
-                {
-                    ctrlName = GetCtrlName(line, 0);
-                    subAdd_CtrlName = GetCtrlName(line, 2);
-                    subAdd_childCtrlName = GetCtrlName(line, 1);
-                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, null, subAdd_CtrlName, subAdd_childCtrlName, null, null, null);
-                    //Console.WriteLine(line);
-                    //Console.WriteLine("{0} : {1} : {2}", ctrlName, subAdd_CtrlName, subAdd_childCtrlName);
-                }
-                else
-                {
-                    //Console.WriteLine(line);
-                }
+                lstCtrlInfo = AnalysisCode_Control_Add(line, lstCtrlInfo);
             }
             else if (line.IndexOf("AddRange") > -1)
             {
-                // 特殊Parent
-                string ctrlName, subAddRange_CtrlName, subAddRange_childCtrlName;
-                string[] lineArray = splitAddRange(line);
-
-                for (int i = 0; i < lineArray.Length; i++)
-                {
-                    split1 = lineArray[i].Split(",");
-                    ctrlName = split1[0];
-                    subAddRange_CtrlName = split1[1];
-                    subAddRange_childCtrlName = split1[2];
-                    lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, null, null, null, subAddRange_CtrlName, subAddRange_childCtrlName, null);
-                }
-                //Console.WriteLine(lineArray[0]);
-                //Console.WriteLine(lineArray[1]);
+                lstCtrlInfo = AnalysisCode_Control_SpecialProperty(line, lstCtrlInfo);
             }
             else if (line.IndexOf("+=") > -1)
             {
-                // events
-                string ctrlName, decHandler;
-                decHandler = line;
-                split1 = line.Split("+=")[0].Split(".");
-                if (split1.Length == 2)
-                {
-                    ctrlName = split1[0];
-                }
-                else
-                {
-                    ctrlName = split1[1];
-                }
-                lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, null, null, null, null, null, decHandler);
-                //Console.WriteLine(eventName);
-                //Console.WriteLine(decHandler);
+                lstCtrlInfo = AnalysisCode_Control_Events(line, lstCtrlInfo);
             }
             else
             {
+                //Console.WriteLine(line);
+            }
+            return lstCtrlInfo;
+        }
+
+        private static List<CONTROL_INFO> AnalysisCode_Control_Events(string line, List<CONTROL_INFO> lstCtrlInfo)
+        {
+            // events
+            string ctrlName, decHandler;
+            decHandler = line;
+            string[] split1 = line.Split("+=")[0].Split(".");
+            if (split1.Length == 2)
+            {
+                ctrlName = split1[0];
+            }
+            else
+            {
+                ctrlName = split1[1];
+            }
+            lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, null, null, null, null, null, decHandler);
+            //Console.WriteLine(eventName);
+            //Console.WriteLine(decHandler);
+            return lstCtrlInfo;
+        }
+
+        private static List<CONTROL_INFO> AnalysisCode_Control_SpecialProperty(string line, List<CONTROL_INFO> lstCtrlInfo)
+        {
+            // 特殊Parent
+            string ctrlName, subAddRange_CtrlName, subAddRange_childCtrlName;
+            string[] lineArray = splitAddRange(line);
+
+            for (int i = 0; i < lineArray.Length; i++)
+            {
+                string[] split1 = lineArray[i].Split(",");
+                ctrlName = split1[0];
+                subAddRange_CtrlName = split1[1];
+                subAddRange_childCtrlName = split1[2];
+                lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, null, null, null, subAddRange_CtrlName, subAddRange_childCtrlName, null);
+            }
+            //Console.WriteLine(lineArray[0]);
+            //Console.WriteLine(lineArray[1]);
+            return lstCtrlInfo;
+        }
+
+        private static List<CONTROL_INFO> AnalysisCode_Control_Add(string line, List<CONTROL_INFO> lstCtrlInfo)
+        {
+            // Parent
+            string[] split1 = line.Split("Controls.Add");
+            string[] split2 = split1[0].Split(".");
+
+            string ctrlName, addCtrlName, subAdd_CtrlName, subAdd_childCtrlName;
+
+            if (split2.Length == 2)
+            {
+                ctrlName = "this";
+                addCtrlName = GetCtrlName(line, 1);
+
+                lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, addCtrlName, null, null, null, null, null);
+                //Console.WriteLine(line);
+                //Console.WriteLine(addCtrlName);
+            }
+            else if (split2.Length == 3)
+            {
+                ctrlName = GetCtrlName(line, 0);
+                addCtrlName = GetCtrlName(line, 1);
+                lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, addCtrlName, null, null, null, null, null);
+                //Console.WriteLine(line);
+                //Console.WriteLine("{0} : {1}", ctrlName, addCtrlName);
+            }
+            else if (split2.Length == 4)
+            {
+                ctrlName = GetCtrlName(line, 0);
+                subAdd_CtrlName = GetCtrlName(line, 2);
+                subAdd_childCtrlName = GetCtrlName(line, 1);
+                lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, null, null, null, subAdd_CtrlName, subAdd_childCtrlName, null, null, null);
+                //Console.WriteLine(line);
+                //Console.WriteLine("{0} : {1} : {2}", ctrlName, subAdd_CtrlName, subAdd_childCtrlName);
+            }
+            else
+            {
+                //Console.WriteLine(line);
+            }
+            return lstCtrlInfo;
+        }
+
+        private static List<CONTROL_INFO> AnalysisCode_Control_Property(string line, List<CONTROL_INFO> lstCtrlInfo)
+        {
+            string[] split1 = line.Split('=');
+            string[] split2 = split1[0].Split('.');
+            if (split2.Length == 3)
+            {
+                // Property ctrlName, propertyName, strProperty
+                string ctrlName, propertyName, strProperty;
+                ctrlName = GetCtrlName(line, 0);
+                propertyName = GetPropertyName(line);
+                strProperty = GetProperty(line);
+                lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, null, propertyName, strProperty, null, null, null, null, null, null);
+                //Console.WriteLine(line);
+                //Console.WriteLine("{0} : {1} : {2}", ctrlName, propertyName, strProperty);
+            }
+            else if (split2.Length == 4)
+            {
+                // 特殊Property
+                //Console.WriteLine(line);
+            }
+            else
+            {
+                // this
+                string ctrlName, ctrlClassName, propertyName, strProperty;
+                ctrlName = "this";
+                ctrlClassName = "Form";
+                propertyName = GetPropertyName(line);
+                strProperty = GetProperty(line);
+                lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, ctrlClassName, propertyName, strProperty, null, null, null, null, null, null);
+                //Console.WriteLine(line);
+                //Console.WriteLine("{0} : {1} : {2} : {3}", ctrlName, ctrlClassName, propertyName, strProperty);
+            }
+            return lstCtrlInfo;
+        }
+
+        private static List<CONTROL_INFO> AnalysisCode_Control_Declaration(string line, List<CONTROL_INFO> lstCtrlInfo)
+        {
+            string[] split1 = line.Split('=');
+            string[] split2 = split1[0].Split('.');
+            if (split2.Length == 2)
+            {
+                // Control宣言 ctrlName, ctrlClassName
+                string ctrlName, ctrlClassName;
+                ctrlName = GetCtrlName(line, 0);
+                ctrlClassName = GetClassName(line);
+                lstCtrlInfo = AddInfo(lstCtrlInfo, ctrlName, ctrlClassName, null, null, null, null, null, null, null, null);
+                //Console.WriteLine(line);
+                //Console.WriteLine("{0} : {1}", ctrlName, ctrlClassName);
+            }
+            else
+            {
+                // 特殊Property
                 //Console.WriteLine(line);
             }
             return lstCtrlInfo;
