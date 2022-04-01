@@ -106,7 +106,7 @@ namespace SWD4CS
             string? newHandler;
             string? funcName = ctrl!.Name + "_" + eventName;
             string funcParam = "";
-
+            string param = "";
 
             if (this.Rows[e.RowIndex].Cells[1].Value.ToString() == "")
             {
@@ -118,84 +118,102 @@ namespace SWD4CS
                 string[] split = delegateType.AssemblyQualifiedName!.Split(",");
                 newHandler = "new " + split[0];
 
-                foreach (ParameterInfo p in pars)
-                {
-                    string param = p.ParameterType.ToString();
+                SetArguments(ref funcParam, ref param, pars);
 
-                    if (param == "System.Object")
-                    {
-                        param += "? sender";
-                    }
-                    else
-                    {
-                        param += " e";
-                    }
-
-                    if (funcParam == "")
-                    {
-                        funcParam = param;
-                    }
-                    else
-                    {
-                        funcParam += ", " + param;
-                    }
-                }
-
-                string decHandler;
-                if (this.form != null)
-                {
-                    decHandler = "this." + eventName + " += " + newHandler + "(" + funcName + ");";
-
-                }
-                else
-                {
-                    decHandler = "this." + ctrl.Name + "." + eventName + " += " + newHandler + "(" + funcName + ");";
-
-                }
+                string decHandler = GetDecHandler(eventName, newHandler, funcName, ctrl.Name);
                 string decFunc = "private void " + funcName + "(" + funcParam + ")";
-
-                if (this.form != null)
-                {
-                    this.form!.decHandler.Add(decHandler);
-                    this.form.decFunc.Add(decFunc);
-                }
-                else
-                {
-                    this.cls_ctrl!.decHandler.Add(decHandler);
-                    this.cls_ctrl.decFunc.Add(decFunc);
-                }
+                DeclarationAdd(decHandler, decFunc);
             }
             else
             {
-                this.Rows[e.RowIndex].Cells[1].Value = "";
+                Delete_Event(e, funcName);
+            }
+        }
 
-                if (this.form != null)
+        private void Delete_Event(DataGridViewCellMouseEventArgs e, string funcName)
+        {
+            this.Rows[e.RowIndex].Cells[1].Value = "";
+
+            if (this.form != null)
+            {
+                for (int i = 0; i < this.form!.decFunc.Count; i++)
                 {
-                    for (int i = 0; i < this.form!.decFunc.Count; i++)
-                    {
-                        string[] split = this.form!.decFunc[i].Split("(")[0].Split(" ");
+                    string[] split = this.form!.decFunc[i].Split("(")[0].Split(" ");
 
-                        if (split[split.Length - 1] == funcName)
-                        {
-                            this.form!.decHandler.Remove(this.form!.decHandler[i]);
-                            this.form!.decFunc.Remove(this.form!.decFunc[i]);
-                            break;
-                        }
+                    if (split[split.Length - 1] == funcName)
+                    {
+                        this.form!.decHandler.Remove(this.form!.decHandler[i]);
+                        this.form!.decFunc.Remove(this.form!.decFunc[i]);
+                        break;
                     }
                 }
-                else if (this.cls_ctrl != null)
+            }
+            else if (this.cls_ctrl != null)
+            {
+                for (int i = 0; i < this.cls_ctrl!.decFunc.Count; i++)
                 {
-                    for (int i = 0; i < this.cls_ctrl!.decFunc.Count; i++)
-                    {
-                        string[] split = this.cls_ctrl!.decFunc[i].Split("(")[0].Split(" ");
+                    string[] split = this.cls_ctrl!.decFunc[i].Split("(")[0].Split(" ");
 
-                        if (split[split.Length - 1] == funcName)
-                        {
-                            this.cls_ctrl!.decHandler.Remove(this.cls_ctrl!.decHandler[i]);
-                            this.cls_ctrl!.decFunc.Remove(this.cls_ctrl!.decFunc[i]);
-                            break;
-                        }
+                    if (split[split.Length - 1] == funcName)
+                    {
+                        this.cls_ctrl!.decHandler.Remove(this.cls_ctrl!.decHandler[i]);
+                        this.cls_ctrl!.decFunc.Remove(this.cls_ctrl!.decFunc[i]);
+                        break;
                     }
+                }
+            }
+        }
+
+        private void DeclarationAdd(string decHandler, string decFunc)
+        {
+            if (this.form != null)
+            {
+                this.form!.decHandler.Add(decHandler);
+                this.form.decFunc.Add(decFunc);
+            }
+            else
+            {
+                this.cls_ctrl!.decHandler.Add(decHandler);
+                this.cls_ctrl.decFunc.Add(decFunc);
+            }
+        }
+
+        private string GetDecHandler(string? eventName, string newHandler, string funcName, string ctrlName)
+        {
+            string decHandler;
+            if (this.form != null)
+            {
+                decHandler = "this." + eventName + " += " + newHandler + "(" + funcName + ");";
+            }
+            else
+            {
+                decHandler = "this." + ctrlName + "." + eventName + " += " + newHandler + "(" + funcName + ");";
+            }
+            return decHandler;
+        }
+
+        private void SetArguments(ref string funcParam, ref string param, ParameterInfo[] pars)
+        {
+            foreach (ParameterInfo p in pars)
+            {
+                param = p.ParameterType.ToString();
+
+                if (param == "System.Object")
+                {
+                    param += "? sender";
+                }
+                else
+                {
+                    param += " e";
+                }
+
+                if (funcParam == "")
+                {
+                    funcParam = param;
+                }
+                else
+                {
+                    funcParam += ", " + param;
                 }
             }
         }
