@@ -161,7 +161,7 @@ namespace SWD4CS
             this.ctrl.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
             this.ctrl.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
 
-            form!.CtrlItems.Add(this);
+            form.CtrlItems.Add(this);
 
             // Property設定
             for (int i = 0; i < ctrlInfo.propertyName.Count; i++)
@@ -316,6 +316,7 @@ namespace SWD4CS
                                  t == typeof(System.Windows.Forms.FixedPanel) ||
                                  t == typeof(System.Windows.Forms.PictureBoxSizeMode) ||
                                  t == typeof(System.Windows.Forms.View) ||
+                                 t == typeof(System.Windows.Forms.Orientation) ||
                                  t == typeof(System.Windows.Forms.FormStartPosition):
 
                     strProperty = " = " + type.ToString() + "." + str2 + ";";
@@ -324,6 +325,7 @@ namespace SWD4CS
                     strProperty = " = " + Property2Color(str2) + ";";
                     break;
             }
+
             return strProperty;
         }
 
@@ -1165,6 +1167,28 @@ namespace SWD4CS
             }
             return style;
         }
+        private static int? String2Orientation(string? propertyValue)
+        {
+            int style = 1;
+
+            if (propertyValue!.IndexOf("System.Windows.Forms.Orientation") > -1)
+            {
+                string[] split = propertyValue.Split(".");
+                propertyValue = split[split.Length - 1];
+            }
+
+            switch (propertyValue)
+            {
+                case "Horizontal":
+                    style = 0;
+                    break;
+                case "Vertical":
+                    style = 1;
+                    break;
+            }
+            return style;
+        }
+
         private static string SetCtrlProperty(Control? ctrl, string? propertyName, string? propertyValue)
         {
             Type type;
@@ -1226,12 +1250,16 @@ namespace SWD4CS
                     case Type t when t == typeof(System.Windows.Forms.View):
                         property.SetValue(ctrl, String2View(propertyValue));
                         return "";
+                    case Type t when t == typeof(System.Windows.Forms.Orientation):
+                        property.SetValue(ctrl, String2Orientation(propertyValue));
+                        return "";
                 }
                 return "Unimplemented PropertyType : " + type;
                 //Console.WriteLine("Unimplemented PropertyType : " + type);
             }
             return "";
         }
+
         private static string SetCtrlProperty(Object? obj, string? propertyName, string? propertyValue)
         {
             Type type;
@@ -1494,7 +1522,7 @@ namespace SWD4CS
                     return false;
             }
 
-            if (className != "DateTimePicker")
+            if (className != "DateTimePicker" && className != "WebBrowser")
             {
                 this.ctrl!.Text = this.ctrl!.Name;
             }
