@@ -263,7 +263,7 @@ namespace SWD4CS
                 "IsMirrored",
                 "SelectionStart",
                 "ContextMenuDefaultLocation",
-                "",
+                "CanUndo",
                 "",
                 "",
             };
