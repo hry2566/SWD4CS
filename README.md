@@ -75,6 +75,7 @@
  ・System.Windows.Forms.PictureBoxSizeMode  
  ・System.Windows.Forms.View  
  ・System.Windows.Forms.Orientation  
+ ・System.Windows.Forms.FormBorderStyle  
 
 ## コントロール追加方法 
  * 「// コントロール追加時に下記を編集すること」に追記。  
