@@ -161,7 +161,7 @@ namespace SWD4CS
             this.ctrl.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
             this.ctrl.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
 
-            form.CtrlItems.Add(this);
+            form!.CtrlItems.Add(this);
 
             // Property設定
             for (int i = 0; i < ctrlInfo.propertyName.Count; i++)
@@ -317,6 +317,7 @@ namespace SWD4CS
                                  t == typeof(System.Windows.Forms.PictureBoxSizeMode) ||
                                  t == typeof(System.Windows.Forms.View) ||
                                  t == typeof(System.Windows.Forms.Orientation) ||
+                                 t == typeof(System.Windows.Forms.FormBorderStyle) ||
                                  t == typeof(System.Windows.Forms.FormStartPosition):
 
                     strProperty = " = " + type.ToString() + "." + str2 + ";";
@@ -1188,6 +1189,42 @@ namespace SWD4CS
             }
             return style;
         }
+        private static int? String2FormBorderStyle(string? propertyValue)
+        {
+            int style = 4;
+
+            if (propertyValue!.IndexOf("System.Windows.Forms.FormBorderStyle") > -1)
+            {
+                string[] split = propertyValue.Split(".");
+                propertyValue = split[split.Length - 1];
+            }
+
+            switch (propertyValue)
+            {
+                case "Fixed3D":
+                    style = 2;
+                    break;
+                case "FixedDialog":
+                    style = 3;
+                    break;
+                case "FixedSingle":
+                    style = 1;
+                    break;
+                case "FixedToolWindow":
+                    style = 5;
+                    break;
+                case "None":
+                    style = 0;
+                    break;
+                case "Sizable":
+                    style = 4;
+                    break;
+                case "SizableToolWindow":
+                    style = 6;
+                    break;
+            }
+            return style;
+        }
 
         private static string SetCtrlProperty(Control? ctrl, string? propertyName, string? propertyValue)
         {
@@ -1252,6 +1289,9 @@ namespace SWD4CS
                         return "";
                     case Type t when t == typeof(System.Windows.Forms.Orientation):
                         property.SetValue(ctrl, String2Orientation(propertyValue));
+                        return "";
+                    case Type t when t == typeof(System.Windows.Forms.FormBorderStyle):
+                        property.SetValue(ctrl, String2FormBorderStyle(propertyValue));
                         return "";
                 }
                 return "Unimplemented PropertyType : " + type;
