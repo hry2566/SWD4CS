@@ -318,6 +318,7 @@ namespace SWD4CS
                                  t == typeof(System.Windows.Forms.View) ||
                                  t == typeof(System.Windows.Forms.Orientation) ||
                                  t == typeof(System.Windows.Forms.FormBorderStyle) ||
+                                 t == typeof(System.Windows.Forms.AutoScaleMode) ||
                                  t == typeof(System.Windows.Forms.FormStartPosition):
 
                     strProperty = " = " + type.ToString() + "." + str2 + ";";
@@ -1225,6 +1226,33 @@ namespace SWD4CS
             }
             return style;
         }
+        private static object? String2AutoScaleMode(string? propertyValue)
+        {
+            int style = 1;
+
+            if (propertyValue!.IndexOf("System.Windows.Forms.AutoScaleMode") > -1)
+            {
+                string[] split = propertyValue.Split(".");
+                propertyValue = split[split.Length - 1];
+            }
+
+            switch (propertyValue)
+            {
+                case "Dpi":
+                    style = 2;
+                    break;
+                case "Font":
+                    style = 1;
+                    break;
+                case "Inherit":
+                    style = 2;
+                    break;
+                case "None":
+                    style = 0;
+                    break;
+            }
+            return style;
+        }
 
         private static string SetCtrlProperty(Control? ctrl, string? propertyName, string? propertyValue)
         {
@@ -1293,12 +1321,17 @@ namespace SWD4CS
                     case Type t when t == typeof(System.Windows.Forms.FormBorderStyle):
                         property.SetValue(ctrl, String2FormBorderStyle(propertyValue));
                         return "";
+                    case Type t when t == typeof(System.Windows.Forms.AutoScaleMode):
+                        property.SetValue(ctrl, String2AutoScaleMode(propertyValue));
+                        return "";
                 }
                 return "Unimplemented PropertyType : " + type;
                 //Console.WriteLine("Unimplemented PropertyType : " + type);
             }
             return "";
         }
+
+
 
         private static string SetCtrlProperty(Object? obj, string? propertyName, string? propertyValue)
         {
