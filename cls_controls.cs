@@ -1,4 +1,5 @@
 ﻿
+using System.Globalization;
 using System.Reflection;
 
 namespace SWD4CS
@@ -326,8 +327,40 @@ namespace SWD4CS
                 case Type t when t == typeof(System.Drawing.Color):
                     strProperty = " = " + Property2Color(str2) + ";";
                     break;
+                case Type t when t == typeof(System.Drawing.Font):
+                    strProperty = " = " + Property2Font(ctrl.Font) + ";";
+                    break;
             }
 
+            return strProperty;
+        }
+
+        private static string Property2Font(Font font)
+        {
+            string[] split = font.ToString().Split(",");
+            string strSize = split[1].Replace("Size=", "").Trim() + "F, ";
+
+            string strStyle = "";
+            split = font.Style.ToString().Split(",");
+
+            if (split.Length == 1)
+            {
+                strStyle = string.Format("System.Drawing.FontStyle.{0}, System.Drawing.GraphicsUnit.Point)", split[0]);
+            }
+            else if (split.Length == 2)
+            {
+                strStyle = string.Format("((System.Drawing.FontStyle)((System.Drawing.FontStyle.{0} | System.Drawing.FontStyle.{1}))), System.Drawing.GraphicsUnit.Point)", split[0].Trim(), split[1].Trim());
+            }
+            else if (split.Length == 3)
+            {
+                strStyle = string.Format("((System.Drawing.FontStyle)(((System.Drawing.FontStyle.{0} | System.Drawing.FontStyle.{1}) | System.Drawing.FontStyle.{2}))), System.Drawing.GraphicsUnit.Point)", split[0].Trim(), split[1].Trim(), split[2].Trim());
+            }
+            else if (split.Length == 4)
+            {
+                strStyle = string.Format("((System.Drawing.FontStyle)((((System.Drawing.FontStyle.{0} | System.Drawing.FontStyle.{1})  | System.Drawing.FontStyle.{2}) | System.Drawing.FontStyle.{3}))), System.Drawing.GraphicsUnit.Point)", split[0].Trim(), split[1].Trim(), split[2].Trim(), split[3].Trim());
+            }
+
+            string strProperty = "new System.Drawing.Font(\"" + font.Name + "\", " + strSize + strStyle;
             return strProperty;
         }
 
@@ -1253,6 +1286,53 @@ namespace SWD4CS
             }
             return style;
         }
+        private static object? String2Font(string? propertyValue)
+        {
+            Font? font = null;
+
+            if (propertyValue!.IndexOf("System.Drawing.Font") > -1)
+            {
+                string[] split = propertyValue.Split(",");
+                string strName = split[0].Replace("new System.Drawing.Font(", "").Trim();
+                string strSize = split[1].Replace("F", "").Trim();
+                float fSize = float.Parse(strSize, CultureInfo.InvariantCulture.NumberFormat);
+
+                string strStyle = split[2].Replace("System.Drawing.FontStyle", "").Replace("(", "").Replace(")", "").Replace(".", "").Replace(" ", "");
+                split = strStyle.Split("|");
+
+                int iStyle = 0;
+                for (int i = 0; i < split.Length; i++)
+                {
+                    switch (split[i])
+                    {
+                        case "Bold":
+                            iStyle += 1;
+                            break;
+                        case "Italic":
+                            iStyle += 2;
+                            break;
+                        case "Regular":
+                            iStyle += 0;
+                            break;
+                        case "Strikeout":
+                            iStyle += 8;
+                            break;
+                        case "Underline":
+                            iStyle += 4;
+                            break;
+                    }
+                }
+
+                font = new System.Drawing.Font(strName, fSize, (FontStyle)iStyle, System.Drawing.GraphicsUnit.Point);
+
+                //Console.WriteLine(propertyValue);
+                //Console.WriteLine(strName);
+                //Console.WriteLine(strSize);
+                //Console.WriteLine(fSize);
+            }
+
+            return font;
+        }
 
         private static string SetCtrlProperty(Control? ctrl, string? propertyName, string? propertyValue)
         {
@@ -1324,6 +1404,9 @@ namespace SWD4CS
                     case Type t when t == typeof(System.Windows.Forms.AutoScaleMode):
                         property.SetValue(ctrl, String2AutoScaleMode(propertyValue));
                         return "";
+                    case Type t when t == typeof(System.Drawing.Font):
+                        property.SetValue(ctrl, String2Font(propertyValue));
+                        return "";
                 }
                 return "Unimplemented PropertyType : " + type;
                 //Console.WriteLine("Unimplemented PropertyType : " + type);
@@ -1331,33 +1414,31 @@ namespace SWD4CS
             return "";
         }
 
+        //private static string SetCtrlProperty(Object? obj, string? propertyName, string? propertyValue)
+        //{
+        //    Type type;
 
+        //    PropertyInfo? property = obj!.GetType().GetProperty(propertyName!);
 
-        private static string SetCtrlProperty(Object? obj, string? propertyName, string? propertyValue)
-        {
-            Type type;
+        //    if (property != null && property!.GetValue(obj) != null)
+        //    {
+        //        type = property!.GetValue(obj)!.GetType();
 
-            PropertyInfo? property = obj!.GetType().GetProperty(propertyName!);
+        //        switch (type)
+        //        {
+        //            case Type t when t == typeof(System.String):
+        //                property.SetValue(obj, propertyValue);
+        //                return "";
+        //            case Type t when t == typeof(System.Int32):
+        //                property.SetValue(obj, int.Parse(propertyValue!));
+        //                return "";
 
-            if (property != null && property!.GetValue(obj) != null)
-            {
-                type = property!.GetValue(obj)!.GetType();
-
-                switch (type)
-                {
-                    case Type t when t == typeof(System.String):
-                        property.SetValue(obj, propertyValue);
-                        return "";
-                    case Type t when t == typeof(System.Int32):
-                        property.SetValue(obj, int.Parse(propertyValue!));
-                        return "";
-
-                }
-                return "Unimplemented PropertyType : " + type;
-                //Console.WriteLine("Unimplemented PropertyType : " + type);
-            }
-            return "";
-        }
+        //        }
+        //        return "Unimplemented PropertyType : " + type;
+        //        //Console.WriteLine("Unimplemented PropertyType : " + type);
+        //    }
+        //    return "";
+        //}
         private void CreatePickBox(Control ctrl)
         {
             Button pickbox = new();
