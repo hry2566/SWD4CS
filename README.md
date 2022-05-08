@@ -77,6 +77,7 @@
  ・System.Windows.Forms.Orientation  
  ・System.Windows.Forms.FormBorderStyle  
  ・System.Windows.Forms.AutoScaleMode  
+ ・System.Drawing.Font  
 
 ## コントロール追加方法 
  * 「// コントロール追加時に下記を編集すること」に追記。  
