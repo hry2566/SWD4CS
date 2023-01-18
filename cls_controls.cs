@@ -14,7 +14,7 @@ namespace SWD4CS
         private bool selectFlag = false;
         private bool changeFlag;
         private Point memPos;
-        private int grid = 8;
+        private int grid = 4;
         internal List<string> decHandler = new();
         internal List<string> decFunc = new();
         public cls_controls(cls_userform form, string className, Control parent, int X, int Y)
@@ -1439,10 +1439,25 @@ namespace SWD4CS
         //    }
         //    return "";
         //}
+
+        private void CreateTrancePanel(Control ctrl)
+        {
+            cls_transparent_panel trancepanel = new();
+            trancepanel.Dock = DockStyle.Fill;
+            trancepanel.BackColor = Color.FromArgb(0, 0, 0, 0);
+
+            trancepanel.Click += new System.EventHandler(Ctrl_Click);
+            trancepanel.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
+            trancepanel.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
+            ctrl.Controls.Add(trancepanel);
+
+            trancepanel.BringToFront();
+            trancepanel.Invalidate();
+        }
+
         private void CreatePickBox(Control ctrl)
         {
             Button pickbox = new();
-            pickbox = new();
             pickbox.Size = new System.Drawing.Size(24, 24);
             pickbox.Text = "▼";
             pickbox.Click += new System.EventHandler(Ctrl_Click);
@@ -1616,35 +1631,35 @@ namespace SWD4CS
                     this.ctrl = new HScrollBar();
                     this.ctrl.Size = new System.Drawing.Size(120, 32);
                     this.ctrl!.Name = className + form!.cnt_HScrollBar;
-                    CreatePickBox(this.ctrl);
+                    CreateTrancePanel(this.ctrl);
                     form.cnt_HScrollBar++;
                     break;
                 case "VScrollBar":
                     this.ctrl = new VScrollBar();
                     this.ctrl.Size = new System.Drawing.Size(32, 120);
                     this.ctrl!.Name = className + form!.cnt_VScrollBar;
-                    CreatePickBox(this.ctrl);
+                    CreateTrancePanel(this.ctrl);
                     form.cnt_VScrollBar++;
                     break;
                 case "MonthCalendar":
                     this.ctrl = new MonthCalendar();
                     this.ctrl.Size = new System.Drawing.Size(151, 121);
                     this.ctrl!.Name = className + form!.cnt_MonthCalendar;
-                    CreatePickBox(this.ctrl);
+                    CreateTrancePanel(this.ctrl);
                     form.cnt_MonthCalendar++;
                     break;
                 case "ListView":
                     this.ctrl = new ListView();
                     this.ctrl.Size = new System.Drawing.Size(151, 121);
                     this.ctrl!.Name = className + form!.cnt_ListView;
-                    CreatePickBox(this.ctrl);
+                    CreateTrancePanel(this.ctrl);
                     form.cnt_ListView++;
                     break;
                 case "TreeView":
                     this.ctrl = new TreeView();
                     this.ctrl.Size = new System.Drawing.Size(151, 121);
                     this.ctrl!.Name = className + form!.cnt_TreeView;
-                    CreatePickBox(this.ctrl);
+                    CreateTrancePanel(this.ctrl);
                     form.cnt_TreeView++;
                     break;
                 case "MaskedTextBox":
@@ -1657,6 +1672,7 @@ namespace SWD4CS
                     this.ctrl = new PropertyGrid();
                     this.ctrl.Size = new System.Drawing.Size(151, 121);
                     this.ctrl!.Name = className + form!.cnt_PropertyGrid;
+                    CreateTrancePanel(this.ctrl);
                     form.cnt_PropertyGrid++;
                     break;
                 case "DateTimePicker":
