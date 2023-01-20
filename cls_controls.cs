@@ -1767,6 +1767,12 @@ namespace SWD4CS
                     tbllaypnl!.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
                     form.cnt_TblLayPnl++;
                     break;
+                case "TrackBar":
+                    this.ctrl = new TrackBar();
+                    this.ctrl.Size = new System.Drawing.Size(151, 121);
+                    this.ctrl!.Name = className + form!.cnt_TblLayPnl;
+                    form.cnt_TrackBar++;
+                    break;
                 default:
                     return false;
             }
@@ -1813,8 +1819,7 @@ namespace SWD4CS
             ctrlLstBox.Items.Add("FlowLayoutPanel");
             ctrlLstBox.Items.Add("Splitter");
             ctrlLstBox.Items.Add("TableLayoutPanel");
-            // ctrlLstBox.Items.Add("ToolStlipContainer");
-            // ctrlLstBox.Items.Add("TrackBar");
+            ctrlLstBox.Items.Add("TrackBar");
         }
         // ****************************************************************************************
     }
