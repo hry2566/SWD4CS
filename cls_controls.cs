@@ -34,10 +34,21 @@ namespace SWD4CS
                     _ = new cls_controls(form, "TabPage", this.ctrl!, X, Y);
                     _ = new cls_controls(form, "TabPage", this.ctrl!, X, Y);
                 }
+
                 if (this.ctrl is TabPage)
                 {
                     selectBox = new cls_selectbox(this, this.ctrl);
                     Selected = false;
+                }
+                else if (parent is FlowLayoutPanel)
+                {
+                    selectBox = new cls_selectbox(this, this.ctrl);
+                    Selected = true;
+                }
+                else if (parent is TableLayoutPanel)
+                {
+                    selectBox = new cls_selectbox(this, this.ctrl);
+                    Selected = true;
                 }
                 else
                 {
@@ -246,11 +257,11 @@ namespace SWD4CS
                 "ClientSize",
                 "UseVisualStyleBackColor",
                 "PreferredHeight",
-                "ColumnCount",
+                // "ColumnCount",
                 "FirstDisplayedScrollingColumnIndex",
                 "FirstDisplayedScrollingRowIndex",
                 "NewRowIndex",
-                "RowCount",
+                // "RowCount",
                 "HasChildren",
                 "PreferredWidth",
                 "SingleMonthSize",
@@ -284,8 +295,8 @@ namespace SWD4CS
             Type type = item.GetValue(ctrl)!.GetType();
             string str2 = item.GetValue(ctrl)!.ToString()!;
 
-            //Console.WriteLine(item.Name);
-            //Console.WriteLine(type);
+            // Console.WriteLine(item.Name);
+            // Console.WriteLine(type);
 
             switch (type)
             {
@@ -320,6 +331,7 @@ namespace SWD4CS
                                  t == typeof(System.Windows.Forms.Orientation) ||
                                  t == typeof(System.Windows.Forms.FormBorderStyle) ||
                                  t == typeof(System.Windows.Forms.AutoScaleMode) ||
+                                 t == typeof(System.Windows.Forms.TableLayoutPanelCellBorderStyle) ||
                                  t == typeof(System.Windows.Forms.FormStartPosition):
 
                     strProperty = " = " + type.ToString() + "." + str2 + ";";
@@ -1334,6 +1346,44 @@ namespace SWD4CS
             return font;
         }
 
+        private static object? String2CellBorderStyle(string? propertyValue)
+        {
+            int style = 1;
+
+            if (propertyValue!.IndexOf("System.Windows.Forms.TableLayoutPanelCellBorderStyle") > -1)
+            {
+                string[] split = propertyValue.Split(".");
+                propertyValue = split[split.Length - 1];
+            }
+
+            switch (propertyValue)
+            {
+                case "Inset":
+                    style = 2;
+                    break;
+                case "InsetDouble":
+                    style = 3;
+                    break;
+                case "None":
+                    style = 0;
+                    break;
+                case "Outset":
+                    style = 0;
+                    break;
+                case "OutsetDouble":
+                    style = 5;
+                    break;
+                case "OutsetPartial":
+                    style = 6;
+                    break;
+                case "Single":
+                    style = 1;
+                    break;
+            }
+            return style;
+        }
+
+
         private static string SetCtrlProperty(Control? ctrl, string? propertyName, string? propertyValue)
         {
             Type type;
@@ -1407,12 +1457,17 @@ namespace SWD4CS
                     case Type t when t == typeof(System.Drawing.Font):
                         property.SetValue(ctrl, String2Font(propertyValue));
                         return "";
+                    case Type t when t == typeof(System.Windows.Forms.TableLayoutPanelCellBorderStyle):
+                        property.SetValue(ctrl, String2CellBorderStyle(propertyValue));
+                        return "";
                 }
                 return "Unimplemented PropertyType : " + type;
                 //Console.WriteLine("Unimplemented PropertyType : " + type);
             }
             return "";
         }
+
+
 
         //private static string SetCtrlProperty(Object? obj, string? propertyName, string? propertyValue)
         //{
@@ -1688,6 +1743,30 @@ namespace SWD4CS
                     this.ctrl!.Name = className + form!.cnt_DomainUpDown;
                     form.cnt_DomainUpDown++;
                     break;
+                case "FlowLayoutPanel":
+                    this.ctrl = new FlowLayoutPanel();
+                    this.ctrl.Size = new System.Drawing.Size(151, 121);
+                    this.ctrl!.Name = className + form!.cnt_FlowLayoutPanel;
+                    FlowLayoutPanel? flwlayoutpnl = this.ctrl as FlowLayoutPanel;
+                    flwlayoutpnl!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+                    form.cnt_FlowLayoutPanel++;
+                    break;
+                case "Splitter":
+                    this.ctrl = new Splitter();
+                    this.ctrl.Size = new System.Drawing.Size(151, 121);
+                    this.ctrl!.Name = className + form!.cnt_Splitter;
+                    Splitter? splitter = this.ctrl as Splitter;
+                    splitter!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+                    form.cnt_Splitter++;
+                    break;
+                case "TableLayoutPanel":
+                    this.ctrl = new TableLayoutPanel();
+                    this.ctrl.Size = new System.Drawing.Size(151, 121);
+                    this.ctrl!.Name = className + form!.cnt_TblLayPnl;
+                    TableLayoutPanel? tbllaypnl = this.ctrl as TableLayoutPanel;
+                    tbllaypnl!.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
+                    form.cnt_TblLayPnl++;
+                    break;
                 default:
                     return false;
             }
@@ -1731,6 +1810,11 @@ namespace SWD4CS
             ctrlLstBox.Items.Add("PropertyGrid");
             ctrlLstBox.Items.Add("DateTimePicker");
             ctrlLstBox.Items.Add("DomainUpDown");
+            ctrlLstBox.Items.Add("FlowLayoutPanel");
+            ctrlLstBox.Items.Add("Splitter");
+            ctrlLstBox.Items.Add("TableLayoutPanel");
+            // ctrlLstBox.Items.Add("ToolStlipContainer");
+            // ctrlLstBox.Items.Add("TrackBar");
         }
         // ****************************************************************************************
     }
