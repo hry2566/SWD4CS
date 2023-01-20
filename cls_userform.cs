@@ -49,8 +49,7 @@ namespace SWD4CS
         internal int cnt_FlowLayoutPanel;
         internal int cnt_Splitter;
         internal int cnt_TblLayPnl;
-        // internal int cnt_TlStlpContainer;
-        // internal int cnt_TrackBar;
+        internal int cnt_TrackBar;
         private void CountInit()
         {
             cnt_Control = -1;
@@ -85,8 +84,7 @@ namespace SWD4CS
             cnt_FlowLayoutPanel = 0;
             cnt_Splitter = 0;
             cnt_TblLayPnl = 0;
-            // cnt_TlStlpContainer = 0;
-            // cnt_TrackBar = 0;
+            cnt_TrackBar = 0;
         }
         // ****************************************************************************************
 
