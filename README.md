@@ -52,7 +52,7 @@
  ・Splitter  
  ・StatusStrip  
  ・TabControl  
- ・TableLayoutPanel
+ ・TableLayoutPanel  
  ・TabPage  
  ・TextBox  
  ・TrackBar  
