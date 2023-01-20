@@ -46,6 +46,11 @@ namespace SWD4CS
         internal int cnt_PropertyGrid;
         internal int cnt_DateTimePicker;
         internal int cnt_DomainUpDown;
+        internal int cnt_FlowLayoutPanel;
+        internal int cnt_Splitter;
+        internal int cnt_TblLayPnl;
+        // internal int cnt_TlStlpContainer;
+        // internal int cnt_TrackBar;
         private void CountInit()
         {
             cnt_Control = -1;
@@ -77,6 +82,11 @@ namespace SWD4CS
             cnt_PropertyGrid = 0;
             cnt_DateTimePicker = 0;
             cnt_DomainUpDown = 0;
+            cnt_FlowLayoutPanel = 0;
+            cnt_Splitter = 0;
+            cnt_TblLayPnl = 0;
+            // cnt_TlStlpContainer = 0;
+            // cnt_TrackBar = 0;
         }
         // ****************************************************************************************
 
