@@ -33,6 +33,7 @@
  ・DataGridView  
  ・DateTimePicker  
  ・DomainUpDown  
+ ・FlowLayoutPanel  
  ・GroupBox  
  ・HScrollBar  
  ・Label  
@@ -48,10 +49,13 @@
  ・RadioButton  
  ・RichText  
  ・SplitContainer  
+ ・Splitter  
  ・StatusStrip  
  ・TabControl  
+ ・TableLayoutPanel
  ・TabPage  
  ・TextBox  
+ ・TrackBar  
  ・TreeView  
  ・VScrollBar  
  ・Designer.csファイルのRead/Write　~~（ただし、SWD4CS以外で編集したものは開けない）~~  
@@ -78,6 +82,7 @@
  ・System.Windows.Forms.FormBorderStyle  
  ・System.Windows.Forms.AutoScaleMode  
  ・System.Drawing.Font  
+ ・System.Windows.Forms.TableLayoutPanelCellBorderStyle  
 
 ## コントロール追加方法 
  * 「// コントロール追加時に下記を編集すること」に追記。  
