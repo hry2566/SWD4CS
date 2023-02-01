@@ -91,6 +91,6 @@
  ・System.Drawing.Font  
  ・System.Windows.Forms.TableLayoutPanelCellBorderStyle  
 
-## コントロール追加方法 
- * 「// コントロール追加時に下記を編集すること」に追記。
+## コントロール追加方法  
+ * 「// コントロール追加時に下記を編集すること」に追記  
 ・cls_control.cs  
