@@ -12,17 +12,11 @@ namespace SWD4CS
 
         internal cls_treenode? Search(string name)
         {
-            if (Text == name)
-            {
-                return this;
-            }
+            if (Text == name) { return this; }
 
             for (int i = 0; i < itemNode.Count(); i++)
             {
-                if (itemNode[i].Search(name) != null)
-                {
-                    return itemNode[i].Search(name);
-                }
+                if (itemNode[i].Search(name) != null) { return itemNode[i].Search(name); }
             }
             return null;
         }
@@ -36,10 +30,7 @@ namespace SWD4CS
                 Array.Resize(ref itemNode, itemNode.Count() + 1);
                 itemNode[itemNode.Count() - 1] = new cls_treenode(name + ".Panel2");
             }
-            else
-            {
-                itemNode[itemNode.Count() - 1] = new cls_treenode(name);
-            }
+            else { itemNode[itemNode.Count() - 1] = new cls_treenode(name); }
 
             this.Nodes.Clear();
             this.Nodes.AddRange(itemNode);
