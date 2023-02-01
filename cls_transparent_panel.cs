@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace SWD4CS
 {
     public class cls_transparent_panel : Panel
@@ -21,10 +19,7 @@ namespace SWD4CS
 
         protected override void OnPaintBackground(PaintEventArgs e)
         {
-            using (var brush = new SolidBrush(BackColor))
-            {
-                e.Graphics.FillRectangle(brush, e.ClipRectangle);
-            }
+            using (var brush = new SolidBrush(BackColor)) { e.Graphics.FillRectangle(brush, e.ClipRectangle); }
         }
     }
 }
