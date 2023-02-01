@@ -47,7 +47,7 @@
  ・ProgressBar  
  ・PropertyGrid  
  ・RadioButton  
- ・RichText  
+ ・RichTextBox  
  ・SplitContainer  
  ・Splitter  
  ・StatusStrip  
@@ -58,6 +58,13 @@
  ・TrackBar  
  ・TreeView  
  ・VScrollBar  
+ ・ColorDialog  
+ ・FolderBrowserDialog  
+ ・FontDialog  
+ ・imageList  
+ ・OpenFiledialog  
+ ・SaveFiledialog  
+ ・Timer
  ・Designer.csファイルのRead/Write　~~（ただし、SWD4CS以外で編集したものは開けない）~~  
  ・他のコントローラー等は必要になったら追加する。
 
@@ -85,6 +92,5 @@
  ・System.Windows.Forms.TableLayoutPanelCellBorderStyle  
 
 ## コントロール追加方法 
- * 「// コントロール追加時に下記を編集すること」に追記。  
-・cls_form.cs  
+ * 「// コントロール追加時に下記を編集すること」に追記。
 ・cls_control.cs  
