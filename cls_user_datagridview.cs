@@ -1,15 +1,14 @@
-﻿using System.Data;
+﻿using System.ComponentModel;
+using System.Data;
 using System.Reflection;
 
 namespace SWD4CS
 {
     public partial class cls_user_datagridview : DataGridView
     {
-        private cls_userform? form;
-        private cls_controls? cls_ctrl;
+        private cls_userform? form; cls_controls? cls_ctrl;
         public cls_user_datagridview()
         {
-            InitializeComponent();
             this.DoubleBuffered = true;
             this.AllowUserToAddRows = false;
             this.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(cls_user_datagridview1_CellMouseDoubleClick);
@@ -19,10 +18,10 @@ namespace SWD4CS
         {
             this.form = form;
             this.cls_ctrl = null;
-
             List<string> evnt = new();
             List<string> fnc = new();
             string[] split;
+
             for (int i = 0; i < form.decHandler.Count; i++)
             {
                 split = form.decHandler[i].Split("+=")[0].Split(".");
@@ -31,17 +30,16 @@ namespace SWD4CS
                 split = form.decFunc[i].Split("(")[0].Split(" ");
                 fnc.Add(split[split.Length - 1].Trim());
             }
-
-            SetEventsData(flag, form.memForm, evnt, fnc);
+            SetEventsData(flag, form, evnt, fnc);
         }
         internal void ShowEventList(bool flag, cls_controls ctrl)
         {
             this.form = null;
             this.cls_ctrl = ctrl;
-
             List<string> evnt = new();
             List<string> fnc = new();
             string[] split;
+
             for (int i = 0; i < ctrl.decHandler.Count; i++)
             {
                 split = ctrl.decHandler[i].Split("+=")[0].Split(".");
@@ -50,10 +48,11 @@ namespace SWD4CS
                 split = ctrl.decFunc[i].Split("(")[0].Split(" ");
                 fnc.Add(split[split.Length - 1].Trim());
             }
-            SetEventsData(flag, ctrl.ctrl, evnt, fnc);
+            if (ctrl.nonCtrl!.GetType() == typeof(Component)) { SetEventsData(flag, ctrl.ctrl, evnt, fnc); }
+            else { SetEventsData(flag, ctrl.nonCtrl, evnt, fnc); }
         }
 
-        private void SetEventsData(bool flag, Control? ctrl, List<string> evnt, List<string> fnc)
+        private void SetEventsData(bool flag, Component? comp, List<string> evnt, List<string> fnc)
         {
             DataTable table = new();
 
@@ -62,7 +61,7 @@ namespace SWD4CS
 
             if (flag)
             {
-                Type type = ctrl!.GetType();
+                Type type = comp!.GetType();
                 MemberInfo[] members = type.GetMembers();
                 foreach (MemberInfo m in members)
                 {
@@ -71,17 +70,12 @@ namespace SWD4CS
                     {
                         for (int i = 0; i < evnt.Count; i++)
                         {
-                            if (evnt[i] == m.Name)
-                            {
-                                funcName = fnc[i];
-                                break;
-                            }
+                            if (evnt[i] == m.Name) { funcName = fnc[i]; break; }
                         }
                         table.Rows.Add(m.Name, funcName);
                     }
                 }
             }
-
             this.DataSource = table;
             this.Sort(this.Columns[0], System.ComponentModel.ListSortDirection.Ascending);
             this.Columns[0].ReadOnly = true;
@@ -89,45 +83,43 @@ namespace SWD4CS
             this.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             this.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
         }
+
         private void cls_user_datagridview1_CellMouseDoubleClick(object? sender, DataGridViewCellMouseEventArgs e)
         {
             Control? ctrl;
+            bool mode = false;
 
-            if (this.form != null)
-            {
-                ctrl = this.form.memForm;
-            }
+            if (this.form != null) { ctrl = this.form; ctrl.Name = this.form.viewName; }
             else
             {
                 ctrl = this.cls_ctrl!.ctrl;
+                if (this.cls_ctrl.nonCtrl!.GetType() != typeof(Component)) { mode = true; }
             }
 
             string? eventName = this.Rows[e.RowIndex].Cells[0].Value.ToString();
             string? newHandler;
-            string? funcName = ctrl!.Name + "_" + eventName;
             string funcParam = "";
             string param = "";
+            string? funcName = ctrl!.Name + "_" + eventName;
 
             if (this.Rows[e.RowIndex].Cells[1].Value.ToString() == "")
             {
                 this.Rows[e.RowIndex].Cells[1].Value = funcName;
+                Type? delegateType;
 
-                Type? delegateType = ctrl.GetType().GetEvent(eventName!)!.EventHandlerType;
+                if (mode) { delegateType = this.cls_ctrl!.nonCtrl!.GetType().GetEvent(eventName!)!.EventHandlerType; }
+                else { delegateType = ctrl!.GetType().GetEvent(eventName!)!.EventHandlerType; }
+
                 MethodInfo? invoke = delegateType!.GetMethod("Invoke");
                 ParameterInfo[] pars = invoke!.GetParameters();
                 string[] split = delegateType.AssemblyQualifiedName!.Split(",");
                 newHandler = "new " + split[0];
-
                 SetArguments(ref funcParam, ref param, pars);
-
-                string decHandler = GetDecHandler(eventName, newHandler, funcName, ctrl.Name);
+                string decHandler = GetDecHandler(eventName, newHandler, funcName, ctrl!.Name);
                 string decFunc = "private void " + funcName + "(" + funcParam + ")";
                 DeclarationAdd(decHandler, decFunc);
             }
-            else
-            {
-                Delete_Event(e, funcName);
-            }
+            else { Delete_Event(e, funcName); }
         }
 
         private void Delete_Event(DataGridViewCellMouseEventArgs e, string funcName)
@@ -139,7 +131,6 @@ namespace SWD4CS
                 for (int i = 0; i < this.form!.decFunc.Count; i++)
                 {
                     string[] split = this.form!.decFunc[i].Split("(")[0].Split(" ");
-
                     if (split[split.Length - 1] == funcName)
                     {
                         this.form!.decHandler.Remove(this.form!.decHandler[i]);
@@ -153,7 +144,6 @@ namespace SWD4CS
                 for (int i = 0; i < this.cls_ctrl!.decFunc.Count; i++)
                 {
                     string[] split = this.cls_ctrl!.decFunc[i].Split("(")[0].Split(" ");
-
                     if (split[split.Length - 1] == funcName)
                     {
                         this.cls_ctrl!.decHandler.Remove(this.cls_ctrl!.decHandler[i]);
@@ -181,14 +171,8 @@ namespace SWD4CS
         private string GetDecHandler(string? eventName, string newHandler, string funcName, string ctrlName)
         {
             string decHandler;
-            if (this.form != null)
-            {
-                decHandler = "this." + eventName + " += " + newHandler + "(" + funcName + ");";
-            }
-            else
-            {
-                decHandler = "this." + ctrlName + "." + eventName + " += " + newHandler + "(" + funcName + ");";
-            }
+            if (this.form != null) { decHandler = "this." + eventName + " += " + newHandler + "(" + funcName + ");"; }
+            else { decHandler = "this." + ctrlName + "." + eventName + " += " + newHandler + "(" + funcName + ");"; }
             return decHandler;
         }
 
@@ -197,24 +181,10 @@ namespace SWD4CS
             foreach (ParameterInfo p in pars)
             {
                 param = p.ParameterType.ToString();
-
-                if (param == "System.Object")
-                {
-                    param += "? sender";
-                }
-                else
-                {
-                    param += " e";
-                }
-
-                if (funcParam == "")
-                {
-                    funcParam = param;
-                }
-                else
-                {
-                    funcParam += ", " + param;
-                }
+                if (param == "System.Object") { param += "? sender"; }
+                else { param += " e"; }
+                if (funcParam == "") { funcParam = param; }
+                else { funcParam += ", " + param; }
             }
         }
     }
