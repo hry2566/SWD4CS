@@ -76,6 +76,7 @@ public partial class MainForm : Form
             if (propertyGrid.SelectedObject is Control)
             {
                 Control? ctrl = propertyGrid.SelectedObject as Control;
+                change_EventsName(ctrl!.Name);
                 ctrl!.Name = propertyCtrlName!.Text;
             }
             else
@@ -181,11 +182,37 @@ public partial class MainForm : Form
         ctrlTreeView.TopNode.Expand();
     }
 
+    private void change_EventsName(string oldName)
+    {
+        int index = search_Ctrl();
+        if (index != -1)
+        {
+            for (int i = 0; i < userForm!.CtrlItems[index].decHandler.Count; i++)
+            {
+                string newHandler = userForm!.CtrlItems[index].decHandler[i].Replace("." + oldName + ".", "." + propertyCtrlName!.Text + ".");
+                newHandler = newHandler.Replace("(" + oldName + "_", "(" + propertyCtrlName!.Text + "_");
+                userForm!.CtrlItems[index].decHandler[i] = newHandler;
+
+                string newFunc = userForm!.CtrlItems[index].decFunc[i].Replace(" " + oldName + "_", " " + propertyCtrlName!.Text + "_");
+                userForm!.CtrlItems[index].decFunc[i] = newFunc;
+            }
+        }
+    }
+
     private int search_nonCtrl()
     {
         for (int i = 0; i < userForm!.CtrlItems.Count; i++)
         {
             if (userForm.CtrlItems[i].nonCtrl == propertyGrid!.SelectedObject) { return i; }
+        }
+        return -1;
+    }
+
+    private int search_Ctrl()
+    {
+        for (int i = 0; i < userForm!.CtrlItems.Count; i++)
+        {
+            if (userForm.CtrlItems[i].ctrl == propertyGrid!.SelectedObject) { return i; }
         }
         return -1;
     }
