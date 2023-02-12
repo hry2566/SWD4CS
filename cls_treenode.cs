@@ -14,9 +14,10 @@ namespace SWD4CS
         {
             if (Text == name) { return this; }
 
-            for (int i = 0; i < itemNode.Count(); i++)
+            foreach (var node in itemNode)
             {
-                if (itemNode[i].Search(name) != null) { return itemNode[i].Search(name); }
+                var result = node.Search(name);
+                if (result != null) { return result; }
             }
             return null;
         }
@@ -26,11 +27,11 @@ namespace SWD4CS
             Array.Resize(ref itemNode, itemNode.Count() + 1);
             if (className == "SplitContainer")
             {
-                itemNode[itemNode.Count() - 1] = new cls_treenode(name + ".Panel1");
+                itemNode[^1] = new cls_treenode(name + ".Panel1");
                 Array.Resize(ref itemNode, itemNode.Count() + 1);
-                itemNode[itemNode.Count() - 1] = new cls_treenode(name + ".Panel2");
+                itemNode[^1] = new cls_treenode(name + ".Panel2");
             }
-            else { itemNode[itemNode.Count() - 1] = new cls_treenode(name); }
+            else { itemNode[^1] = new cls_treenode(name); }
 
             this.Nodes.Clear();
             this.Nodes.AddRange(itemNode);
