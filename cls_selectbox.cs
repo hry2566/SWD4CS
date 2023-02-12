@@ -46,18 +46,20 @@
             parent.Controls.AddRange(this.selectbox);
         }
 
-        private void SelectboxMouseDown(object sender, MouseEventArgs e)
+        private void SelectboxMouseDown(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left) { memPos = e.Location; }
         }
 
-        private void SelectboxMouseMove(object sender, MouseEventArgs e)
+        private void SelectboxMouseMove(object? sender, MouseEventArgs e)
         {
-            var move_selectbox = (Panel)sender;
+            var move_selectbox = (Panel)sender!;
 
             if (e.Button == MouseButtons.Left)
             {
-                var newPos = new Point(e.X - memPos.X + move_selectbox.Location.X, e.Y - memPos.Y + move_selectbox.Location.Y);
+                int x = e.X - memPos.X + move_selectbox.Location.X;
+                int y = e.Y - memPos.Y + move_selectbox.Location.Y;
+                var newPos = new Point(x, y);
                 move_selectbox.Location = newPos;
                 if (ctrl == null) { SetFormSize(newPos, move_selectbox.TabIndex); }
                 else { SetControlSize(newPos, move_selectbox.TabIndex); }
@@ -66,27 +68,17 @@
 
         private void SetFormSize(Point pos, int index)
         {
-            Point newPos = new((int)(pos.X / grid) * grid, (int)(pos.Y / grid) * grid);
-            int width = newPos.X - form!.Left;
-            int height = newPos.Y - form.Top;
+            int newX = (int)(pos.X / grid) * grid;
+            int newY = (int)(pos.Y / grid) * grid;
+            int width = newX - form!.Left;
+            int height = newY - form.Top;
 
-            switch (index)
-            {
-                case 3:
-                case 4:
-                    form.Height = height;
-                    break;
-                case 5:
-                    form.Width = width;
-                    form.Height = height;
-                    break;
-                case 2:
-                case 7:
-                    form.Width = width;
-                    break;
-            }
-            if (form.Width < 160) { form.Width = 160; }
-            if (form.Height < 40) { form.Height = 40; }
+            if (index == 3 || index == 4) { form.Height = height; }
+            if (index == 5) { form.Width = width; form.Height = height; }
+            if (index == 2 || index == 7) { form.Width = width; }
+
+            form.Width = Math.Max(form.Width, 160);
+            form.Height = Math.Max(form.Height, 40);
             form.SetSelect(true);
         }
 
@@ -146,45 +138,34 @@
             ctrl.Selected = true;
         }
 
-        // ********************************************************************************************
-        // internal Function 
-        // ********************************************************************************************
         internal void SetSelectBoxPos(bool flag)
         {
             if (flag)
             {
                 int x1, x2, x3, y1, y2, y3;
+                Control? control = ctrl?.ctrl ?? form;
+
+                x1 = control!.Left - 8;
+                x2 = control.Width / 2 + control.Left - 4;
+                x3 = control.Width + control.Left;
+                y1 = control.Top - 8;
+                y2 = control.Height / 2 + control.Top - 4;
+                y3 = control.Height + control.Top;
 
                 if (ctrl != null)
                 {
-                    if (ctrl.ctrl is TabPage)
-                    {
-                        x1 = ctrl.ctrl.Left;
-                        x2 = ctrl.ctrl.Width / 2 + ctrl.ctrl.Left - 8;
-                        x3 = ctrl.ctrl.Width + ctrl.ctrl.Left - 16;
-                        y1 = ctrl.ctrl.Top - 27;
-                        y2 = ctrl.ctrl.Height / 2 + ctrl.ctrl.Top - 35;
-                        y3 = ctrl.ctrl.Height + ctrl.ctrl.Top - 40;
-                    }
-                    else
-                    {
-                        x1 = ctrl.ctrl!.Left - 8;
-                        x2 = ctrl.ctrl!.Width / 2 + ctrl.ctrl!.Left - 4;
-                        x3 = ctrl.ctrl!.Width + ctrl.ctrl!.Left;
-                        y1 = ctrl.ctrl!.Top - 8;
-                        y2 = ctrl.ctrl!.Height / 2 + ctrl.ctrl!.Top - 4;
-                        y3 = ctrl.ctrl!.Height + ctrl.ctrl!.Top;
-                    }
+                    int a1 = 0, a2 = 0, a3 = 0, b1 = 0, b2 = 0, b3 = 0;
+                    if (control is TabPage) { a2 = 8; a3 = 16; b1 = 27; b2 = 35; b3 = 40; }
+                    else { a1 = 9; a2 = 4; b1 = 8; b2 = 4; }
+
+                    x1 = control.Left - a1;
+                    x2 = control.Width / 2 + control.Left - a2;
+                    x3 = control.Width + control.Left - a3;
+                    y1 = control.Top - b1;
+                    y2 = control.Height / 2 + control.Top - b2;
+                    y3 = control.Height + control.Top - b3;
                 }
-                else
-                {
-                    x1 = form!.Left - 8;
-                    x2 = form.Width / 2 + form.Left - 4;
-                    x3 = form.Width + form.Left;
-                    y1 = form.Top - 8;
-                    y2 = form.Height / 2 + form.Top - 4;
-                    y3 = form.Height + form.Top;
-                }
+
                 this.selectbox[0].Location = new Point(x1, y1);
                 this.selectbox[1].Location = new Point(x2, y1);
                 this.selectbox[2].Location = new Point(x3, y1);
