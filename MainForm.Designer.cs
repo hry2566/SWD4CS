@@ -81,7 +81,6 @@ partial class MainForm
         this.mainWndSplitContainer.Text =  "mainWndSplitContainer";
         this.mainWndSplitContainer.BackColor = System.Drawing.Color.WhiteSmoke;
         this.mainWndSplitContainer.Location = new System.Drawing.Point(0,31);
-        this.mainWndSplitContainer.Name =  "mainWndSplitContainer";
         this.mainWndSplitContainer.Size = new System.Drawing.Size(1003,608);
         this.mainWndSplitContainer.SplitterDistance = 199;
         this.mainWndSplitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
@@ -91,9 +90,9 @@ partial class MainForm
         this.ctrlsTab.Controls.Add(this.tabPage1);
         this.ctrlsTab.Controls.Add(this.tabPage2);
         this.ctrlsTab.ItemSize = new System.Drawing.Size(59,20);
+        this.ctrlsTab.SelectedIndex = 0;
         this.ctrlsTab.Text =  "ctrlsTab";
         this.ctrlsTab.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.ctrlsTab.Name =  "ctrlsTab";
         this.ctrlsTab.Size = new System.Drawing.Size(197,606);
         this.ctrlsTab.TabIndex = 1;
         this.ctrlsTab.SelectedIndexChanged += new System.EventHandler(ctrlsTab_SelectedIndexChanged);
@@ -101,12 +100,11 @@ partial class MainForm
         // tabPage1
         //
         this.tabPage1.Controls.Add(this.ctrlLstBox);
-        this.tabPage1.BackColor = Color.Transparent;
         this.tabPage1.Location = new System.Drawing.Point(4,24);
         this.tabPage1.TabIndex = 2;
         this.tabPage1.Text =  "ToolsBox";
-        this.tabPage1.Name =  "tabPage1";
         this.tabPage1.Size = new System.Drawing.Size(189,578);
+        this.tabPage1.BackColor = Color.Transparent;
         //
         // ctrlLstBox
         //
@@ -114,19 +112,17 @@ partial class MainForm
         this.ctrlLstBox.Text =  "ctrlLstBox";
         this.ctrlLstBox.FormattingEnabled =  true;
         this.ctrlLstBox.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.ctrlLstBox.Name =  "ctrlLstBox";
         this.ctrlLstBox.Size = new System.Drawing.Size(189,574);
         this.ctrlLstBox.TabIndex = 3;
         //
         // tabPage2
         //
         this.tabPage2.Controls.Add(this.ctrlTreeView);
-        this.tabPage2.BackColor = Color.Transparent;
         this.tabPage2.Location = new System.Drawing.Point(4,24);
         this.tabPage2.TabIndex = 1;
         this.tabPage2.Text =  "TreeView";
-        this.tabPage2.Name =  "tabPage2";
         this.tabPage2.Size = new System.Drawing.Size(189,578);
+        this.tabPage2.BackColor = Color.Transparent;
         //
         // ctrlTreeView
         //
@@ -134,7 +130,6 @@ partial class MainForm
         this.ctrlTreeView.LineColor = System.Drawing.Color.Black;
         this.ctrlTreeView.Text =  "ctrlTreeView";
         this.ctrlTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.ctrlTreeView.Name =  "ctrlTreeView";
         this.ctrlTreeView.Size = new System.Drawing.Size(189,578);
         this.ctrlTreeView.TabIndex = 5;
         this.ctrlTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(ctrlTreeView_AfterSelect);
@@ -149,7 +144,6 @@ partial class MainForm
         this.subWndSplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
         this.subWndSplitContainer.Text =  "subWndSplitContainer";
         this.subWndSplitContainer.BackColor = System.Drawing.Color.WhiteSmoke;
-        this.subWndSplitContainer.Name =  "subWndSplitContainer";
         this.subWndSplitContainer.Size = new System.Drawing.Size(800,608);
         this.subWndSplitContainer.TabIndex = 6;
         this.subWndSplitContainer.SplitterDistance = 527;
@@ -159,9 +153,9 @@ partial class MainForm
         this.designTab.Controls.Add(this.designPage);
         this.designTab.Controls.Add(this.sourcePage);
         this.designTab.ItemSize = new System.Drawing.Size(54,20);
+        this.designTab.SelectedIndex = 0;
         this.designTab.Text =  "designTab";
         this.designTab.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.designTab.Name =  "designTab";
         this.designTab.Size = new System.Drawing.Size(525,606);
         this.designTab.TabIndex = 1;
         this.designTab.SelectedIndexChanged += new System.EventHandler(designTab_SelectedIndexChanged);
@@ -169,23 +163,21 @@ partial class MainForm
         // designPage
         //
         this.designPage.Controls.Add(this.designSplitContainer);
-        this.designPage.BackColor = Color.Transparent;
         this.designPage.Location = new System.Drawing.Point(4,24);
         this.designPage.TabIndex = 8;
         this.designPage.Text =  "Design";
-        this.designPage.AutoScroll =  true;
-        this.designPage.Name =  "designPage";
         this.designPage.Size = new System.Drawing.Size(517,578);
+        this.designPage.BackColor = Color.Transparent;
+        this.designPage.AutoScroll =  true;
         //
         // sourcePage
         //
         this.sourcePage.Controls.Add(this.sourceTxtBox);
-        this.sourcePage.BackColor = Color.Transparent;
         this.sourcePage.Location = new System.Drawing.Point(4,24);
         this.sourcePage.TabIndex = 1;
         this.sourcePage.Text =  "Source";
-        this.sourcePage.Name =  "sourcePage";
         this.sourcePage.Size = new System.Drawing.Size(517,578);
+        this.sourcePage.BackColor = Color.Transparent;
         //
         // sourceTxtBox
         //
@@ -196,7 +188,6 @@ partial class MainForm
         this.sourceTxtBox.ReadOnly =  true;
         this.sourceTxtBox.WordWrap =  false;
         this.sourceTxtBox.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.sourceTxtBox.Name =  "sourceTxtBox";
         this.sourceTxtBox.Size = new System.Drawing.Size(517,578);
         this.sourceTxtBox.TabIndex = 10;
         //
@@ -205,9 +196,9 @@ partial class MainForm
         this.tabControl1.Controls.Add(this.tabPage3);
         this.tabControl1.Controls.Add(this.tabPage4);
         this.tabControl1.ItemSize = new System.Drawing.Size(57,20);
+        this.tabControl1.SelectedIndex = 0;
         this.tabControl1.Text =  "TabControl2";
         this.tabControl1.Location = new System.Drawing.Point(4,32);
-        this.tabControl1.Name =  "tabControl1";
         this.tabControl1.Size = new System.Drawing.Size(269,600);
         this.tabControl1.TabIndex = 15;
         this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
@@ -215,18 +206,16 @@ partial class MainForm
         // tabPage3
         //
         this.tabPage3.Controls.Add(this.propertyBox);
-        this.tabPage3.BackColor = Color.Transparent;
         this.tabPage3.Location = new System.Drawing.Point(4,24);
         this.tabPage3.TabIndex = 16;
         this.tabPage3.Text =  "Property";
-        this.tabPage3.Name =  "tabPage3";
         this.tabPage3.Size = new System.Drawing.Size(261,572);
+        this.tabPage3.BackColor = Color.Transparent;
         //
         // nameTxtBox
         //
         this.nameTxtBox.Text =  "TextBox3";
         this.nameTxtBox.Location = new System.Drawing.Point(58,6);
-        this.nameTxtBox.Name =  "nameTxtBox";
         this.nameTxtBox.Size = new System.Drawing.Size(206,23);
         this.nameTxtBox.TabIndex = 2;
         this.nameTxtBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right)));
@@ -238,7 +227,6 @@ partial class MainForm
         this.label1.Text =  "Name";
         this.label1.BackColor = Color.Transparent;
         this.label1.Location = new System.Drawing.Point(8,9);
-        this.label1.Name =  "label1";
         this.label1.Size = new System.Drawing.Size(38,15);
         this.label1.TabIndex = 1;
         //
@@ -246,7 +234,6 @@ partial class MainForm
         //
         this.propertyBox.Text =  "PropertyGrid0";
         this.propertyBox.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.propertyBox.Name =  "propertyBox";
         this.propertyBox.Size = new System.Drawing.Size(261,572);
         this.propertyBox.TabIndex = 19;
         //
@@ -255,7 +242,6 @@ partial class MainForm
         this.tabPage4.Location = new System.Drawing.Point(4,24);
         this.tabPage4.TabIndex = 20;
         this.tabPage4.Text =  "Event";
-        this.tabPage4.Name =  "tabPage4";
         this.tabPage4.Size = new System.Drawing.Size(261,572);
         //
         // statusStrip1
@@ -263,7 +249,6 @@ partial class MainForm
         this.statusStrip1.BackColor = System.Drawing.Color.WhiteSmoke;
         this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20,20);
         this.statusStrip1.Location = new System.Drawing.Point(0,642);
-        this.statusStrip1.Name =  "statusStrip1";
         this.statusStrip1.Size = new System.Drawing.Size(1003,22);
         this.statusStrip1.TabIndex = 1;
         this.statusStrip1.Text =  "statusStrip1";
@@ -276,7 +261,6 @@ partial class MainForm
         this.designSplitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
         this.designSplitContainer.Text =  "SplitContainer2";
         this.designSplitContainer.BackColor = Color.Transparent;
-        this.designSplitContainer.Name =  "designSplitContainer";
         this.designSplitContainer.Size = new System.Drawing.Size(517,578);
         this.designSplitContainer.TabIndex = 22;
         this.designSplitContainer.SplitterDistance = 465;
@@ -287,18 +271,16 @@ partial class MainForm
         this.otherCtlPanel.AutoScroll =  true;
         this.otherCtlPanel.BackColor = System.Drawing.Color.White;
         this.otherCtlPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.otherCtlPanel.Name =  "otherCtlPanel";
         this.otherCtlPanel.Size = new System.Drawing.Size(515,107);
         this.otherCtlPanel.TabIndex = 23;
-        //
-        // form
-        //
+     //
+     // form
+     //
         this.BackColor = System.Drawing.Color.WhiteSmoke;
         this.KeyPreview =  true;
         this.Size = new System.Drawing.Size(1019,703);
         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
         this.Text =  "SWD4CS";
-        this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         this.KeyDown += new System.Windows.Forms.KeyEventHandler(MainForm_KeyDown);
         this.Controls.Add(this.mainWndSplitContainer);
@@ -327,9 +309,9 @@ partial class MainForm
         this.designSplitContainer.ResumeLayout(false);
         this.otherCtlPanel.ResumeLayout(false);
         this.ResumeLayout(false);
-    }
+    } 
 
-    #endregion
+    #endregion 
 
     private System.Windows.Forms.SplitContainer mainWndSplitContainer;
     private System.Windows.Forms.TabControl ctrlsTab;
@@ -353,28 +335,28 @@ partial class MainForm
     private System.Windows.Forms.FlowLayoutPanel otherCtlPanel;
 }
 
-//private void ctrlsTab_SelectedIndexChanged(System.Object? sender, System.EventArgs e)
-//{
-//
-//}
+// private void ctrlsTab_SelectedIndexChanged(System.Object? sender, System.EventArgs e)
+// {
+// 
+// }
 
-//private void ctrlTreeView_AfterSelect(System.Object? sender, System.Windows.Forms.TreeViewEventArgs e)
-//{
-//
-//}
+// private void ctrlTreeView_AfterSelect(System.Object? sender, System.Windows.Forms.TreeViewEventArgs e)
+// {
+// 
+// }
 
-//private void designTab_SelectedIndexChanged(System.Object? sender, System.EventArgs e)
-//{
-//
-//}
+// private void designTab_SelectedIndexChanged(System.Object? sender, System.EventArgs e)
+// {
+// 
+// }
 
-//private void nameTxtBox_TextChanged(System.Object? sender, System.EventArgs e)
-//{
-//
-//}
+// private void nameTxtBox_TextChanged(System.Object? sender, System.EventArgs e)
+// {
+// 
+// }
 
-//private void MainForm_KeyDown(System.Object? sender, System.Windows.Forms.KeyEventArgs e)
-//{
+// private void MainForm_KeyDown(System.Object? sender, System.Windows.Forms.KeyEventArgs e)
+// {
 //
-//}
+// }
 
