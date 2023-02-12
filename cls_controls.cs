@@ -16,37 +16,40 @@ namespace SWD4CS
 
         public cls_controls(cls_userform form, FlowLayoutPanel? otherCtrlPanel, string className, Control parent, int X, int Y, bool fileFlag = false)
         {
-            if ((className == "TabPage" && parent == form) || (parent is StatusStrip)) { return; }
-
             this.form = form;
             this.otherCtrlPanel = otherCtrlPanel;
 
-            if (AddCtrl_Init(className))
+            if ((className == "TabPage" && parent == form) || (parent is StatusStrip)) { return; }
+            if (!AddCtrl_Init(className)) { return; }
+
+            this.className = className;
+            this.ctrl!.Location = new System.Drawing.Point(X, Y);
+            this.form.CtrlItems!.Add(this);
+
+            if (this.nonCtrl.GetType() == typeof(Component))
             {
-                this.className = className;
-                this.ctrl!.Location = new System.Drawing.Point(X, Y);
-                this.form.CtrlItems!.Add(this);
-
-                if (this.nonCtrl.GetType() == typeof(Component))
-                {
-                    parent.Controls.Add(this.ctrl);
-                    CreateSelectBox(parent);
-                }
-                else { otherCtrlPanel!.Controls.Add(this.ctrl); Selected = true; }
-
-                if (this.ctrl is TabControl && !fileFlag)
-                {
-                    _ = new cls_controls(form, otherCtrlPanel, "TabPage", this.ctrl!, 0, 0);
-                    _ = new cls_controls(form, otherCtrlPanel, "TabPage", this.ctrl!, 0, 0);
-                }
-
-                if (this.ctrl is TabPage) { CreateSelectBox(this.ctrl); }
-
-                ctrl!.Click += new System.EventHandler(Ctrl_Click);
-                ctrl.MouseMove += new System.Windows.Forms.MouseEventHandler(ControlMouseMove);
-                ctrl.MouseDown += new System.Windows.Forms.MouseEventHandler(ControlMouseDown);
+                parent.Controls.Add(this.ctrl);
+                CreateSelectBox(parent);
             }
+            else
+            {
+                otherCtrlPanel!.Controls.Add(this.ctrl);
+                Selected = true;
+            }
+
+            if (this.ctrl is TabControl && !fileFlag)
+            {
+                _ = new cls_controls(form, otherCtrlPanel, "TabPage", this.ctrl!, 0, 0);
+                _ = new cls_controls(form, otherCtrlPanel, "TabPage", this.ctrl!, 0, 0);
+            }
+
+            if (this.ctrl is TabPage) { CreateSelectBox(this.ctrl); }
+
+            ctrl!.Click += Ctrl_Click;
+            ctrl.MouseMove += ControlMouseMove;
+            ctrl.MouseDown += ControlMouseDown;
         }
+
 
         // ********************************************************************************************
         // events Function 
@@ -62,15 +65,13 @@ namespace SWD4CS
 
         private void ControlMouseMove(object? sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left && Selected)
-            {
-                Point pos = new((int)(e.X / grid) * grid, (int)(e.Y / grid) * grid);
-                Point newPos = new(pos.X - memPos.X + ctrl!.Location.X, pos.Y - memPos.Y + ctrl.Location.Y);
-                ctrl.Location = newPos;
-                Selected = true;
-                changeFlag = false;
-            }
-            else { changeFlag = true; }
+            if (e.Button != MouseButtons.Left || !Selected) { changeFlag = true; return; }
+
+            Point pos = new Point((int)(e.X / grid) * grid, (int)(e.Y / grid) * grid);
+            Point newPos = new Point(pos.X - memPos.X + ctrl!.Location.X, pos.Y - memPos.Y + ctrl.Location.Y);
+            ctrl.Location = newPos;
+            Selected = true;
+            changeFlag = false;
         }
 
         private void Ctrl_Click(object? sender, EventArgs e)
@@ -132,16 +133,12 @@ namespace SWD4CS
 
         internal static string SetFormProperty(Control? cls_ctrl, string? propertyName, string? propertyValue)
         {
-            Component? ctrl = cls_ctrl;
-            string ret = cls_properties.SetProperty(ctrl!, propertyName!, propertyValue!);
-            return ret;
+            return cls_properties.SetProperty(cls_ctrl!, propertyName!, propertyValue!);
         }
 
         internal static string SetCtrlProperty(cls_controls? cls_ctrl, string? propertyName, string? propertyValue)
         {
-            Component? ctrl = new();
-            if (cls_ctrl!.nonCtrl!.GetType() == typeof(Component)) { ctrl = cls_ctrl!.ctrl; }
-            else { ctrl = cls_ctrl!.nonCtrl; }
+            Component? ctrl = cls_ctrl!.nonCtrl!.GetType() == typeof(Component) ? cls_ctrl!.ctrl : cls_ctrl!.nonCtrl;
             string ret = cls_properties.SetProperty(ctrl!, propertyName!, propertyValue!);
             return ret;
         }
@@ -164,33 +161,33 @@ namespace SWD4CS
 
         private void CreateSelectBox(Control parent)
         {
-            bool select_flag = true;
-            Control ctl = this.ctrl!;
-            if (this.ctrl is TabPage) { select_flag = false; }
-            else if (!(parent is FlowLayoutPanel) && !(parent is TableLayoutPanel)) { ctl = parent; }
-            selectBox = new cls_selectbox(this, ctl);
-            if (this.ctrl is TabPage) { return; }
-            Selected = select_flag;
+            Control? ctl = this.ctrl!;
+            bool isTabPage = this.ctrl is TabPage;
+            if (!isTabPage)
+            {
+                bool isFlowOrTable = (parent is FlowLayoutPanel) || (parent is TableLayoutPanel);
+                ctl = isFlowOrTable ? this.ctrl : parent;
+            }
+            if (ctl is TabControl || ctl is SplitContainer || ctl is StatusStrip || ctl is FlowLayoutPanel || ctl is TableLayoutPanel) { return; }
+            selectBox = new cls_selectbox(this, ctl!);
+            Selected = !isTabPage;
         }
 
-        private void SetSelected(MouseEventArgs me)
+        private void SetSelected(MouseEventArgs mouseEvent)
         {
-            if (me.Button != MouseButtons.Left) { return; }
+            if (mouseEvent.Button != MouseButtons.Left) { return; }
+            bool isControlPressed = (Control.ModifierKeys & Keys.Control) == Keys.Control;
+            // if (Selected && changeFlag) { Selected = false; }
             if (Selected && changeFlag) { Selected = false; }
-            else
-            {
-                if ((Control.ModifierKeys & Keys.Control) != Keys.Control) { form!.SelectAllClear(); }
-                Selected = true;
-            }
+            else if (!isControlPressed) { form!.SelectAllClear(); Selected = true; }
+            else { Selected = true; }
         }
 
         private void ShowProperty(bool flag)
         {
             if (flag)
             {
-                Component Comp;
-                if (this.nonCtrl!.GetType() == typeof(Component)) { Comp = this.ctrl!; }
-                else { Comp = this.nonCtrl; }
+                Component? Comp = this.nonCtrl!.GetType() == typeof(Component) ? Comp = this.ctrl : this.nonCtrl;
                 form!.mainForm!.propertyGrid!.SelectedObject = Comp;
                 form.mainForm.propertyCtrlName!.Text = this.ctrl!.Name;
             }
@@ -200,6 +197,7 @@ namespace SWD4CS
                 form.mainForm!.propertyCtrlName!.Text = "";
             }
         }
+
         private void CreateTrancePanel(Control ctrl)
         {
             cls_transparent_panel trancepanel = new();
@@ -224,18 +222,21 @@ namespace SWD4CS
             ctrl.Controls.Add(pickbox);
         }
 
-        private void AddControls(MouseEventArgs me, SplitterPanel? splitpanel = null)
+        private void AddControls(MouseEventArgs mouseEvent, SplitterPanel? splitPanel = null)
         {
-            int X = (int)(me.X / grid) * grid;
-            int Y = (int)(me.Y / grid) * grid;
+            int x = (int)(mouseEvent.X / grid) * grid;
+            int y = (int)(mouseEvent.Y / grid) * grid;
             form!.SelectAllClear();
 
-            if ((this.ctrl is TabControl && form!.mainForm!.toolLstBox!.Text == "TabPage") ||
-                (this.ctrl is TabControl == false && form!.mainForm!.toolLstBox!.Text != "TabPage"))
+            bool isTabControl = this.ctrl is TabControl;
+            bool isTabPageSelected = form!.mainForm!.toolLstBox!.Text == "TabPage";
+
+            if ((isTabControl && isTabPageSelected) || (!isTabControl && !isTabPageSelected))
             {
-                if (splitpanel == null) { _ = new cls_controls(form, otherCtrlPanel, form!.mainForm!.toolLstBox!.Text, this.ctrl!, X, Y); }
-                else { _ = new cls_controls(form, otherCtrlPanel, form!.mainForm!.toolLstBox!.Text, splitpanel!, X, Y); }
+                Control? parentPanel = splitPanel == null ? this.ctrl : splitPanel;
+                _ = new cls_controls(form, otherCtrlPanel, form!.mainForm!.toolLstBox!.Text, parentPanel!, x, y);
             }
+
             form!.mainForm!.toolLstBox!.SelectedIndex = 0;
         }
 
@@ -248,48 +249,37 @@ namespace SWD4CS
             {
                 case "Button":
                     this.ctrl = new Button();
-                    this.ctrl.Name = className + form!.cnt_Control;
                     break;
                 case "Label":
                     this.ctrl = new Label();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     this.ctrl!.AutoSize = true;
                     break;
                 case "GroupBox":
                     this.ctrl = new GroupBox();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     break;
                 case "TextBox":
                     this.ctrl = new TextBox();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     break;
                 case "ListBox":
                     this.ctrl = new ListBox();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     ListBox? listbox = this.ctrl as ListBox;
                     listbox!.Items.Add("ListBox");
                     break;
                 case "TabControl":
                     this.ctrl = new TabControl();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     break;
                 case "TabPage":
                     this.ctrl = new TabPage();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     break;
                 case "CheckBox":
                     this.ctrl = new CheckBox();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     this.ctrl!.AutoSize = true;
                     break;
                 case "ComboBox":
                     this.ctrl = new ComboBox();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     break;
                 case "SplitContainer":
                     this.ctrl = new SplitContainer();
-                    this.ctrl.Size = new System.Drawing.Size(120, 32);
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     this.ctrl.Size = new System.Drawing.Size(250, 125);
                     SplitContainer? splitcontainer = this.ctrl as SplitContainer;
                     splitcontainer!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -304,114 +294,92 @@ namespace SWD4CS
                     break;
                 case "DataGridView":
                     this.ctrl = new DataGridView();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     break;
                 case "Panel":
                     this.ctrl = new Panel();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     Panel? panel = this.ctrl as Panel;
                     panel!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
                     break;
                 case "CheckedListBox":
                     this.ctrl = new CheckedListBox();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     CheckedListBox? checkedlistbox = this.ctrl as CheckedListBox;
                     checkedlistbox!.Items.Add("CheckedListBox");
                     break;
                 case "LinkLabel":
                     this.ctrl = new LinkLabel();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     this.ctrl!.AutoSize = true;
                     break;
                 case "PictureBox":
                     this.ctrl = new PictureBox();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     PictureBox? picbox = this.ctrl as PictureBox;
                     picbox!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
                     break;
                 case "ProgressBar":
                     this.ctrl = new ProgressBar();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     ProgressBar? prgressbar = this.ctrl as ProgressBar;
                     prgressbar!.Value = 50;
                     break;
                 case "RadioButton":
                     this.ctrl = new RadioButton();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     this.ctrl!.AutoSize = true;
                     break;
                 case "RichTextBox":
                     this.ctrl = new RichTextBox();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     break;
                 case "StatusStrip":
                     this.ctrl = new StatusStrip();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     break;
                 case "HScrollBar":
                     this.ctrl = new HScrollBar();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     CreateTrancePanel(this.ctrl);
                     break;
                 case "VScrollBar":
                     this.ctrl = new VScrollBar();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     CreateTrancePanel(this.ctrl);
                     break;
                 case "MonthCalendar":
                     this.ctrl = new MonthCalendar();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     CreateTrancePanel(this.ctrl);
                     break;
                 case "ListView":
                     this.ctrl = new ListView();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     CreateTrancePanel(this.ctrl);
                     break;
                 case "TreeView":
                     this.ctrl = new TreeView();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     CreateTrancePanel(this.ctrl);
                     break;
                 case "MaskedTextBox":
                     this.ctrl = new MaskedTextBox();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     break;
                 case "PropertyGrid":
                     this.ctrl = new PropertyGrid();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     CreateTrancePanel(this.ctrl);
                     break;
                 case "DateTimePicker":
                     this.ctrl = new DateTimePicker();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     CreatePickBox(this.ctrl);
                     break;
                 case "DomainUpDown":
                     this.ctrl = new DomainUpDown();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     break;
                 case "FlowLayoutPanel":
                     this.ctrl = new FlowLayoutPanel();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     FlowLayoutPanel? flwlayoutpnl = this.ctrl as FlowLayoutPanel;
                     flwlayoutpnl!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
                     break;
                 case "Splitter":
                     this.ctrl = new Splitter();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     Splitter? splitter = this.ctrl as Splitter;
                     splitter!.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
                     break;
                 case "TableLayoutPanel":
                     this.ctrl = new TableLayoutPanel();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     TableLayoutPanel? tbllaypnl = this.ctrl as TableLayoutPanel;
                     tbllaypnl!.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
                     break;
                 case "TrackBar":
                     this.ctrl = new TrackBar();
-                    this.ctrl!.Name = className + form!.cnt_Control;
                     break;
                 case "Timer":
                     this.nonCtrl = new System.Windows.Forms.Timer();
@@ -444,8 +412,9 @@ namespace SWD4CS
                 lbl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
                 this.ctrl = lbl;
                 this.ctrl.AutoSize = true;
-                this.ctrl!.Name = className + form!.cnt_Control;
             }
+
+            this.ctrl.Name = className + form!.cnt_Control;
             if (className != "DateTimePicker") { this.ctrl!.Text = this.ctrl!.Name; }
             this.ctrl!.TabIndex = form!.cnt_Control;
             form.cnt_Control++;
