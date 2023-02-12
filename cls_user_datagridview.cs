@@ -16,39 +16,40 @@ namespace SWD4CS
 
         internal void ShowEventList(bool flag, cls_userform form)
         {
-            this.form = form;
-            this.cls_ctrl = null;
             List<string> evnt = new();
             List<string> fnc = new();
             string[] split;
+            this.form = form;
+            this.cls_ctrl = null;
 
             for (int i = 0; i < form.decHandler.Count; i++)
             {
                 split = form.decHandler[i].Split("+=")[0].Split(".");
-                evnt.Add(split[split.Length - 1].Trim());
-
+                evnt.Add(split[^1].Trim());
                 split = form.decFunc[i].Split("(")[0].Split(" ");
-                fnc.Add(split[split.Length - 1].Trim());
+                fnc.Add(split[^1].Trim());
             }
             SetEventsData(flag, form, evnt, fnc);
         }
+
         internal void ShowEventList(bool flag, cls_controls ctrl)
         {
-            this.form = null;
-            this.cls_ctrl = ctrl;
             List<string> evnt = new();
             List<string> fnc = new();
             string[] split;
+            this.form = null;
+            this.cls_ctrl = ctrl;
 
             for (int i = 0; i < ctrl.decHandler.Count; i++)
             {
                 split = ctrl.decHandler[i].Split("+=")[0].Split(".");
-                evnt.Add(split[split.Length - 1].Trim());
-
+                evnt.Add(split[^1].Trim());
                 split = ctrl.decFunc[i].Split("(")[0].Split(" ");
-                fnc.Add(split[split.Length - 1].Trim());
+                fnc.Add(split[^1].Trim());
             }
-            if (ctrl.nonCtrl!.GetType() == typeof(Component)) { SetEventsData(flag, ctrl.ctrl, evnt, fnc); }
+
+            Type type = ctrl.nonCtrl!.GetType();
+            if (type == typeof(Component)) { SetEventsData(flag, ctrl.ctrl, evnt, fnc); }
             else { SetEventsData(flag, ctrl.nonCtrl, evnt, fnc); }
         }
 
@@ -126,30 +127,17 @@ namespace SWD4CS
         {
             this.Rows[e.RowIndex].Cells[1].Value = "";
 
-            if (this.form != null)
+            var decFuncList = this.form != null ? this.form.decFunc : this.cls_ctrl!.decFunc;
+            var decHandlerList = this.form != null ? this.form.decHandler : this.cls_ctrl!.decHandler;
+
+            for (int i = 0; i < decFuncList.Count; i++)
             {
-                for (int i = 0; i < this.form!.decFunc.Count; i++)
+                string[] split = decFuncList[i].Split("(")[0].Split(" ");
+                if (split[^1] == funcName)
                 {
-                    string[] split = this.form!.decFunc[i].Split("(")[0].Split(" ");
-                    if (split[split.Length - 1] == funcName)
-                    {
-                        this.form!.decHandler.Remove(this.form!.decHandler[i]);
-                        this.form!.decFunc.Remove(this.form!.decFunc[i]);
-                        break;
-                    }
-                }
-            }
-            else if (this.cls_ctrl != null)
-            {
-                for (int i = 0; i < this.cls_ctrl!.decFunc.Count; i++)
-                {
-                    string[] split = this.cls_ctrl!.decFunc[i].Split("(")[0].Split(" ");
-                    if (split[split.Length - 1] == funcName)
-                    {
-                        this.cls_ctrl!.decHandler.Remove(this.cls_ctrl!.decHandler[i]);
-                        this.cls_ctrl!.decFunc.Remove(this.cls_ctrl!.decFunc[i]);
-                        break;
-                    }
+                    decHandlerList.RemoveAt(i);
+                    decFuncList.RemoveAt(i);
+                    break;
                 }
             }
         }
@@ -170,10 +158,8 @@ namespace SWD4CS
 
         private string GetDecHandler(string? eventName, string newHandler, string funcName, string ctrlName)
         {
-            string decHandler;
-            if (this.form != null) { decHandler = "this." + eventName + " += " + newHandler + "(" + funcName + ");"; }
-            else { decHandler = "this." + ctrlName + "." + eventName + " += " + newHandler + "(" + funcName + ");"; }
-            return decHandler;
+            string prefix = form != null ? "this." : "this." + ctrlName + ".";
+            return prefix + eventName + " += " + newHandler + "(" + funcName + ");";
         }
 
         private void SetArguments(ref string funcParam, ref string param, ParameterInfo[] pars)
