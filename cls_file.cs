@@ -46,7 +46,7 @@
 
             for (int i = 0; i < line_code.Length; i++)
             {
-                if (line_code[i].IndexOf("partial class ") > -1)
+                if (line_code[i].Contains("partial class "))
                 {
                     string[] spl = line_code[i].Split(" ");
                     fileInfo.formName = spl[spl.Length - 1];
@@ -55,13 +55,13 @@
                 if (mode == 0)
                 {
                     fileInfo.source_base.Add(line_code[i]);
-                    if (line_code[i].IndexOf("private void InitializeComponent()") > -1) { mode = 1; }
+                    if (line_code[i].Contains("private void InitializeComponent()")) { mode = 1; }
                 }
 
                 if (mode == 1)
                 {
                     Read_Instance(line_code[i], fileInfo);
-                    if (line_code[i].IndexOf("//") > -1) { mode = 2; }
+                    if (line_code[i].Contains("//")) { mode = 2; }
                 }
 
                 if (mode == 2)
@@ -73,7 +73,7 @@
                 if (mode == 3)
                 {
                     Read_Ctrl(line_code[i], fileInfo);
-                    if (line_code[i + 1].IndexOf("this.ResumeLayout(false)") >= 1) { mode = 4; }
+                    if (line_code[i + 1].Contains("this.ResumeLayout(false)")) { mode = 4; }
                 }
             }
             return fileInfo;
@@ -89,22 +89,14 @@
 
         private static void Read_Ctrl(string line_code, FILE_INFO fileInfo)
         {
-            if (line_code.IndexOf("this.") == -1) { return; }
-
-            // イベント
-            if (line_code.IndexOf("+=") > -1) { Read_Events(line_code, fileInfo); }
-            // parent
-            else if (line_code.IndexOf("Controls.Add") > -1) { Read_Parent(line_code, fileInfo, PARENT); }
-            else
+            if (!line_code.Contains("this.")) { return; }
+            if (line_code.Contains("+=")) { Read_Events(line_code, fileInfo); }
+            else if (line_code.Contains("Controls.Add")) { Read_Parent(line_code, fileInfo, PARENT); }
+            else if (line_code.Contains("="))
             {
                 string[] spl1 = line_code.Split("=");
-                // form
                 if (spl1[0].Split(".").Length == 2) { Read_Property(line_code, fileInfo, PROPERTY); }
-                else
-                {
-                    // property
-                    if (line_code.IndexOf("=") > -1) { Read_Property(line_code, fileInfo, PROPERTY); }
-                }
+                else { Read_Property(line_code, fileInfo, PROPERTY); }
             }
         }
 
@@ -113,14 +105,13 @@
             // Console.WriteLine(line_code.Trim());
             string ctrlName = GetCtrlName(line_code, EVENTS);
             int index = Find_Control_Index(ctrlName, fileInfo);
-            if (index != -1)
-            {
-                CONTROL_INFO ctrl = fileInfo.ctrlInfo[index];
-                ctrl.eventName.Add(GetEvents(line_code));
-                ctrl.eventFunc.Add(GetFunc(line_code));
-                fileInfo.ctrlInfo[index] = ctrl;
-                // Console.WriteLine("{0}, {1}, {2}, {3}", ctrlName, GetEvents(line_code), GetFunc(line_code), line_code);
-            }
+            if (index == -1) { return; }
+
+            CONTROL_INFO ctrl = fileInfo.ctrlInfo[index];
+            ctrl.eventName.Add(GetEvents(line_code));
+            ctrl.eventFunc.Add(GetFunc(line_code));
+            fileInfo.ctrlInfo[index] = ctrl;
+            // Console.WriteLine("{0}, {1}, {2}, {3}", ctrlName, GetEvents(line_code), GetFunc(line_code), line_code);
         }
 
         private static void Read_Parent(string line_code, FILE_INFO fileInfo, int mode)
@@ -128,22 +119,20 @@
             string ctrlName = GetCtrlName(line_code, mode);
             int panelNum = 0;
             int index = Find_Control_Index(ctrlName, fileInfo);
-            if (index != -1)
-            {
-                CONTROL_INFO ctrl = fileInfo.ctrlInfo[index];
-                ctrl.parent = GetCtrlName(line_code, 4);
+            if (index == -1) { return; }
 
-                if (ctrl.parent.IndexOf(".Panel") > -1)
-                {
-                    string[] spl = ctrl.parent.Split(".");
-                    ctrl.parent = spl[0];
-                    if (spl[1] == "Panel1") { panelNum = 1; }
-                    else { panelNum = 2; }
-                }
-                ctrl.panelNum = panelNum;
-                fileInfo.ctrlInfo[index] = ctrl;
-                // Console.WriteLine("parent; {0}, {1}, {2}, {3}", ctrlName, ctrl.parent, panelNum, line_code);
+            CONTROL_INFO ctrl = fileInfo.ctrlInfo[index];
+            ctrl.parent = GetCtrlName(line_code, 4);
+
+            if (ctrl.parent.Contains(".Panel"))
+            {
+                string[] spl = ctrl.parent.Split(".");
+                ctrl.parent = spl[0];
+                panelNum = spl[1] == "Panel1" ? 1 : 2;
             }
+            ctrl.panelNum = panelNum;
+            fileInfo.ctrlInfo[index] = ctrl;
+            // Console.WriteLine("parent; {0}, {1}, {2}, {3}", ctrlName, ctrl.parent, panelNum, line_code);
         }
 
         private static void Read_Property(string line_code, FILE_INFO fileInfo, int mode)
@@ -164,14 +153,17 @@
 
         private static void Read_Instance(string line_code, FILE_INFO fileInfo)
         {
-            CONTROL_INFO ctrl = new();
+            if (!TryParseInstance(line_code, out CONTROL_INFO ctrl)) { return; }
+            fileInfo.ctrlInfo.Add(ctrl);
+        }
 
-            if (line_code.IndexOf("this.SuspendLayout();") > -1) { return; }
-            if (line_code.IndexOf("new") == -1) { return; }
-
+        private static bool TryParseInstance(string line_code, out CONTROL_INFO ctrl)
+        {
+            ctrl = new();
+            if (!line_code.Contains("new")) { return false; }
             ctrl.ctrlName = GetCtrlName(line_code, INSTANCE);
             ctrl.ctrlClassName = GetClassName(line_code);
-            fileInfo.ctrlInfo.Add(ctrl);
+            return true;
         }
 
         private static int Find_Control_Index(string ctrlName, FILE_INFO fileInfo)
@@ -206,17 +198,17 @@
 
         private static string GetPropertyName(string line)
         {
-            string[] split1 = line.Split("=");
+            string[] split1 = line.Split(" = ");
             string[] split2 = split1[0].Split(".");
             return split2[split2.Length - 1].Trim();
         }
 
         private static string GetClassName(string line)
         {
-            string[] split1 = line.Split("new");
-            string[] split2 = split1[1].Split(".");
-            return split2[split2.Length - 1].Replace("();", "").Trim();
+            string[] spl = line.Split(".");
+            return spl[spl.Length - 1].Replace("();", "").Trim();
         }
+
 
         private static string GetCtrlName(string line, int mode)
         {
@@ -256,7 +248,6 @@
                     split1 = line.Split("(");
                     split2 = split1[0].Split(".");
                     if (split2.Length == 5) { ctrlName = split2[1] + "." + split2[2].Replace(");", "").Trim(); }
-                    // if (split2.Length == 5) { ctrlName = split2[1].Replace(");", "").Trim(); }
                     else if (split2.Length == 4) { ctrlName = split2[1].Replace(");", "").Trim(); }
                     else { ctrlName = split2[0].Replace(");", "").Trim(); }
                     break;
@@ -278,41 +269,40 @@
             if (fName.IndexOf(".Designer.cs") == -1) { return new FILE_INFO(); }
             return ReadCode(fName);
         }
-
         internal static List<string> NewFile()
         {
-            List<string> source_base = new();
-
-            source_base.Add("namespace WinFormsApp");
-            source_base.Add("{");
-            source_base.Add("    partial class Form1");
-            source_base.Add("    {");
-            source_base.Add("        /// <summary>");
-            source_base.Add("        ///  Required designer variable.");
-            source_base.Add("        /// </summary>");
-            source_base.Add("        private System.ComponentModel.IContainer components = null;");
-            source_base.Add("");
-            source_base.Add("        /// <summary>");
-            source_base.Add("        ///  Clean up any resources being used.");
-            source_base.Add("        /// </summary>");
-            source_base.Add("        /// <param name=\"disposing\">true if managed resources should be disposed; otherwise, false.</param>");
-            source_base.Add("        protected override void Dispose(bool disposing)");
-            source_base.Add("        {");
-            source_base.Add("            if (disposing && (components != null))");
-            source_base.Add("            {");
-            source_base.Add("                components.Dispose();");
-            source_base.Add("            }");
-            source_base.Add("            base.Dispose(disposing);");
-            source_base.Add("        }");
-            source_base.Add("");
-            source_base.Add("        #region Windows Form Designer generated code");
-            source_base.Add("");
-            source_base.Add("        /// <summary>");
-            source_base.Add("        ///  Required method for Designer support - do not modify");
-            source_base.Add("        ///  the contents of this method with the code editor.");
-            source_base.Add("        /// </summary>");
-            source_base.Add("        private void InitializeComponent()");
-            return source_base;
+            return new List<string>
+            {
+                "namespace WinFormsApp",
+                "{",
+                "    partial class Form1",
+                "    {",
+                "        /// <summary>",
+                "        ///  Required designer variable.",
+                "        /// </summary>",
+                "        private System.ComponentModel.IContainer components = null;",
+                "",
+                "        /// <summary>",
+                "        ///  Clean up any resources being used.",
+                "        /// </summary>",
+                "        /// <param name=\"disposing\">true if managed resources should be disposed; otherwise, false.</param>",
+                "        protected override void Dispose(bool disposing)",
+                "        {",
+                "            if (disposing && (components != null))",
+                "            {",
+                "                components.Dispose();",
+                "            }",
+                "            base.Dispose(disposing);",
+                "        }",
+                "",
+                "        #region Windows Form Designer generated code",
+                "",
+                "        /// <summary>",
+                "        ///  Required method for Designer support - do not modify",
+                "        ///  the contents of this method with the code editor.",
+                "        /// </summary>",
+                "        private void InitializeComponent()"
+            };
         }
 
         internal static void SaveAs(string FileName, string SourceCode)
