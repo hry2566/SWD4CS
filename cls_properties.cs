@@ -95,14 +95,10 @@ namespace SWD4CS
         // ********************************************************************************************
         private static Size String2Size(string propertyValue)
         {
-            string[] split = propertyValue.Split("(");
-            string dummy = split[1];
-            split = dummy.Split(")");
-            dummy = split[0];
-            split = dummy.Split(",");
-            Size size = new(int.Parse(split[0]), int.Parse(split[1]));
-            return size;
+            var values = propertyValue.Split("(").Last().Split(")").First().Split(",");
+            return new Size(int.Parse(values[0]), int.Parse(values[1]));
         }
+
         private static Point String2Point(string propertyValue)
         {
             string[] split = propertyValue.Split("(");
@@ -113,48 +109,43 @@ namespace SWD4CS
             Point point = new(int.Parse(split[0]), int.Parse(split[1]));
             return point;
         }
+
         private static Color? String2Color(string? propertyValue)
         {
             Color color;
-            string[] split;
 
             if (propertyValue == "Color.Transparent") { color = Color.Transparent; }
-            else if (propertyValue!.IndexOf("FromArgb") > -1)
+            else if (propertyValue!.Contains("FromArgb"))
             {
-                split = propertyValue!.Split("(");
-                string strRGB = split[1].Trim().Replace(")", "");
-                split = strRGB.Split(",");
+                string[] split = propertyValue!.Split("(")[1].Trim().Replace(")", "").Split(",");
                 color = Color.FromArgb(int.Parse(split[0]), int.Parse(split[1]), int.Parse(split[2]));
             }
-            else
-            {
-                split = propertyValue!.Split(".");
-                color = Color.FromName(split[3]);
-            }
+            else { color = Color.FromName(propertyValue!.Split(".")[^1]); }
             return color;
         }
+
         private static int String2AnchorStyles(string propertyValue)
         {
             int style = 0;
 
-            if (propertyValue.IndexOf("System.Windows.Forms.AnchorStyles") > -1)
+            if (propertyValue.Contains("System.Windows.Forms.AnchorStyles"))
             {
                 string dummy = propertyValue.Replace("System.Windows.Forms.AnchorStyles", "").Replace("(", "").Replace(")", "").Replace(";", "");
-                string[] split2 = dummy.Split("|");
+                string[] spl1 = dummy.Split("|");
                 propertyValue = "";
-                for (int i = 0; i < split2.Length; i++)
+
+                foreach (var s in spl1)
                 {
-                    string[] split3 = split2[i].Trim().Split(".");
-                    if (propertyValue == "") { propertyValue += split3[split3.Length - 1]; }
-                    else { propertyValue += "," + split3[split3.Length - 1]; }
+                    string spl2 = s.Trim().Split(".")[^1];
+                    propertyValue += propertyValue == "" ? spl2 : "," + spl2;
                 }
             }
 
-            string[] split = propertyValue!.Split(',');
+            string[] spl3 = propertyValue!.Split(',');
 
-            for (int j = 0; j < split.Length; j++)
+            foreach (var s in spl3)
             {
-                switch (split[j].Trim().ToLower())
+                switch (s.Trim().ToLower())
                 {
                     case "bottom":
                         style += 2;
@@ -172,15 +163,14 @@ namespace SWD4CS
             }
             return style;
         }
+
         private static int String2DockStyle(string? propertyValue)
         {
             int style = 0;
 
-            if (propertyValue!.IndexOf("System.Windows.Forms.DockStyle") > -1)
+            if (propertyValue!.Contains("System.Windows.Forms.DockStyle"))
             {
-                string[] split = propertyValue.Split(".");
-                split = split[split.Length - 1].Split(";");
-                propertyValue = split[0];
+                propertyValue = propertyValue.Split(".")[^1].Split(";")[0];
             }
 
             switch (propertyValue!.ToLower())
@@ -203,14 +193,14 @@ namespace SWD4CS
             }
             return style;
         }
+
         private static int? String2FixedPanel(string? propertyValue)
         {
             int style = 0;
 
-            if (propertyValue!.IndexOf("System.Windows.Forms.FixedPanel") > -1)
+            if (propertyValue!.Contains("System.Windows.Forms.FixedPanel"))
             {
-                string[] split = propertyValue.Split(".");
-                propertyValue = split[split.Length - 1];
+                propertyValue = propertyValue.Split(".")[^1];
             }
 
             switch (propertyValue)
@@ -227,14 +217,14 @@ namespace SWD4CS
             }
             return style;
         }
+
         private static int? String2View(string? propertyValue)
         {
             int style = 0;
 
-            if (propertyValue!.IndexOf("System.Windows.Forms.View") > -1)
+            if (propertyValue!.Contains("System.Windows.Forms.View"))
             {
-                string[] split = propertyValue.Split(".");
-                propertyValue = split[split.Length - 1];
+                propertyValue = propertyValue.Split(".")[^1];
             }
 
             switch (propertyValue)
@@ -257,14 +247,14 @@ namespace SWD4CS
             }
             return style;
         }
+
         private static int? String2PictureBoxSizeMode(string? propertyValue)
         {
             int style = 0;
 
-            if (propertyValue!.IndexOf("System.Windows.Forms.PictureBoxSizeMode") > -1)
+            if (propertyValue!.Contains("System.Windows.Forms.PictureBoxSizeMode"))
             {
-                string[] split = propertyValue.Split(".");
-                propertyValue = split[split.Length - 1];
+                propertyValue = propertyValue.Split(".")[^1];
             }
 
             switch (propertyValue)
@@ -287,14 +277,14 @@ namespace SWD4CS
             }
             return style;
         }
+
         private static int String2HorizontalAlignment(string? propertyValue)
         {
             int style = 0;
 
-            if (propertyValue!.IndexOf("System.Windows.Forms.HorizontalAlignment") > -1)
+            if (propertyValue!.Contains("System.Windows.Forms.HorizontalAlignment"))
             {
-                string[] split = propertyValue.Split(".");
-                propertyValue = split[split.Length - 1];
+                propertyValue = propertyValue.Split(".")[^1];
             }
 
             switch (propertyValue!.ToLower())
@@ -311,14 +301,14 @@ namespace SWD4CS
             }
             return style;
         }
+
         private static int String2ContentAlignment(string? propertyValue)
         {
             int style = 32;
 
-            if (propertyValue!.IndexOf("System.Drawing.ContentAlignment") > -1)
+            if (propertyValue!.Contains("System.Drawing.ContentAlignment"))
             {
-                string[] split = propertyValue.Split(".");
-                propertyValue = split[split.Length - 1].Replace(";", "");
+                propertyValue = propertyValue.Split(".")[^1].Replace(";", "");
             }
 
             switch (propertyValue!.ToLower())
@@ -350,15 +340,14 @@ namespace SWD4CS
             }
             return style;
         }
+
         private static int String2ScrollBars(string? propertyValue)
         {
             int style = 0;
 
-            if (propertyValue!.IndexOf("System.Windows.Forms.ScrollBars") > -1)
+            if (propertyValue!.Contains("System.Windows.Forms.ScrollBars"))
             {
-                string[] split = propertyValue.Split(".");
-                split = split[split.Length - 1].Split(";");
-                propertyValue = split[0];
+                propertyValue = propertyValue.Split(".")[^1].Split(";")[0];
             }
 
             switch (propertyValue!.ToLower())
@@ -375,14 +364,14 @@ namespace SWD4CS
             }
             return style;
         }
+
         private static int? String2FormStartPosition(string? propertyValue)
         {
             int style = 0;
 
-            if (propertyValue!.IndexOf("System.Windows.Forms.FormStartPosition") > -1)
+            if (propertyValue!.Contains("System.Windows.Forms.FormStartPosition"))
             {
-                string[] split = propertyValue.Split(".");
-                propertyValue = split[split.Length - 1];
+                propertyValue = propertyValue.Split(".")[^1];
             }
 
             switch (propertyValue)
@@ -405,14 +394,14 @@ namespace SWD4CS
             }
             return style;
         }
+
         private static int? String2FormWindowState(string? propertyValue)
         {
             int style = 0;
 
-            if (propertyValue!.IndexOf("System.Windows.Forms.FormWindowState") > -1)
+            if (propertyValue!.Contains("System.Windows.Forms.FormWindowState"))
             {
-                string[] split = propertyValue.Split(".");
-                propertyValue = split[split.Length - 1];
+                propertyValue = propertyValue.Split(".")[^1];
             }
 
             switch (propertyValue)
@@ -429,14 +418,14 @@ namespace SWD4CS
             }
             return style;
         }
+
         private static int? String2Orientation(string? propertyValue)
         {
             int style = 1;
 
-            if (propertyValue!.IndexOf("System.Windows.Forms.Orientation") > -1)
+            if (propertyValue!.Contains("System.Windows.Forms.Orientation"))
             {
-                string[] split = propertyValue.Split(".");
-                propertyValue = split[split.Length - 1];
+                propertyValue = propertyValue.Split(".")[^1];
             }
 
             switch (propertyValue)
@@ -450,14 +439,14 @@ namespace SWD4CS
             }
             return style;
         }
+
         private static int? String2FormBorderStyle(string? propertyValue)
         {
             int style = 4;
 
-            if (propertyValue!.IndexOf("System.Windows.Forms.FormBorderStyle") > -1)
+            if (propertyValue!.Contains("System.Windows.Forms.FormBorderStyle"))
             {
-                string[] split = propertyValue.Split(".");
-                propertyValue = split[split.Length - 1];
+                propertyValue = propertyValue.Split(".")[^1];
             }
 
             switch (propertyValue)
@@ -486,14 +475,14 @@ namespace SWD4CS
             }
             return style;
         }
+
         private static object? String2AutoScaleMode(string? propertyValue)
         {
             int style = 1;
 
-            if (propertyValue!.IndexOf("System.Windows.Forms.AutoScaleMode") > -1)
+            if (propertyValue!.Contains("System.Windows.Forms.AutoScaleMode"))
             {
-                string[] split = propertyValue.Split(".");
-                propertyValue = split[split.Length - 1];
+                propertyValue = propertyValue.Split(".")[^1];
             }
 
             switch (propertyValue)
@@ -513,13 +502,14 @@ namespace SWD4CS
             }
             return style;
         }
+
         private static object? String2Font(string? propertyValue)
         {
             Font? font = null;
 
-            if (propertyValue!.IndexOf("System.Drawing.Font") > -1)
+            if (propertyValue?.IndexOf("System.Drawing.Font") > -1)
             {
-                string[] split = propertyValue.Split(",");
+                string[] split = propertyValue.Split(',');
                 string strName = split[0].Replace("new System.Drawing.Font(", "").Trim();
                 string strSize = split[1].Replace("F", "").Trim();
                 float fSize = float.Parse(strSize, CultureInfo.InvariantCulture.NumberFormat);
@@ -527,24 +517,24 @@ namespace SWD4CS
                 split = strStyle.Split("|");
                 int iStyle = 0;
 
-                for (int i = 0; i < split.Length; i++)
+                foreach (string style in split)
                 {
-                    switch (split[i])
+                    switch (style)
                     {
                         case "Bold":
-                            iStyle += 1;
+                            iStyle += (int)FontStyle.Bold;
                             break;
                         case "Italic":
-                            iStyle += 2;
+                            iStyle += (int)FontStyle.Italic;
                             break;
                         case "Regular":
-                            iStyle += 0;
+                            iStyle += (int)FontStyle.Regular;
                             break;
                         case "Strikeout":
-                            iStyle += 8;
+                            iStyle += (int)FontStyle.Strikeout;
                             break;
                         case "Underline":
-                            iStyle += 4;
+                            iStyle += (int)FontStyle.Underline;
                             break;
                     }
                 }
@@ -557,10 +547,9 @@ namespace SWD4CS
         {
             int style = 1;
 
-            if (propertyValue!.IndexOf("System.Windows.Forms.TableLayoutPanelCellBorderStyle") > -1)
+            if (propertyValue!.Contains("System.Windows.Forms.TableLayoutPanelCellBorderStyle"))
             {
-                string[] split = propertyValue.Split(".");
-                propertyValue = split[split.Length - 1];
+                propertyValue = propertyValue.Split(".")[^1];
             }
 
             switch (propertyValue)
@@ -575,7 +564,7 @@ namespace SWD4CS
                     style = 0;
                     break;
                 case "Outset":
-                    style = 0;
+                    style = 4;
                     break;
                 case "OutsetDouble":
                     style = 5;
