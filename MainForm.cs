@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace SWD4CS;
 
 public partial class MainForm : Form
@@ -69,20 +71,20 @@ public partial class MainForm : Form
                 break;
         }
     }
+
     private void nameTxtBox_TextChanged(System.Object? sender, System.EventArgs e)
     {
         if (propertyGrid!.SelectedObject != null && propertyGrid.SelectedObject is Form == false)
         {
-            if (propertyGrid.SelectedObject is Control)
+
+            for (int i = 0; i < userForm!.CtrlItems.Count; i++)
             {
-                Control? ctrl = propertyGrid.SelectedObject as Control;
-                change_EventsName(ctrl!.Name);
-                ctrl!.Name = propertyCtrlName!.Text;
-            }
-            else
-            {
-                int index = search_nonCtrl();
-                if (index != -1) { userForm!.CtrlItems[index].ctrl!.Name = propertyCtrlName!.Text; }
+                if (ReferenceEquals(userForm.CtrlItems[i].ctrl, propertyGrid!.SelectedObject) || ReferenceEquals(userForm.CtrlItems[i].nonCtrl, propertyGrid!.SelectedObject))
+                {
+                    change_EventsName(userForm.CtrlItems[i].ctrl!.Name, i);
+                    userForm.CtrlItems[i].ctrl!.Name = propertyCtrlName!.Text;
+                    break;
+                }
             }
         }
     }
@@ -120,12 +122,12 @@ public partial class MainForm : Form
         }
         else
         {
-            for (int i = 0; i < userForm!.CtrlItems.Count; i++)
+            foreach (cls_controls item in userForm!.CtrlItems)
             {
-                if (userForm.CtrlItems[i].ctrl!.Name == ctrlName && !userForm.CtrlItems[i].Selected)
+                if (item.ctrl!.Name == ctrlName && !item.Selected)
                 {
                     userForm.SelectAllClear();
-                    userForm.CtrlItems[i].Selected = true;
+                    item.Selected = true;
                     break;
                 }
             }
@@ -136,85 +138,59 @@ public partial class MainForm : Form
     private void Show_ControlView(cls_userform? form)
     {
         ctrlTreeView.Nodes.Clear();
-        TreeNode NodeRoot = new("Form");
-        cls_treenode[] itemNode = Array.Empty<cls_treenode>();
+        TreeNode NodeRoot = new TreeNode("Form");
+        var itemNode = new List<cls_treenode>();
 
-        for (int i = 0; i < form!.CtrlItems.Count; i++)
+        if (form != null)
         {
-            if (form.CtrlItems[i].ctrl!.Parent == form)
+            foreach (var formCtrl in form.CtrlItems)
             {
-                Array.Resize(ref itemNode, itemNode.Length + 1);
-                if (form.CtrlItems[i].className == "SplitContainer")
+                if (formCtrl.ctrl!.Parent == form)
                 {
-                    itemNode[itemNode.Length - 1] = new cls_treenode(form.CtrlItems[i].ctrl!.Name + ".Panel1");
-                    Array.Resize(ref itemNode, itemNode.Length + 1);
-                    itemNode[itemNode.Length - 1] = new cls_treenode(form.CtrlItems[i].ctrl!.Name + ".Panel2");
+                    if (formCtrl.className == "SplitContainer")
+                    {
+                        itemNode.Add(new cls_treenode(formCtrl.ctrl.Name + ".Panel1"));
+                        itemNode.Add(new cls_treenode(formCtrl.ctrl.Name + ".Panel2"));
+                    }
+                    else { itemNode.Add(new cls_treenode(formCtrl.ctrl.Name)); }
                 }
-                else { itemNode[itemNode.Length - 1] = new cls_treenode(form.CtrlItems[i].ctrl!.Name); }
-            }
-            else
-            {
-                for (int j = 0; j < itemNode.Length; j++)
+                else
                 {
-                    cls_treenode? retNode;
+                    foreach (var node in itemNode)
+                    {
+                        cls_treenode? retNode;
+                        if (formCtrl.ctrl.Parent.Name.IndexOf(".Panel1") > -1)
+                        {
+                            retNode = node.Search(formCtrl.ctrl.Parent.Parent.Name + ".Panel1");
+                        }
+                        else if (formCtrl.ctrl.Parent.Name.IndexOf(".Panel2") > -1)
+                        {
+                            retNode = node.Search(formCtrl.ctrl.Parent.Parent.Name + ".Panel2");
+                        }
+                        else { retNode = node.Search(formCtrl.ctrl.Parent.Name); }
 
-                    if (form.CtrlItems[i].ctrl!.Parent!.Name.IndexOf(".Panel1") > -1)
-                    {
-                        retNode = itemNode[j].Search(form.CtrlItems[i].ctrl!.Parent!.Parent!.Name + ".Panel1");
-                    }
-                    else if (form.CtrlItems[i].ctrl!.Parent!.Name.IndexOf(".Panel2") > -1)
-                    {
-                        retNode = itemNode[j].Search(form.CtrlItems[i].ctrl!.Parent!.Parent!.Name + ".Panel2");
-                    }
-                    else { retNode = itemNode[j].Search(form.CtrlItems[i].ctrl!.Parent!.Name); }
-
-                    if (retNode != null)
-                    {
-                        retNode.Add(form.CtrlItems[i].ctrl!.Name, form.CtrlItems[i].className!);
-                        break;
+                        if (retNode != null) { retNode.Add(formCtrl.ctrl.Name, formCtrl.className!); break; }
                     }
                 }
             }
         }
 
-        if (itemNode.Length > 0) { NodeRoot.Nodes.AddRange(itemNode); }
+        if (itemNode.Count > 0) { NodeRoot.Nodes.AddRange(itemNode.ToArray()); }
         ctrlTreeView.Nodes.Add(NodeRoot);
         ctrlTreeView.TopNode.Expand();
     }
 
-    private void change_EventsName(string oldName)
+    private void change_EventsName(string oldName, int index)
     {
-        int index = search_Ctrl();
-        if (index != -1)
+        for (int i = 0; i < userForm!.CtrlItems[index].decHandler.Count; i++)
         {
-            for (int i = 0; i < userForm!.CtrlItems[index].decHandler.Count; i++)
-            {
-                string newHandler = userForm!.CtrlItems[index].decHandler[i].Replace("." + oldName + ".", "." + propertyCtrlName!.Text + ".");
-                newHandler = newHandler.Replace("(" + oldName + "_", "(" + propertyCtrlName!.Text + "_");
-                userForm!.CtrlItems[index].decHandler[i] = newHandler;
+            string newHandler = userForm!.CtrlItems[index].decHandler[i].Replace("." + oldName + ".", "." + propertyCtrlName!.Text + ".");
+            newHandler = newHandler.Replace("(" + oldName + "_", "(" + propertyCtrlName!.Text + "_");
+            userForm!.CtrlItems[index].decHandler[i] = newHandler;
 
-                string newFunc = userForm!.CtrlItems[index].decFunc[i].Replace(" " + oldName + "_", " " + propertyCtrlName!.Text + "_");
-                userForm!.CtrlItems[index].decFunc[i] = newFunc;
-            }
+            string newFunc = userForm!.CtrlItems[index].decFunc[i].Replace(" " + oldName + "_", " " + propertyCtrlName!.Text + "_");
+            userForm!.CtrlItems[index].decFunc[i] = newFunc;
         }
-    }
-
-    private int search_nonCtrl()
-    {
-        for (int i = 0; i < userForm!.CtrlItems.Count; i++)
-        {
-            if (userForm.CtrlItems[i].nonCtrl == propertyGrid!.SelectedObject) { return i; }
-        }
-        return -1;
-    }
-
-    private int search_Ctrl()
-    {
-        for (int i = 0; i < userForm!.CtrlItems.Count; i++)
-        {
-            if (userForm.CtrlItems[i].ctrl == propertyGrid!.SelectedObject) { return i; }
-        }
-        return -1;
     }
 
     private void Init_Manual_Add_Controls()
