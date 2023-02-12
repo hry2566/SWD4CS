@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Reflection;
+using System.Text;
 
 namespace SWD4CS
 {
@@ -100,25 +101,37 @@ namespace SWD4CS
 
         internal void RemoveSelectedItem()
         {
-            for (int i = 0; i < CtrlItems!.Count; i++)
+            int i = 0;
+            while (i < CtrlItems.Count)
             {
                 if (CtrlItems[i].Selected)
                 {
-                    if (CtrlItems[i].ctrl is TabPage)
+                    if (CtrlItems[i].ctrl is TabPage tabPage)
                     {
-                        TabControl? tabctrl = CtrlItems[i].ctrl!.Parent as TabControl;
-                        if (tabctrl!.TabPages.Count > 1) { Delete(CtrlItems[i]); i--; }
+                        TabControl? tabctrl = tabPage.Parent as TabControl;
+                        if (tabctrl != null && tabctrl.TabPages.Count > 1)
+                        {
+                            Delete(CtrlItems[i]);
+                            continue;
+                        }
                     }
-                    else { Delete(CtrlItems[i]); i--; }
+                    else
+                    {
+                        Delete(CtrlItems[i]);
+                        continue;
+                    }
                 }
+                i++;
             }
         }
 
         internal void CtrlAllClear()
         {
-            this.cnt_Control = 0;
+            cnt_Control = 0;
+            decHandler.Clear();
+            decFunc.Clear();
 
-            for (int i = 0; i < CtrlItems!.Count; i++)
+            for (int i = CtrlItems.Count - 1; i >= 0; i--)
             {
                 CtrlItems[i].Selected = true;
             }
@@ -130,18 +143,21 @@ namespace SWD4CS
             CtrlAllClear();
 
             this.SuspendLayout();
-            for (int i = 0; i < ctrlInfo.Count; i++)
+
+            // Create, set properties, and set events for all controls in the list
+            foreach (var info in ctrlInfo)
             {
-                if (CreateControls(ctrlInfo[i]))
+                if (CreateControls(info))
                 {
-                    SetProperty(ctrlInfo[i]);
-                    SetEvents(ctrlInfo[i]);
+                    SetProperty(info);
+                    SetEvents(info);
                 }
             }
-            this.ResumeLayout(false);
 
+            this.ResumeLayout(false);
             SelectAllClear();
         }
+
 
         // ********************************************************************************************
         // Private Function
@@ -187,9 +203,7 @@ namespace SWD4CS
 
         private string GetDecHandler(string? eventName, string newHandler, string funcName, string ctrlName)
         {
-            string decHandler;
-            if (ctrlName != "") { decHandler = "this." + ctrlName + "." + eventName + " += " + newHandler + "(" + funcName + ");"; }
-            else { decHandler = "this." + eventName + " += " + newHandler + "(" + funcName + ");"; }
+            string decHandler = "this." + (ctrlName != "" ? ctrlName + "." : "") + eventName + " += " + newHandler + "(" + funcName + ");";
             return decHandler;
         }
 
@@ -226,22 +240,8 @@ namespace SWD4CS
 
         private bool CreateControls(CONTROL_INFO ctrlInfo)
         {
-            Control parent = new();
-            if (ctrlInfo.parent != "")
-            {
-                int index = Find_Control_Index(ctrlInfo.parent);
-                if (index != -1)
-                {
-                    if (ctrlInfo.panelNum == 0) { parent = CtrlItems[index].ctrl!; }
-                    else
-                    {
-                        SplitContainer? splConta = CtrlItems[index].ctrl as SplitContainer;
-                        if (ctrlInfo.panelNum == 1) { parent = splConta!.Panel1; }
-                        else { parent = splConta!.Panel2; }
-                    }
-                }
-                else { parent = this; }
-            }
+            Control? parent = GetParentControl(ctrlInfo.parent, ctrlInfo);
+            if (parent == null) { parent = this; }
 
             if (ctrlInfo.ctrlClassName != "Form")
             {
@@ -258,13 +258,22 @@ namespace SWD4CS
             return false;
         }
 
+        private Control? GetParentControl(string? parent, CONTROL_INFO ctrlInfo)
+        {
+            int index = Find_Control_Index(parent);
+            if (index == -1) { return null; }
+
+            Control control = CtrlItems[index].ctrl!;
+            if (control is SplitContainer splConta)
+            {
+                control = (ctrlInfo.panelNum == 1) ? splConta.Panel1 : splConta.Panel2;
+            }
+            return control;
+        }
+
         private int Find_Control_Index(string? parent)
         {
-            for (int i = 0; i < CtrlItems.Count; i++)
-            {
-                if (parent == CtrlItems[i].ctrl!.Name) { return i; }
-            }
-            return -1;
+            return CtrlItems.FindIndex(x => x.ctrl!.Name == parent);
         }
 
         private void ShowProperty(bool flag)
@@ -284,21 +293,19 @@ namespace SWD4CS
 
         private void Delete(cls_controls ctrl)
         {
-            for (int i = 0; i < CtrlItems.Count; i++)
+            int i = 0;
+            while (i < CtrlItems.Count)
             {
-                if (ctrl.ctrl == CtrlItems[i].ctrl!.Parent) { Delete(CtrlItems[i]); i--; }
-                if (ctrl.ctrl is SplitContainer)
+                if (ctrl.ctrl == CtrlItems[i].ctrl!.Parent) { Delete(CtrlItems[i]); }
+                else if (ctrl.ctrl is SplitContainer splitContainer)
                 {
-                    SplitContainer? splcontainer = ctrl.ctrl as SplitContainer;
-                    for (int j = 0; j < CtrlItems.Count; j++)
+                    if (splitContainer.Panel1 == CtrlItems[i].ctrl!.Parent || splitContainer.Panel2 == CtrlItems[i].ctrl!.Parent)
                     {
-                        if (splcontainer!.Panel1 == CtrlItems[j].ctrl!.Parent || splcontainer!.Panel2 == CtrlItems[j].ctrl!.Parent)
-                        {
-                            Delete(CtrlItems[j]);
-                            i--;
-                        }
+                        Delete(CtrlItems[i]);
                     }
+                    else { i++; }
                 }
+                else { i++; }
             }
             ctrl.Delete();
             CtrlItems.Remove(ctrl);
