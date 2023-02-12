@@ -19,9 +19,7 @@ namespace SWD4CS
             List<string> lstSuspend = new();
             List<string> lstResume = new();
             string space = "";
-
-            if (fileInfo.source_base[0].IndexOf(";") == -1) { space = space.PadLeft(8); }
-            else { space = space.PadLeft(4); }
+            space = !fileInfo.source_base[0].Contains(";") ? space.PadLeft(8) : space.PadLeft(4);
 
             source = Create_Code_Instance(source, space);
             source = Create_Code_Suspend_Resume(source, lstSuspend, lstResume, space);
@@ -39,7 +37,7 @@ namespace SWD4CS
 
             source = Create_Code_EventDeclaration(source, space);
 
-            if (fileInfo.source_base[0].IndexOf(";") == -1) { source += "    }" + Environment.NewLine; }
+            if (!fileInfo.source_base[0].Contains(";")) { source += "    }" + Environment.NewLine; }
 
             source += "}" + Environment.NewLine;
             source += Environment.NewLine;
@@ -62,81 +60,56 @@ namespace SWD4CS
 
         private static string Create_Code_Suspend_Resume(string source, List<string> lstSuspend, List<string> lstResume, string space)
         {
+            string[] className_group1 = new string[] { "DataGridView", "PictureBox", "SplitContainer", "TrackBar" };
+            string[] className_group2 = new string[] { "GroupBox", "Panel", "StatusStrip", "TabControl", "TabPage", "FlowLayoutPanel", "TableLayoutPanel" };
+
             // Suspend & resume
-            for (int i = 0; i < userForm!.CtrlItems.Count; i++)
+            foreach (var item in userForm!.CtrlItems)
             {
-                source += space + "    this." + userForm.CtrlItems[i].ctrl!.Name + " = new System.Windows.Forms." + userForm.CtrlItems[i].className + "();" + Environment.NewLine;
+                source += $"{space}    this.{item.ctrl!.Name} = new System.Windows.Forms.{item.className}();{Environment.NewLine}";
 
-                List<string> className_group1 = new()
+                if (className_group1.Contains(item.className))
                 {
-                    "DataGridView",
-                    "PictureBox",
-                    "SplitContainer",
-                    "TrackBar"
-                };
-                for (int j = 0; j < className_group1.Count; j++)
-                {
-                    if (userForm.CtrlItems[i].className == className_group1[j])
-                    {
-                        lstSuspend.Add(space + "    ((System.ComponentModel.ISupportInitialize)(this." + userForm.CtrlItems[i].ctrl!.Name + ")).BeginInit();" + Environment.NewLine);
-                        lstResume.Add(space + "    ((System.ComponentModel.ISupportInitialize)(this." + userForm.CtrlItems[i].ctrl!.Name + ")).EndInit();" + Environment.NewLine);
-                    }
+                    lstSuspend.Add($"{space}    ((System.ComponentModel.ISupportInitialize)(this.{item.ctrl!.Name})).BeginInit();{Environment.NewLine}");
+                    lstResume.Add($"{space}    ((System.ComponentModel.ISupportInitialize)(this.{item.ctrl!.Name})).EndInit();{Environment.NewLine}");
                 }
-
-                List<string> className_group2 = new()
+                if (className_group2.Contains(item.className))
                 {
-                    "GroupBox",
-                    "Panel",
-                    "StatusStrip",
-                    "TabControl",
-                    "TabPage",
-                    "FlowLayoutPanel",
-                    "TableLayoutPanel"
-                };
-                for (int j = 0; j < className_group2.Count; j++)
-                {
-                    if (userForm.CtrlItems[i].className == className_group2[j])
-                    {
-                        lstSuspend.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".SuspendLayout();" + Environment.NewLine);
-                        lstResume.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".ResumeLayout(false);" + Environment.NewLine);
-                    }
+                    lstSuspend.Add($"{space}    this.{item.ctrl!.Name}.SuspendLayout();{Environment.NewLine}");
+                    lstResume.Add($"{space}    this.{item.ctrl!.Name}.ResumeLayout(false);{Environment.NewLine}");
                 }
-
-                if (userForm.CtrlItems[i].className == "SplitContainer")
+                if (item.className == "SplitContainer")
                 {
-                    lstSuspend.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".Panel1.SuspendLayout();" + Environment.NewLine);
-                    lstSuspend.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".Panel2.SuspendLayout();" + Environment.NewLine);
-                    lstSuspend.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".SuspendLayout();" + Environment.NewLine);
-                    lstResume.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".Panel1.ResumeLayout(false);" + Environment.NewLine);
-                    lstResume.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".Panel2.ResumeLayout(false);" + Environment.NewLine);
-                    lstResume.Add(space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".ResumeLayout(false);" + Environment.NewLine);
+                    lstSuspend.Add($"{space}    this.{item.ctrl!.Name}.Panel1.SuspendLayout();{Environment.NewLine}");
+                    lstSuspend.Add($"{space}    this.{item.ctrl!.Name}.Panel2.SuspendLayout();{Environment.NewLine}");
+                    lstSuspend.Add($"{space}    this.{item.ctrl!.Name}.SuspendLayout();{Environment.NewLine}");
+                    lstResume.Add($"{space}    this.{item.ctrl!.Name}.Panel1.ResumeLayout(false);{Environment.NewLine}");
+                    lstResume.Add($"{space}    this.{item.ctrl!.Name}.Panel2.ResumeLayout(false);{Environment.NewLine}");
+                    lstResume.Add($"{space}    this.{item.ctrl!.Name}.ResumeLayout(false);{Environment.NewLine}");
                 }
             }
-            lstSuspend.Add(space + "    this.SuspendLayout();" + Environment.NewLine);
-            lstResume.Add(space + "    this.ResumeLayout(false);" + Environment.NewLine);
+            lstSuspend.Add($"{space}    this.SuspendLayout();{Environment.NewLine}");
+            lstResume.Add($"{space}    this.ResumeLayout(false);{Environment.NewLine}");
             return source;
         }
 
         private static string Create_Code_Property(string source, string space)
         {
-            // Property
             for (int i = 0; i < userForm!.CtrlItems.Count; i++)
             {
                 string memCode = "";
-                source += space + "    //" + Environment.NewLine;
-                source += space + "    // " + userForm.CtrlItems[i].ctrl!.Name + Environment.NewLine;
-                source += space + "    //" + Environment.NewLine;
+                Control ctrl = userForm.CtrlItems[i].ctrl!;
+                Component comp = userForm.CtrlItems[i].nonCtrl!;
+                Type ctlType = comp.GetType() == typeof(Component) ? ctrl.GetType() : comp.GetType();
+
+                source += $"{space}    //{Environment.NewLine}" +
+                          $"{space}    // {ctrl.Name}{Environment.NewLine}" +
+                          $"{space}    //{Environment.NewLine}";
                 source = Create_Code_AddControl(source, space, i);
-
-                // Property
-                Type? ctlType = userForm.CtrlItems[i].nonCtrl!.GetType();
-
-                if (ctlType == typeof(Component)) { ctlType = userForm.CtrlItems[i].ctrl!.GetType(); }
-                else { ctlType = userForm.CtrlItems[i].nonCtrl!.GetType(); }
 
                 foreach (PropertyInfo item in ctlType.GetProperties())
                 {
-                    if (HideProperty(item.Name))
+                    if (!IsReadOnlyProperty(item) && HideProperty(item.Name))
                     {
                         Get_Code_Property(ref source, ref memCode, item, userForm.CtrlItems[i], space);
                     }
@@ -150,28 +123,26 @@ namespace SWD4CS
         private static string Create_Code_FormProperty(string source, string space)
         {
             // form-property
-            source += space + "    //" + Environment.NewLine;
-            source += space + "    // form" + Environment.NewLine;
-            source += space + "    //" + Environment.NewLine;
+            source += $"{space} //{Environment.NewLine}" +
+                      $"{space} // form{Environment.NewLine}" +
+                      $"{space} //{Environment.NewLine}";
 
-            foreach (PropertyInfo item in userForm!.GetType().GetProperties())
+            Type formType = typeof(Form);
+            var formProperties = userForm!.GetType().GetProperties().Where(prop => !IsReadOnlyProperty(prop) && HideProperty(prop.Name));
+
+            foreach (PropertyInfo item in formProperties)
             {
-                if (HideProperty(item.Name))
+                object? userFormValue = item.GetValue(userForm);
+                object? baseFormValue = item.GetValue(new Form());
+
+                if (userFormValue != null && baseFormValue != null && userFormValue.ToString() != baseFormValue.ToString())
                 {
-                    Control? baseForm = new Form();
+                    string str1 = $"{space}    this.{item.Name}";
+                    string strProperty = Property2String(userForm, item);
 
-                    if (item.GetValue(userForm) != null && item.GetValue(baseForm) != null)
+                    if (!string.IsNullOrEmpty(strProperty) && item.Name != "Name" && item.Name != "Location")
                     {
-                        if (item.GetValue(userForm)!.ToString() != item.GetValue(baseForm)!.ToString())
-                        {
-                            string str1 = space + "    this." + item.Name;
-                            string strProperty = Property2String(userForm, item);
-
-                            if (strProperty != "" && item.Name != "Name" && item.Name != "Location")
-                            {
-                                source += str1 + strProperty + Environment.NewLine;
-                            }
-                        }
+                        source += str1 + strProperty + Environment.NewLine;
                     }
                 }
             }
@@ -179,34 +150,37 @@ namespace SWD4CS
             return source;
         }
 
+        private static bool IsReadOnlyProperty(PropertyInfo item)
+        {
+            var attributes = item.GetCustomAttributes(typeof(ReadOnlyAttribute), false);
+            return attributes.Length > 0;
+        }
+
         private static string Create_Code_FormAddControl(string source, string space)
         {
             // AddControl
-            for (int i = 0; i < userForm!.CtrlItems.Count; i++)
+            foreach (var ctrlItem in userForm!.CtrlItems.Where(i => i.ctrl!.Parent == userForm))
             {
-                if (userForm.CtrlItems[i].ctrl!.Parent == userForm)
-                {
-                    source += space + "    this.Controls.Add(this." + userForm.CtrlItems[i].ctrl!.Name + ");" + Environment.NewLine;
-                }
+                source += $"{space}    this.Controls.Add(this.{ctrlItem.ctrl!.Name});{Environment.NewLine}";
             }
             return source;
         }
 
         private static string Create_Code_EventDeclaration(string source, string space)
         {
-            source += space + "}" + Environment.NewLine;
-            source += Environment.NewLine;
-            source += space + "#endregion" + Environment.NewLine;
-            source += Environment.NewLine;
+            source += $"{space}}} {Environment.NewLine}" +
+                      $"{Environment.NewLine}" +
+                      $"{space}#endregion {Environment.NewLine}" +
+                      $"{Environment.NewLine}";
 
             // declaration
-            for (int i = 0; i < userForm!.CtrlItems.Count; i++)
+            foreach (var ctrlItem in userForm!.CtrlItems)
             {
-                string dec = "";
-                Type type = userForm.CtrlItems[i].nonCtrl!.GetType();
-                if (type == typeof(Component)) { dec = userForm.CtrlItems[i].ctrl!.GetType().ToString(); }
-                else { dec = userForm.CtrlItems[i].nonCtrl!.GetType().ToString(); }
-                source += space + "private " + dec + " " + userForm.CtrlItems[i].ctrl!.Name + ";" + Environment.NewLine;
+                Type type = ctrlItem.nonCtrl!.GetType();
+                string typeName1 = ctrlItem.ctrl!.GetType().ToString();
+                string typeName2 = ctrlItem.nonCtrl!.GetType().ToString();
+                string dec = type == typeof(Component) ? typeName1 : typeName2;
+                source += $"{space}private {dec} {ctrlItem.ctrl!.Name};{Environment.NewLine}";
             }
             return source;
         }
@@ -218,22 +192,22 @@ namespace SWD4CS
             {
                 for (int j = 0; j < userForm.CtrlItems[i].decFunc.Count; j++)
                 {
-                    source += "//" + userForm.CtrlItems[i].decFunc[j] + Environment.NewLine;
-                    source += "//{" + Environment.NewLine;
-                    source += "//" + Environment.NewLine;
-                    source += "//}" + Environment.NewLine;
-                    source += Environment.NewLine;
+                    source += $"// {userForm.CtrlItems[i].decFunc[j]}{Environment.NewLine}" +
+                              $"// {{{Environment.NewLine}" +
+                              $"// {Environment.NewLine}" +
+                              $"// }}{Environment.NewLine}" +
+                              Environment.NewLine;
                 }
             }
 
             // form
-            for (int i = 0; i < userForm.decFunc.Count; i++)
+            foreach (string decFunc in userForm.decFunc)
             {
-                source += "//" + userForm.decFunc[i] + Environment.NewLine;
-                source += "//{" + Environment.NewLine;
-                source += "//" + Environment.NewLine;
-                source += "//}" + Environment.NewLine;
-                source += Environment.NewLine;
+                source += $"// {decFunc}{Environment.NewLine}" +
+                          "// {" + Environment.NewLine +
+                          "//" + Environment.NewLine +
+                          "// }" + Environment.NewLine +
+                          Environment.NewLine;
             }
             return source;
         }
@@ -241,21 +215,25 @@ namespace SWD4CS
         private static string Create_Code_AddControl(string source, string space, int i)
         {
             // AddControl
-            for (int j = 0; j < userForm!.CtrlItems.Count; j++)
+            Control ctrl1 = userForm!.CtrlItems[i].ctrl!;
+
+            for (int j = 0; j < userForm.CtrlItems.Count; j++)
             {
-                if (userForm.CtrlItems[i].ctrl!.Name == userForm.CtrlItems[j].ctrl!.Parent!.Name)
+                Control ctrl2 = userForm.CtrlItems[j].ctrl!;
+
+                if (ctrl1!.Name == ctrl2!.Parent!.Name)
                 {
-                    source += space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".Controls.Add(this." + userForm.CtrlItems[j].ctrl!.Name + ");" + Environment.NewLine;
+                    source += $"{space}    this.{ctrl1.Name}.Controls.Add(this.{ctrl2.Name});{Environment.NewLine}";
                 }
-                else if (userForm.CtrlItems[i].ctrl!.Name == userForm.CtrlItems[j].ctrl!.Parent!.Parent!.Name)
+                else if (ctrl1.Name == ctrl2.Parent!.Parent!.Name)
                 {
-                    if (userForm.CtrlItems[j].ctrl!.Parent!.Name.IndexOf("Panel1") > -1)
+                    if (ctrl2.Parent!.Name.Contains("Panel1"))
                     {
-                        source += space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".Panel1.Controls.Add(this." + userForm.CtrlItems[j].ctrl!.Name + ");" + Environment.NewLine;
+                        source += $"{space}    this.{ctrl1.Name}.Panel1.Controls.Add(this.{ctrl2.Name});{Environment.NewLine}";
                     }
-                    else if (userForm.CtrlItems[j].ctrl!.Parent!.Name.IndexOf("Panel2") > -1)
+                    else if (ctrl2.Parent!.Name.Contains("Panel2"))
                     {
-                        source += space + "    this." + userForm.CtrlItems[i].ctrl!.Name + ".Panel2.Controls.Add(this." + userForm.CtrlItems[j].ctrl!.Name + ");" + Environment.NewLine;
+                        source += $"{space}    this.{ctrl1!.Name}.Panel2.Controls.Add(this.{ctrl2.Name});{Environment.NewLine}";
                     }
                 }
             }
@@ -264,24 +242,20 @@ namespace SWD4CS
 
         private static void Get_Code_Property(ref string source, ref string memCode, PropertyInfo item, cls_controls ctrlItems, string space)
         {
-            Component? comp;
-            Component? baseCtrl;
-            if (ctrlItems.nonCtrl!.GetType() == typeof(Component)) { comp = ctrlItems.ctrl; }
-            else { comp = ctrlItems.nonCtrl; }
-            baseCtrl = GetBaseCtrl(ctrlItems);
+            Component? comp = (ctrlItems.nonCtrl!.GetType() == typeof(Component)) ? ctrlItems.ctrl : ctrlItems.nonCtrl;
+            Component? baseCtrl = GetBaseCtrl(ctrlItems);
 
             if (item.GetValue(comp) == null || item.GetValue(baseCtrl) == null) { return; }
-            if (item.GetValue(comp)!.ToString() != item.GetValue(baseCtrl)!.ToString())
-            {
-                string str1 = space + "    this." + ctrlItems.ctrl!.Name + "." + item.Name;
-                string strProperty = Property2String(comp!, item);
-                if (strProperty != "")
-                {
-                    bool flag = item.Name != "SplitterDistance" && item.Name != "Anchor";
-                    if (flag) { source += str1 + strProperty + Environment.NewLine; }
-                    else { memCode += str1 + strProperty + Environment.NewLine; }
-                }
-            }
+            if (item.GetValue(comp)!.ToString() == item.GetValue(baseCtrl)!.ToString()) { return; }
+
+            string str1 = space + "    this." + ctrlItems.ctrl!.Name + "." + item.Name;
+            string strProperty = Property2String(comp!, item);
+
+            if (strProperty == "") { return; }
+
+            bool flag = item.Name != "SplitterDistance" && item.Name != "Anchor";
+            if (flag) { source += str1 + strProperty + Environment.NewLine; }
+            else { memCode += str1 + strProperty + Environment.NewLine; }
         }
 
         private static string Create_Code_EventsDec(string source, string space, cls_controls cls_ctrl)
@@ -320,88 +294,73 @@ namespace SWD4CS
             }
             return strProperty;
         }
+
         private static string Property2String(Component ctrl, PropertyInfo item)
         {
-            string strProperty = "";
-            Type type = item.GetValue(ctrl)!.GetType();
-            string str2 = item.GetValue(ctrl)!.ToString()!;
+            object value = item.GetValue(ctrl)!;
+            if (value == null) { return ""; }
 
-            // Console.WriteLine(item.Name);
-            // Console.WriteLine(type);
-
-            switch (type)
+            Type type = value.GetType();
+            switch (type.Name)
             {
-                case Type t when t == typeof(System.Drawing.Point):
-                    Point point = (Point)item.GetValue(ctrl)!;
-                    strProperty = " = new " + type.ToString() + "(" + point.X + "," + point.Y + ");";
-                    break;
-                case Type t when t == typeof(System.Drawing.Size):
-                    Size size = (Size)item.GetValue(ctrl)!;
-                    strProperty = " = new " + type.ToString() + "(" + size.Width + "," + size.Height + ");";
-                    break;
-                case Type t when t == typeof(System.String):
-                    strProperty = " =  " + "\"" + str2 + "\";";
-                    break;
-                case Type t when t == typeof(System.Boolean):
-                    strProperty = " =  " + str2.ToLower() + ";";
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.AnchorStyles):
-                    strProperty = AnchorStyles2String(item.GetValue(ctrl));
-                    break;
-                case Type t when t == typeof(System.Int32):
-                    strProperty = " = " + int.Parse(str2) + ";";
-                    break;
-                case Type t when t == typeof(System.Windows.Forms.DockStyle) ||
-                                 t == typeof(System.Drawing.ContentAlignment) ||
-                                 t == typeof(System.Windows.Forms.ScrollBars) ||
-                                 t == typeof(System.Windows.Forms.HorizontalAlignment) ||
-                                 t == typeof(System.Windows.Forms.FormWindowState) ||
-                                 t == typeof(System.Windows.Forms.FixedPanel) ||
-                                 t == typeof(System.Windows.Forms.PictureBoxSizeMode) ||
-                                 t == typeof(System.Windows.Forms.View) ||
-                                 t == typeof(System.Windows.Forms.Orientation) ||
-                                 t == typeof(System.Windows.Forms.FormBorderStyle) ||
-                                 t == typeof(System.Windows.Forms.AutoScaleMode) ||
-                                 t == typeof(System.Windows.Forms.TableLayoutPanelCellBorderStyle) ||
-                                 t == typeof(System.Windows.Forms.FormStartPosition):
-
-                    strProperty = " = " + type.ToString() + "." + str2 + ";";
-                    break;
-                case Type t when t == typeof(System.Drawing.Color):
-                    strProperty = " = " + Property2Color(str2) + ";";
-                    break;
-                case Type t when t == typeof(System.Drawing.Font):
+                case nameof(System.Drawing.Point):
+                    Point point = (Point)value;
+                    return $" = new {type}({point.X},{point.Y});";
+                case nameof(System.Drawing.Size):
+                    Size size = (Size)value;
+                    return $" = new {type}({size.Width},{size.Height});";
+                case nameof(System.String):
+                    return $" =  \"{value}\";";
+                case nameof(System.Boolean):
+                    return $" =  {value.ToString()!.ToLower()};";
+                case nameof(System.Windows.Forms.AnchorStyles):
+                    return AnchorStyles2String(value);
+                case nameof(System.Int32):
+                    return $" = {(int)value};";
+                case nameof(System.Drawing.Color):
+                    return $" = {Property2Color(value.ToString()!)};";
+                case nameof(System.Drawing.Font):
                     Control ctl = (Control)ctrl;
-                    strProperty = " = " + Property2Font(ctl.Font) + ";";
-                    break;
+                    return $" = {Property2Font(ctl.Font)};";
+                case nameof(System.Windows.Forms.DockStyle):
+                case nameof(System.Drawing.ContentAlignment):
+                case nameof(System.Windows.Forms.ScrollBars):
+                case nameof(System.Windows.Forms.HorizontalAlignment):
+                case nameof(System.Windows.Forms.FormWindowState):
+                case nameof(System.Windows.Forms.FixedPanel):
+                case nameof(System.Windows.Forms.PictureBoxSizeMode):
+                case nameof(System.Windows.Forms.View):
+                case nameof(System.Windows.Forms.Orientation):
+                case nameof(System.Windows.Forms.FormBorderStyle):
+                case nameof(System.Windows.Forms.AutoScaleMode):
+                case nameof(System.Windows.Forms.TableLayoutPanelCellBorderStyle):
+                case nameof(System.Windows.Forms.FormStartPosition):
+                    return $" = {type}.{value};";
             }
-            return strProperty;
+            return "";
         }
 
         private static Component? GetBaseCtrl(cls_controls ctrl)
         {
-            Type type;
-            if (ctrl.nonCtrl!.GetType() == typeof(Component)) { type = ctrl.ctrl!.GetType(); }
-            else { type = ctrl.nonCtrl!.GetType(); }
-            Component? baseCtrl = (Component)Activator.CreateInstance(type)!;
-            return baseCtrl;
+            Type type = ctrl.nonCtrl!.GetType() == typeof(Component) ? ctrl.ctrl!.GetType() : ctrl.nonCtrl.GetType();
+            return (Component)Activator.CreateInstance(type)!;
         }
 
         private static bool HideProperty(string itemName)
         {
             List<string> propertyName = new()
             {
-                "AccessibilityObject",
-                "BindingContext",
-                "Parent",
-                "TopLevelControl",
-                "DataSource",
-                "FirstDisplayedCell",
-                "Item",
-                "TopItem",
-                "Rtf",
-                "ParentForm",
-                "SelectedTab",
+                // "AccessibilityObject",
+                // "BindingContext",
+                // "Parent",
+                // "TopLevelControl",
+                // "DataSource",
+                // "FirstDisplayedCell",
+                // "Item",
+                // "TopItem",
+                // "Rtf",
+                // "ParentForm",
+                // "SelectedTab",
                 "Top",
                 "Left",
                 "Right",
@@ -413,276 +372,240 @@ namespace SWD4CS
                 "IsHandleCreated",
                 "PreferredSize",
                 "Visible",
-                "Enable",
+                // "Enable",
                 "ClientSize",
                 "UseVisualStyleBackColor",
                 "PreferredHeight",
-                "ColumnCount",
-                "FirstDisplayedScrollingColumnIndex",
-                "FirstDisplayedScrollingRowIndex",
-                "NewRowIndex",
+                // "ColumnCount",
+                // "FirstDisplayedScrollingColumnIndex",
+                // "FirstDisplayedScrollingRowIndex",
+                // "NewRowIndex",
                 "RowCount",
                 "HasChildren",
                 "PreferredWidth",
-                "SingleMonthSize",
+                // "SingleMonthSize",
                 "TextLength",
-                "SelectedIndex",
+                // "SelectedIndex",
                 "TabCount",
                 "VisibleCount",
                 "DesktopLocation",
                 "AutoScale",
-                "CanFocus",
-                "IsMirrored",
-                "SelectionStart",
+                // "CanFocus",
+                // "IsMirrored",
+                // "SelectionStart",
                 "ContextMenuDefaultLocation",
-                "CanUndo",
+                // "CanUndo",
                 "CompanyName",
                 "ProductName",
                 "ProductVersion",
                 "TopLevel",
-                "Tag",
-                "Site",
-                "Container",
-                "",
-                "",
+                // "Tag",
+                // "Site",
+                // "Container",
+                "Name",
+                ""
             };
-
-            for (int i = 0; i < propertyName.Count; i++)
-            {
-                if (propertyName[i] == itemName) { return false; }
-            }
-            return true;
+            return !propertyName.Contains(itemName);
         }
+
+        private static readonly string[] SystemColorName = new string[]
+        {
+            "ActiveBorder",
+            "ActiveCaption",
+            "ActiveCaptionText",
+            "AppWorkspace",
+            "ButtonFace",
+            "ButtonHighlight",
+            "ButtonShadow",
+            "Control",
+            "ControlDark",
+            "ControlDarkDark",
+            "ControlLight",
+            "ControlLightLight",
+            "ControlText",
+            "Desktop",
+            "GradientActiveCaption",
+            "GradientInactiveCaption",
+            "GrayText",
+            "Highlight",
+            "HighlightText",
+            "HotTrack",
+            "InactiveBorder",
+            "InactiveCaption",
+            "InactiveCaptionText",
+            "Info",
+            "InfoText",
+            "Menu",
+            "MenuBar",
+            "MenuHighlight",
+            "MenuText",
+            "ScrollBar",
+            "Window",
+            "WindowFrame",
+            "WindowText",
+        };
+
+        private static readonly string[] ColorName = new string[]
+        {
+            "Black",
+            "DimGray",
+            "Gray",
+            "DarkGray",
+            "Silver",
+            "LightGray",
+            "Gainsboro",
+            "WhiteSmoke",
+            "White",
+            "RosyBrown",
+            "IndianRed",
+            "Brown",
+            "Firebrick",
+            "LightCoral",
+            "Maroon",
+            "DarkRed",
+            "Red",
+            "Snow",
+            "MistyRose",
+            "Salmon",
+            "Tomato",
+            "DarkSalmon",
+            "Coral",
+            "OrangeRed",
+            "LightSalmon",
+            "Sienna",
+            "SeaShell",
+            "Chocolate",
+            "SaddleBrown",
+            "SandyBrown",
+            "PeachPuff",
+            "Peru",
+            "Linen",
+            "Bisque",
+            "DarkOrange",
+            "BurlyWood",
+            "Tan",
+            "AntiqueWhite",
+            "NavajoWhite",
+            "BlanchedAlmond",
+            "PapayaWhip",
+            "Moccasin",
+            "Orange",
+            "Wheat",
+            "OldLace",
+            "FloralWhite",
+            "DarkGoldenrod",
+            "Goldenrod",
+            "Cornsilk",
+            "Gold",
+            "Khaki",
+            "LemonChiffon",
+            "PaleGoldenrod",
+            "DarkKhaki",
+            "Beige",
+            "LightGoldenrodYellow",
+            "Olive",
+            "Yellow",
+            "LightYellow",
+            "Ivory",
+            "OliveDrab",
+            "YellowGreen",
+            "DarkOliveGreen",
+            "GreenYellow",
+            "Chartreuse",
+            "LawnGreen",
+            "DarkSeaGreen",
+            "ForestGreen",
+            "LimeGreen",
+            "LightGreen",
+            "PaleGreen",
+            "DarkGreen",
+            "Green",
+            "Lime",
+            "Honeydew",
+            "SeaGreen",
+            "MediumSeaGreen",
+            "SpringGreen",
+            "MintCream",
+            "MediumSpringGreen",
+            "MediumAquamarine",
+            "Aquamarine",
+            "Turquoise",
+            "LightSeaGreen",
+            "MediumTurquoise",
+            "DarkSlateGray",
+            "PaleTurquoise",
+            "Teal",
+            "DarkCyan",
+            "Cyan",
+            "Aqua",
+            "LightCyan",
+            "Azure",
+            "DarkTurquoise",
+            "CadetBlue",
+            "PowderBlue",
+            "LightBlue",
+            "DeepSkyBlue",
+            "SkyBlue",
+            "LightSkyBlue",
+            "SteelBlue",
+            "AliceBlue",
+            "DodgerBlue",
+            "SlateGray",
+            "LightSlateGray",
+            "LightSteelBlue",
+            "CornflowerBlue",
+            "RoyalBlue",
+            "MidnightBlue",
+            "Lavender",
+            "Navy",
+            "DarkBlue",
+            "MediumBlue",
+            "Blue",
+            "GhostWhite",
+            "SlateBlue",
+            "DarkSlateBlue",
+            "MediumSlateBlue",
+            "MediumPurple",
+            "BlueViolet",
+            "Indigo",
+            "DarkOrchid",
+            "DarkViolet",
+            "MediumOrchid",
+            "Thistle",
+            "Plum",
+            "Violet",
+            "Purple",
+            "DarkMagenta",
+            "Fuchsia",
+            "Magenta",
+            "Orchid",
+            "MediumVioletRed",
+            "DeepPink",
+            "HotPink",
+            "LavenderBlush",
+            "PaleVioletRed",
+            "Crimson",
+        };
 
         private static string Property2Color(string color)
         {
-            List<string> systemColorName = new()
-            {
-                "ActiveBorder",
-                "ActiveCaption",
-                "ActiveCaptionText",
-                "AppWorkspace",
-                "ButtonFace",
-                "ButtonHighlight",
-                "ButtonShadow",
-                "Control",
-                "ControlDark",
-                "ControlDarkDark",
-                "ControlLight",
-                "ControlLightLight",
-                "ControlText",
-                "Desktop",
-                "GradientActiveCaption",
-                "GradientInactiveCaption",
-                "GrayText",
-                "Highlight",
-                "HighlightText",
-                "HotTrack",
-                "InactiveBorder",
-                "InactiveCaption",
-                "InactiveCaptionText",
-                "Info",
-                "InfoText",
-                "Menu",
-                "MenuBar",
-                "MenuHighlight",
-                "MenuText",
-                "ScrollBar",
-                "Window",
-                "WindowFrame",
-                "WindowText",
-            };
-
-            List<string> colorName = new()
-            {
-                "Black",
-                "DimGray",
-                "Gray",
-                "DarkGray",
-                "Silver",
-                "LightGray",
-                "Gainsboro",
-                "WhiteSmoke",
-                "White",
-                "RosyBrown",
-                "IndianRed",
-                "Brown",
-                "Firebrick",
-                "LightCoral",
-                "Maroon",
-                "DarkRed",
-                "Red",
-                "Snow",
-                "MistyRose",
-                "Salmon",
-                "Tomato",
-                "DarkSalmon",
-                "Coral",
-                "OrangeRed",
-                "LightSalmon",
-                "Sienna",
-                "SeaShell",
-                "Chocolate",
-                "SaddleBrown",
-                "SandyBrown",
-                "PeachPuff",
-                "Peru",
-                "Linen",
-                "Bisque",
-                "DarkOrange",
-                "BurlyWood",
-                "Tan",
-                "AntiqueWhite",
-                "NavajoWhite",
-                "BlanchedAlmond",
-                "PapayaWhip",
-                "Moccasin",
-                "Orange",
-                "Wheat",
-                "OldLace",
-                "FloralWhite",
-                "DarkGoldenrod",
-                "Goldenrod",
-                "Cornsilk",
-                "Gold",
-                "Khaki",
-                "LemonChiffon",
-                "PaleGoldenrod",
-                "DarkKhaki",
-                "Beige",
-                "LightGoldenrodYellow",
-                "Olive",
-                "Yellow",
-                "LightYellow",
-                "Ivory",
-                "OliveDrab",
-                "YellowGreen",
-                "DarkOliveGreen",
-                "GreenYellow",
-                "Chartreuse",
-                "LawnGreen",
-                "DarkSeaGreen",
-                "ForestGreen",
-                "LimeGreen",
-                "LightGreen",
-                "PaleGreen",
-                "DarkGreen",
-                "Green",
-                "Lime",
-                "Honeydew",
-                "SeaGreen",
-                "MediumSeaGreen",
-                "SpringGreen",
-                "MintCream",
-                "MediumSpringGreen",
-                "MediumAquamarine",
-                "Aquamarine",
-                "Turquoise",
-                "LightSeaGreen",
-                "MediumTurquoise",
-                "DarkSlateGray",
-                "PaleTurquoise",
-                "Teal",
-                "DarkCyan",
-                "Cyan",
-                "Aqua",
-                "LightCyan",
-                "Azure",
-                "DarkTurquoise",
-                "CadetBlue",
-                "PowderBlue",
-                "LightBlue",
-                "DeepSkyBlue",
-                "SkyBlue",
-                "LightSkyBlue",
-                "SteelBlue",
-                "AliceBlue",
-                "DodgerBlue",
-                "SlateGray",
-                "LightSlateGray",
-                "LightSteelBlue",
-                "CornflowerBlue",
-                "RoyalBlue",
-                "MidnightBlue",
-                "Lavender",
-                "Navy",
-                "DarkBlue",
-                "MediumBlue",
-                "Blue",
-                "GhostWhite",
-                "SlateBlue",
-                "DarkSlateBlue",
-                "MediumSlateBlue",
-                "MediumPurple",
-                "BlueViolet",
-                "Indigo",
-                "DarkOrchid",
-                "DarkViolet",
-                "MediumOrchid",
-                "Thistle",
-                "Plum",
-                "Violet",
-                "Purple",
-                "DarkMagenta",
-                "Fuchsia",
-                "Magenta",
-                "Orchid",
-                "MediumVioletRed",
-                "DeepPink",
-                "HotPink",
-                "LavenderBlush",
-                "PaleVioletRed",
-                "Crimson",
-            };
-
             color = color.Replace("Color [", "").Replace("]", "");
-            string? strSystemColor = "System.Drawing.SystemColors.";
-            string? strColor = "System.Drawing.Color.";
-            string? strRGB = "System.Drawing.Color.FromArgb(";
-
             if (color == "Transparent") { return "Color.Transparent"; }
 
-            for (int i = 0; i < systemColorName.Count; i++)
-            {
-                if (systemColorName[i] == color) { return strSystemColor + color; }
-            }
+            int index = Array.IndexOf(SystemColorName, color);
+            if (index >= 0) { return $"System.Drawing.SystemColors.{color}"; }
 
-            for (int i = 0; i < colorName.Count; i++)
-            {
-                if (colorName[i] == color) { return strColor + color; }
-            }
+            index = Array.IndexOf(ColorName, color);
+            if (index >= 0) { return $"System.Drawing.Color.{color}"; }
 
-            color = color.Replace("A", "").Replace("R", "").Replace("G", "").Replace("B", "").Replace("=", "");
-            string[] split = color.Split(",");
-            strRGB += split[1] + "," + split[2] + "," + split[3] + ")";
-            return strRGB;
+            string[] split = color.Split(new char[] { 'A', 'R', 'G', 'B', '=', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            return $"System.Drawing.Color.FromArgb({split[2]}, {split[4]}, {split[6]})";
         }
 
         private static string Property2Font(Font font)
         {
-            string[] split = font.ToString().Split(",");
-            string strSize = split[1].Replace("Size=", "").Trim() + "F, ";
-
-            string strStyle = "";
-            split = font.Style.ToString().Split(",");
-
-            if (split.Length == 1)
-            {
-                strStyle = string.Format("System.Drawing.FontStyle.{0}, System.Drawing.GraphicsUnit.Point)", split[0]);
-            }
-            else if (split.Length == 2)
-            {
-                strStyle = string.Format("((System.Drawing.FontStyle)((System.Drawing.FontStyle.{0} | System.Drawing.FontStyle.{1}))), System.Drawing.GraphicsUnit.Point)", split[0].Trim(), split[1].Trim());
-            }
-            else if (split.Length == 3)
-            {
-                strStyle = string.Format("((System.Drawing.FontStyle)(((System.Drawing.FontStyle.{0} | System.Drawing.FontStyle.{1}) | System.Drawing.FontStyle.{2}))), System.Drawing.GraphicsUnit.Point)", split[0].Trim(), split[1].Trim(), split[2].Trim());
-            }
-            else if (split.Length == 4)
-            {
-                strStyle = string.Format("((System.Drawing.FontStyle)((((System.Drawing.FontStyle.{0} | System.Drawing.FontStyle.{1})  | System.Drawing.FontStyle.{2}) | System.Drawing.FontStyle.{3}))), System.Drawing.GraphicsUnit.Point)", split[0].Trim(), split[1].Trim(), split[2].Trim(), split[3].Trim());
-            }
-
+            string strSize = font.Size + "F, ";
+            string strStyle = "System.Drawing.FontStyle." + font.Style.ToString() + ", System.Drawing.GraphicsUnit.Point)";
             string strProperty = "new System.Drawing.Font(\"" + font.Name + "\", " + strSize + strStyle;
             return strProperty;
         }
