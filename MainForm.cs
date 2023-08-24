@@ -96,6 +96,14 @@ public partial class MainForm : Form
 
     private void MainForm_KeyDown(object sender, KeyEventArgs e)
     {
+        if (e.Control && e.KeyCode == Keys.S){
+            designTab.SelectedIndex = 0;
+            designTab.SelectedIndex = 1;
+            designTab.SelectedIndex = 0;
+
+            if (sourceFileName != "") { cls_file.SaveAs(sourceFileName, sourceTxtBox.Text); }
+            else { cls_file.Save(sourceTxtBox.Text); }
+        }
         if (e.Alt && e.KeyCode == Keys.Delete && designTab.SelectedIndex == 0) { userForm!.RemoveSelectedItem(); }
     }
 
@@ -256,7 +264,7 @@ public partial class MainForm : Form
         // 
         this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
         this.saveToolStripMenuItem.Size = new System.Drawing.Size(128, 26);
-        this.saveToolStripMenuItem.Text = "Save";
+        this.saveToolStripMenuItem.Text = "Save (Ctrl+S)";
         this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
         // 
         // closeToolStripMenuItem
